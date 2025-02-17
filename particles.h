@@ -10,4 +10,12 @@ typedef struct {
   double m;
 } particle_t;
 
+typedef struct {
+  double x;
+  double y;
+  long long n_part;
+  long long c_part;
+  particle_t *par;
+} cell_t;
+
 #endif // __PARTICLES_H
