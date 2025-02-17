@@ -2,6 +2,9 @@
 #include "debug.h"
 #include "utils.h"
 #include "init_particles.h"
+#include <omp.h>
+#include <stdlib.h>
+
 
 int main(int argc, char* argv[]) {
   DEBUG("%d\n", argc);
@@ -46,5 +49,17 @@ int main(int argc, char* argv[]) {
   DEBUG("%lld, ", npart);
   DEBUG("%lld\n", nstep);
 
+  particle_t* par = malloc(npart*sizeof(particle_t));
+
+
+  double exec_time;
+  init_particles(seed, side, ncside, npart, par);
+  exec_time =-omp_get_wtime();
+  //simulation();
+  exec_time += omp_get_wtime();
+  fprintf(stderr, "%.1fs\n", exec_time);
+  //print_result();
+  free(par);
+  
   return 0;
 }
