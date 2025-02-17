@@ -1,5 +1,6 @@
 
 #include "init_particles.h"
+#include <math.h>
 
 unsigned int seed;
 void init_r4uni(int input_seed)

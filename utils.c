@@ -8,7 +8,7 @@
 bool cast_to_long(const char *str, long *out) {
   if (str == NULL || *str == '\0') return false;
 
-  char *endptr;
+  char *endptr = NULL;
   errno = 0;
   long val = strtol(str, &endptr, 10);
 
@@ -16,13 +16,12 @@ bool cast_to_long(const char *str, long *out) {
 
   *out = val;
   return true;
-
 }
 
 bool cast_to_long_long(const char *str, long long *out) {
   if (str == NULL || *str == '\0') return false;
 
-  char *endptr;
+  char *endptr = NULL;
   errno = 0;
   long long val = strtoll(str, &endptr, 10);
 
@@ -30,13 +29,12 @@ bool cast_to_long_long(const char *str, long long *out) {
 
   *out = val;
   return true;
-
 }
 
 bool cast_to_double(const char *str, double *out) {
   if (str == NULL || *str == '\0') return false;
 
-  char *endptr;
+  char *endptr = NULL;
   errno = 0;
   double val = strtod(str, &endptr);
   if (errno == ERANGE) return false;
