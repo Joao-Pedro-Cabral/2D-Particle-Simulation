@@ -4,6 +4,7 @@
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <vector>
 
 int main(int argc, char *argv[]) {
   DEBUG("%d\n", argc);
@@ -38,16 +39,16 @@ int main(int argc, char *argv[]) {
 
   DEBUG("%ld, %lf, %ld, %lld, %lld\n", seed, side, ncside, npart, nstep);
 
-  particle_t *par = malloc(npart * sizeof(particle_t));
+  std::vector<particle_t> par;
+  par.reserve(npart);
 
   double exec_time;
-  init_particles(seed, side, ncside, npart, par);
+  init_particles(seed, side, ncside, npart, par.data()); // .data() to provide C compatibility
   exec_time = -omp_get_wtime();
   // simulation();
   exec_time += omp_get_wtime();
   fprintf(stderr, "%.1fs\n", exec_time);
   // print_result();
-  free(par);
 
   return 0;
 }

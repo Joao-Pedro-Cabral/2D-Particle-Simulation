@@ -2,6 +2,8 @@
 #ifndef __PARTICLES_H
 #define __PARTICLES_H
 
+#include <vector>
+
 typedef struct {
   double x;
   double y;
@@ -13,9 +15,7 @@ typedef struct {
 typedef struct {
   double x;
   double y;
-  long long n_part;
-  long long c_part;
-  particle_t *par;
+  std::vector<particle_t> par;
 } cell_t;
 
 #endif // __PARTICLES_H
