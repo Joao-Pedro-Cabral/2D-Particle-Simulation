@@ -2,7 +2,6 @@
 #include "init_particles.h"
 #include "debug.h"
 #include <vector>
-#include <cmath>
 
 
 void particles_per_cell(double side, long ncside, long long n_part, const std::vector<particle_t>& par,
@@ -10,10 +9,7 @@ void particles_per_cell(double side, long ncside, long long n_part, const std::v
   double size = side / ncside;
 
   for (long long i = 0; i < n_part; i++) {
-    long xpart = par[i].x / size;
-    long ypart = par[i].y / size;
-    long ind = ypart * ncside + xpart;
-    cells[ind].par.push_back(par[i]);
+    cells[find_particle_cell(par[i], size, ncside)].par.push_back(par[i]);
   }
 }
 
@@ -30,61 +26,41 @@ void center_of_mass(double size, long ncside, long long n_part, std::vector<cell
       weighted_y += cells[i].par[j].m * cells[i].par[j].y;
     }
 
-    cells[i].m = total_mass;
+    cells[i].center.m = total_mass;
 
     if (total_mass > 0) {
-      cells[i].x = weighted_x / total_mass;
-      cells[i].y = weighted_y / total_mass;
+      cells[i].center.x = weighted_x / total_mass;
+      cells[i].center.y = weighted_y / total_mass;
     } else {
       DEBUG("Warning: Cell  %d has no particles. Setting default center of mass to (0.0, 0.0)", i);
-      cells[i].x = (i%ncside + 0.5)*size;  // Default if no particles exist in the cell
-      cells[i].y = (i/ncside + 0.5)*size;
+      cells[i].center.x = (i%ncside + 0.5)*size;  // Default if no particles exist in the cell
+      cells[i].center.y = (i/ncside + 0.5)*size;
     }
   }
 }
 
-void remove_and_swap(std::vector<cell_t>& cells, long i, long long j) {
-  long long last = cells[i].par.size() - 1;
-  cells[i].par[j].x = cells[i].par[last].x;
-  cells[i].par[j].y = cells[i].par[last].y;
-  cells[i].par[j].vx = cells[i].par[last].vx;
-  cells[i].par[j].vy = cells[i].par[last].vy;
-  cells[i].par[j].m = cells[i].par[last].m;
-  cells[i].par.resize(last);
-}
-
-void gravitational_force(double size, long ncside, long long n_part, std::vector<cell_t>& cells, std::vector<acc_t>& acc_vec) {
+void gravitational_force(double size, long ncside, long long n_part, std::vector<cell_t>& cells, std::vector<vec_t>& acc_vec) {
   long long l = 0;
   // TODO: WRAP!!!!!!!!!!!!!!!!!!!!!!!!!
   for (long i = 0; i < cells.size(); i++) {
     for (long long  j = 0; j < cells[i].par.size(); j++) {
-      double force_x = 0.0;
-      double force_y = 0.0;
+      double resultant_x = 0.0;
+      double resultant_y = 0.0;
       for(long long k = 0; k < cells[i].par.size(); k ++) {
-        if(k ==  j) continue;
-        double dx = cells[i].par[j].x - cells[i].par[k].x;
-        double dy = cells[i].par[j].y - cells[i].par[k].y;
-        double distance = dx * dx + dy * dy;
-        double hypotenuse = sqrt(distance);
-        double cos = dx/hypotenuse;
-        double sin = dy/hypotenuse;
-        force_x += cos*(G * cells[i].par[k].m * cells[i].par[j].m) / distance;
-        force_y += sin*(G * cells[i].par[k].m * cells[i].par[j].m) / distance;
+        if(k == j) continue;
+        vec_t force = compute_gravitacional_force(cells[i].par[j], cells[i].par[k]);
+        resultant_x += force.x;
+        resultant_y += force.y;
       }
       for(long long k = 0; k < 9; k ++) {
-        if(k ==  5) continue;
+        if(k == 5) continue;
         long long ind = i + ((k%3)-1) + (k/3-1)*ncside;
-        double dx = cells[i].par[j].x - cells[ind].x;
-        double dy = cells[i].par[j].y - cells[ind].y;
-        double distance = dx * dx + dy * dy;
-        double hypotenuse = sqrt(distance);
-        double cos = dx/hypotenuse;
-        double sin = dy/hypotenuse;
-        force_x += cos*(G * cells[ind].m * cells[i].par[j].m) / distance;
-        force_y += sin*(G * cells[ind].m * cells[i].par[j].m) / distance;
+        vec_t force = compute_gravitacional_force(cells[i].par[j], cells[ind].center);
+        resultant_x += force.x;
+        resultant_y += force.y;
       }
-      acc_vec[l].x = force_x/cells[i].par[j].m;
-      acc_vec[l].y = force_y/cells[i].par[j].m;
+      acc_vec[l].x = resultant_x/cells[i].par[j].m;
+      acc_vec[l].y = resultant_y/cells[i].par[j].m;
       l ++;
     }
   }
@@ -92,19 +68,14 @@ void gravitational_force(double size, long ncside, long long n_part, std::vector
   l = 0;
   for (long i = 0; i < cells.size(); i++) {
     for (long long  j = 0; j < cells[i].par.size(); j++) {
-      cells[i].par[j].x += cells[i].par[j].vx + 0.5*(DELTAT*DELTAT)*acc_vec[l].x;
-      cells[i].par[j].y += cells[i].par[j].vy + 0.5*(DELTAT*DELTAT)*acc_vec[l].y;
-      cells[i].par[j].vx += DELTAT*acc_vec[l].x;
-      cells[i].par[j].vy += DELTAT*acc_vec[l].y;
+      update_position_and_velocity(cells[i].par[j], acc_vec[l]);
       l ++;
     }
   }
 
   for (long i = 0; i < cells.size(); i++) {
     for (long long j = cells[i].par.size() - 1; j > 0; j--) {
-      long xpart = cells[i].par[j].x / size;
-      long ypart = cells[i].par[j].y / size;
-      long ind = ypart * ncside + xpart;
+      long ind = find_particle_cell(cells[i].par[j], size, ncside);
       if(ind == i) continue;
       cells[ind].par.push_back(cells[i].par[j]);
       remove_and_swap(cells, i, j);
@@ -118,10 +89,8 @@ long long detect_collisions(double side, long ncside, long long n_part, std::vec
   for (long i = 0; i < cells.size(); i++) {
     for (long long  j = 0; j < cells[i].par.size(); j++) {
       for(long long k = 0; k < cells[i].par.size(); k ++) {
-        if(k ==  j) continue;
-        double dx = cells[i].par[j].x - cells[i].par[k].x;
-        double dy = cells[i].par[j].y - cells[i].par[k].y;
-        double distance = dx * dx + dy * dy;
+        if(k == j) continue;
+        double distance = calculate_distance(cells[i].par[j], cells[i].par[k]);
         if(distance > DELTAT*DELTAT) continue;
         remove_and_swap(cells, i, j);
         remove_and_swap(cells, i, k);
