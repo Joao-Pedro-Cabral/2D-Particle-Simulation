@@ -32,13 +32,21 @@ double calc_distance(const particle_t &par1, const particle_t &par2) {
 
 void update_position_and_velocity(double side, particle_t &par,
                                   const vec_t &acc) {
-  par.x +=
-      fmod(par.vx + 0.5 * (DELTAT * DELTAT) * acc.x, side); // TODO: Check fmod
-  par.y += fmod(par.vy + 0.5 * (DELTAT * DELTAT) * acc.y, side);
+  par.x += par.vx + 0.5 * (DELTAT * DELTAT) * acc.x;
+  if (par.x > side)
+    par.x -= side;
+  if (par.x < 0)
+    par.x += side;
+  par.y += par.vy + 0.5 * (DELTAT * DELTAT) * acc.y;
+  if (par.y > side)
+    par.y -= side;
+  if (par.y < 0)
+    par.y += side;
   par.vx += DELTAT * acc.x;
   par.vy += DELTAT * acc.y;
 }
 
+// TODO: Maybe is -force
 vec_t calc_gravitacional_force(const particle_t &par1, const particle_t &par2) {
   vec_t force;
   double dx = par1.x - par2.x;

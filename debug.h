@@ -1,6 +1,9 @@
 
 #ifndef __DEBUG_H
 #define __DEBUG_H
+
+#include <stdio.h>
+#include <stdlib.h>
 #ifdef DEBUG_H
 #define DEBUG(str, ...) printf(str, ##__VA_ARGS__)
 #define ERROR(str, ...)                                                        \

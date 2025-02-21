@@ -8,9 +8,8 @@
 #include <vector>
 
 void print_result(const simulation_result &res) {
-  printf("%.3lf\n", res.particle_zero.x);
-  printf("%.3lf\n", res.particle_zero.y);
-  printf("%ld\n", res.number_of_collisions);
+  printf("%.3lf %.3lf\n", res.particle_zero.x, res.particle_zero.y);
+  printf("%lld\n", res.number_of_collisions);
 }
 
 int main(int argc, char *argv[]) {
