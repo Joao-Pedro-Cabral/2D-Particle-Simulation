@@ -42,7 +42,8 @@ int main(int argc, char *argv[]) {
   std::vector<particle_t> par(npart);
 
   double exec_time;
-  init_particles(seed, side, ncside, npart, par.data()); // .data() to provide C compatibility
+  init_particles(seed, side, ncside, npart,
+                 par.data()); // .data() to provide C compatibility
   exec_time = -omp_get_wtime();
   // simulation();
   exec_time += omp_get_wtime();

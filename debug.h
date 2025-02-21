@@ -5,7 +5,7 @@
 #define DEBUG(str, ...) printf(str, ##__VA_ARGS__)
 #define ERROR(str, ...)                                                        \
   do {                                                                         \
-    printf(str, ##__VA_ARGS__);                                 \
+    printf(str, ##__VA_ARGS__);                                                \
     exit(1);                                                                   \
   } while (0)
 #else
