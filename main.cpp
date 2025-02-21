@@ -1,10 +1,17 @@
 #include "debug.h"
 #include "init_particles.h"
+#include "parsim.h"
 #include "utils.h"
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
+
+void print_result(const simulation_result &res) {
+  printf("%.3lf\n", res.particle_zero.x);
+  printf("%.3lf\n", res.particle_zero.y);
+  printf("%ld\n", res.number_of_collisions);
+}
 
 int main(int argc, char *argv[]) {
   DEBUG("%d\n", argc);
@@ -45,10 +52,10 @@ int main(int argc, char *argv[]) {
   init_particles(seed, side, ncside, npart,
                  par.data()); // .data() to provide C compatibility
   exec_time = -omp_get_wtime();
-  // simulation();
+  simulation_result res = simulation(side, ncside, npart, nstep, par);
   exec_time += omp_get_wtime();
   fprintf(stderr, "%.1fs\n", exec_time);
-  // print_result();
+  print_result(res);
 
   return 0;
 }

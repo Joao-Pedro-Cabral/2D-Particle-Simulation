@@ -1,3 +1,4 @@
+#include "parsim.h"
 #include "debug.h"
 #include "init_particles.h"
 #include "particles.h"
@@ -114,16 +115,30 @@ long long detect_collisions(std::vector<cell_t> &cells) {
   return n_collisions;
 }
 
-void simulation(double side, long ncside, long long npart, long long nstep,
-                const std::vector<particle_t> &par) {
+particle_t find_particle_zero(std::vector<cell_t> &cells) {
+  for (long i = 0; i < cells.size(); i++) {
+    for (long long j = 0; j < cells[i].par.size(); j++) {
+      if (cells[i].par[j].ind == 0)
+        return cells[i].par[j];
+    }
+  }
+}
+
+simulation_result simulation(double side, long ncside, long long npart,
+                             long long nstep,
+                             const std::vector<particle_t> &par) {
   double size = side / ncside;
   std::vector<cell_t> cells(ncside);
   std::vector<vec_t> acc_vec(npart);
+  simulation_result res;
+  res.number_of_collisions = 0;
   fill_cells(size, ncside, npart, par, cells);
   for (long long i = 0; i < nstep; i++) {
     compute_centers_of_mass(size, ncside, cells);
     compute_accelerations(ncside, cells, acc_vec);
     compute_new_positions_and_velocities(size, ncside, cells, acc_vec);
-    detect_collisions(cells);
+    res.number_of_collisions += detect_collisions(cells);
   }
+  res.particle_zero = find_particle_zero(cells);
+  return res;
 }
