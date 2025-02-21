@@ -15,8 +15,13 @@ typedef struct {
 typedef struct {
   double x;
   double y;
-  double mass;
+  double m;
   std::vector<particle_t> par;
 } cell_t;
+
+typedef struct {
+  double x;
+  double y;
+} acc_t;
 
 #endif // __PARTICLES_H

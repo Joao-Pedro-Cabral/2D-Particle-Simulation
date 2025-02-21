@@ -30,7 +30,7 @@ void center_of_mass(double side, long ncside, long long n_part, std::vector<cell
       weighted_y += cells[i].par[j].m * cells[i].par[j].y;
     }
 
-    cells[i].mass = total_mass;
+    cells[i].m = total_mass;
 
     if (total_mass > 0) {
       cells[i].x = weighted_x / total_mass;
@@ -43,20 +43,50 @@ void center_of_mass(double side, long ncside, long long n_part, std::vector<cell
   }
 }
 
-void gravitational_force(double side, long ncside, long long n_part, std::vector<cell_t>& cells) {
-
+void gravitational_force(double side, long ncside, long long n_part, std::vector<cell_t>& cells, std::vector<acc_t>& acc_vec) {
+  long long l = 0;
   for (long long i = 0; i < cells.size(); i++) {
     for (long long  j = 0; j < cells[i].par.size(); j++) {
-      double force = 0.0;
+      double force_x = 0.0;
+      double force_y = 0.0;
       for(long long k = 0; k < cells[i].par.size(); k ++) {
         if(k ==  j) continue;
         double dx = cells[i].par[j].x - cells[i].par[k].x;
         double dy = cells[i].par[j].y - cells[i].par[k].y;
         double distance = dx * dx + dy * dy;
-        force += (G * cells[i].par[k].m * cells[i].par[j].m) / distance;
+        double hypotenuse = sqrt(distance);
+        double cos = dx/hypotenuse;
+        double sin = dy/hypotenuse;
+        force_x += cos*(G * cells[i].par[k].m * cells[i].par[j].m) / distance;
+        force_y += sin*(G * cells[i].par[k].m * cells[i].par[j].m) / distance;
       }
+      for(long long k = 0; k < 9; k ++) {
+        if(k ==  5) continue;
+        long long ind = i + ((k%3)-1) + (k/3-1)*ncside;
+        double dx = cells[i].par[j].x - cells[ind].x;
+        double dy = cells[i].par[j].y - cells[ind].y;
+        double distance = dx * dx + dy * dy;
+        double hypotenuse = sqrt(distance);
+        double cos = dx/hypotenuse;
+        double sin = dy/hypotenuse;
+        force_x += cos*(G * cells[ind].m * cells[i].par[j].m) / distance;
+        force_y += sin*(G * cells[ind].m * cells[i].par[j].m) / distance;
+      }
+      acc_vec[l].x = force_x/cells[i].par[j].m;
+      acc_vec[l].y = force_y/cells[i].par[j].m;
+      l ++;
     }
-    
+  }
+
+  l = 0;
+  for (long long i = 0; i < cells.size(); i++) {
+    for (long long  j = 0; j < cells[i].par.size(); j++) {
+      cells[i].par[j].x += cells[i].par[j].vx + 0.5*(DELTAT*DELTAT)*acc_vec[l].x;
+      cells[i].par[j].y += cells[i].par[j].vy + 0.5*(DELTAT*DELTAT)*acc_vec[l].y;
+      cells[i].par[j].vx += DELTAT*acc_vec[l].x;
+      cells[i].par[j].vy += DELTAT*acc_vec[l].y;
+      l ++;
+    }
   }
   
 }
