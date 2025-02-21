@@ -15,6 +15,7 @@ void copy_particle(particle_t & par1, const particle_t & par2) {
   par1.vx = par2.vx;
   par1.vy = par2.vy;
   par1.m = par2.m;
+  par1.ind = par2.ind;
 }
 
 void remove_and_swap(std::vector<cell_t>& cells, long i, long long j) {
