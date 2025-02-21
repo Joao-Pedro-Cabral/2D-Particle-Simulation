@@ -39,8 +39,7 @@ int main(int argc, char *argv[]) {
 
   DEBUG("%ld, %lf, %ld, %lld, %lld\n", seed, side, ncside, npart, nstep);
 
-  std::vector<particle_t> par;
-  par.reserve(npart);
+  std::vector<particle_t> par(npart);
 
   double exec_time;
   init_particles(seed, side, ncside, npart, par.data()); // .data() to provide C compatibility
