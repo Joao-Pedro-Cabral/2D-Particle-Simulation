@@ -24,21 +24,22 @@ void remove_and_swap(std::vector<cell_t> &cells, long i, long long j) {
   cells[i].par.resize(last);
 }
 
-double calculate_distance(const particle_t &par1, const particle_t &par2) {
+double calc_distance(const particle_t &par1, const particle_t &par2) {
   double dx = par1.x - par2.x;
   double dy = par1.y - par2.y;
   return dx * dx + dy * dy;
 }
 
-void update_position_and_velocity(particle_t &par, const vec_t &acc) {
-  par.x += par.vx + 0.5 * (DELTAT * DELTAT) * acc.x;
-  par.y += par.vy + 0.5 * (DELTAT * DELTAT) * acc.y;
+void update_position_and_velocity(double side, particle_t &par,
+                                  const vec_t &acc) {
+  par.x +=
+      fmod(par.vx + 0.5 * (DELTAT * DELTAT) * acc.x, side); // TODO: Check fmod
+  par.y += fmod(par.vy + 0.5 * (DELTAT * DELTAT) * acc.y, side);
   par.vx += DELTAT * acc.x;
   par.vy += DELTAT * acc.y;
 }
 
-vec_t compute_gravitacional_force(const particle_t &par1,
-                                  const particle_t &par2) {
+vec_t calc_gravitacional_force(const particle_t &par1, const particle_t &par2) {
   vec_t force;
   double dx = par1.x - par2.x;
   double dy = par1.y - par2.y;

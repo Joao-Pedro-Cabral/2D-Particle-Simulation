@@ -54,7 +54,7 @@ void compute_accelerations(long ncside, const std::vector<cell_t> &cells,
         if (k == j)
           continue;
         vec_t force =
-            compute_gravitacional_force(cells[i].par[j], cells[i].par[k]);
+            calc_gravitacional_force(cells[i].par[j], cells[i].par[k]);
         resultant_x += force.x;
         resultant_y += force.y;
       }
@@ -63,7 +63,7 @@ void compute_accelerations(long ncside, const std::vector<cell_t> &cells,
           continue;
         long long ind = i + ((k % 3) - 1) + (k / 3 - 1) * ncside;
         vec_t force =
-            compute_gravitacional_force(cells[i].par[j], cells[ind].center);
+            calc_gravitacional_force(cells[i].par[j], cells[ind].center);
         resultant_x += force.x;
         resultant_y += force.y;
       }
@@ -74,13 +74,13 @@ void compute_accelerations(long ncside, const std::vector<cell_t> &cells,
   }
 }
 
-void compute_new_positions_and_velocities(double size, long ncside,
+void compute_new_positions_and_velocities(double side, double size, long ncside,
                                           std::vector<cell_t> &cells,
                                           const std::vector<vec_t> &acc_vec) {
   long long l = 0;
   for (long i = 0; i < cells.size(); i++) {
     for (long long j = 0; j < cells[i].par.size(); j++) {
-      update_position_and_velocity(cells[i].par[j], acc_vec[l]);
+      update_position_and_velocity(side, cells[i].par[j], acc_vec[l]);
       l++;
     }
   }
@@ -103,7 +103,7 @@ long long detect_collisions(std::vector<cell_t> &cells) {
       for (long long k = 0; k < cells[i].par.size(); k++) {
         if (k == j)
           continue;
-        double distance = calculate_distance(cells[i].par[j], cells[i].par[k]);
+        double distance = calc_distance(cells[i].par[j], cells[i].par[k]);
         if (distance > DELTAT * DELTAT)
           continue;
         remove_and_swap(cells, i, j);
@@ -136,7 +136,7 @@ simulation_result simulation(double side, long ncside, long long npart,
   for (long long i = 0; i < nstep; i++) {
     compute_centers_of_mass(size, ncside, cells);
     compute_accelerations(ncside, cells, acc_vec);
-    compute_new_positions_and_velocities(size, ncside, cells, acc_vec);
+    compute_new_positions_and_velocities(side, size, ncside, cells, acc_vec);
     res.number_of_collisions += detect_collisions(cells);
   }
   res.particle_zero = find_particle_zero(cells);
