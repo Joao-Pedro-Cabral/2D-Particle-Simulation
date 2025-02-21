@@ -1,9 +1,12 @@
 #include "particles.h"
+#include "init_particles.h"
+#include "debug.h"
 #include <vector>
+#include <cmath>
 
-void center_of_mass(double side, long ncside, long long n_part, const std::vector<particle_t>& par,
-                    std::vector<cell_t>& cells) {
 
+void particles_per_cell(double side, long ncside, long long n_part, const std::vector<particle_t>& par,
+               std::vector<cell_t>& cells) {
   double size = side / ncside;
 
   for (long long i = 0; i < n_part; i++) {
@@ -12,4 +15,48 @@ void center_of_mass(double side, long ncside, long long n_part, const std::vecto
     long ind = ypart * ncside + xpart;
     cells[ind].par.push_back(par[i]);
   }
+}
+
+void center_of_mass(double side, long ncside, long long n_part, std::vector<cell_t>& cells) {
+
+  for (long long i = 0; i <cells.size(); i++) {
+    double total_mass = 0.0;
+    double weighted_x = 0.0;
+    double weighted_y = 0.0;
+
+    for (long long j = 0; j < cells[i].par.size(); j++){
+      total_mass += cells[i].par[j].m;
+      weighted_x += cells[i].par[j].m * cells[i].par[j].x;
+      weighted_y += cells[i].par[j].m * cells[i].par[j].y;
+    }
+
+    cells[i].mass = total_mass;
+
+    if (total_mass > 0) {
+      cells[i].x = weighted_x / total_mass;
+      cells[i].y = weighted_y / total_mass;
+    } else {
+      DEBUG("Warning: Cell  %d has no particles. Setting default center of mass to (0.0, 0.0)", i);
+      cells[i].x = (i%ncside + 0.5)*side;  // Default if no particles exist in the cell
+      cells[i].y = (i/ncside + 0.5)*side;
+    }
+  }
+}
+
+void gravitational_force(double side, long ncside, long long n_part, std::vector<cell_t>& cells) {
+
+  for (long long i = 0; i < cells.size(); i++) {
+    for (long long  j = 0; j < cells[i].par.size(); j++) {
+      double force = 0.0;
+      for(long long k = 0; k < cells[i].par.size(); k ++) {
+        if(k ==  j) continue;
+        double dx = cells[i].par[j].x - cells[i].par[k].x;
+        double dy = cells[i].par[j].y - cells[i].par[k].y;
+        double distance = dx * dx + dy * dy;
+        force += (G * cells[i].par[k].m * cells[i].par[j].m) / distance;
+      }
+    }
+    
+  }
+  
 }
