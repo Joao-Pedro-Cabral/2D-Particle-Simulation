@@ -94,7 +94,6 @@ void debug_accelerations(const vec_t &force, long ind) {
 void compute_accelerations(long ncside, const std::vector<cell_t> &cells,
                            std::vector<vec_t> &accs) {
   long long l = 0;
-  // TODO: WRAP!!!!!!!!!!!!!!!!!!!!!!!!!
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
       long i = POS(ix, iy, ncside);
@@ -130,6 +129,18 @@ void compute_accelerations(long ncside, const std::vector<cell_t> &cells,
   }
 }
 
+void debug_compute_new_positions_and_velocities(long ncside, std::vector<cell_t> &cells) {
+  for (long iy = 0; iy < ncside; iy++) {
+    for (long ix = 0; ix < ncside; ix++) {
+      long i = POS(ix, iy, ncside);
+      for (long long j = 0; j < cells[i].par.size(); j++) {
+        DEBUG("Particle %lld: m: %.3f, x: %.6f, y: %.6f, vx: %.3f, vy: %.3f\n", cells[i].par[j].ind, cells[i].par[j].m,
+                                        cells[i].par[j].x, cells[i].par[j].y, cells[i].par[j].vx, cells[i].par[j].vy);
+      }
+    }
+  }
+}
+
 void compute_new_positions_and_velocities(double side, double size, long ncside,
                                           std::vector<cell_t> &cells,
                                           const std::vector<vec_t> &accs) {
@@ -156,6 +167,7 @@ void compute_new_positions_and_velocities(double side, double size, long ncside,
       }
     }
   }
+  debug_compute_new_positions_and_velocities(ncside, cells);
 }
 
 long long detect_collisions(long ncside, std::vector<cell_t> &cells,
@@ -168,7 +180,8 @@ long long detect_collisions(long ncside, std::vector<cell_t> &cells,
         collisions[j] = false;
         for (long long k = 0; k < j; k++) {
           double distance = calc_distance(cells[i].par[j], cells[i].par[k]);
-          if (distance > DELTAT * DELTAT)
+          if(cells[i].par[j].ind == 5) DEBUG("Distance: %.6lf, j: %lld, k: %lld\n", distance, j, k);
+          if (distance > EPSILON2)
             continue;
           if (collisions[i] == false)
             n_collisions++;
@@ -179,10 +192,12 @@ long long detect_collisions(long ncside, std::vector<cell_t> &cells,
       for (long long j = 0; j < cells[i].par.size(); j++) {
         if (collisions[j] == false)
           continue;
+        DEBUG("Removing Particle %lld from cells[%ld].par[%lld]\n", cells[i].par[j].ind, i, j);
         remove_and_swap(cells, i, j);
       }
     }
   }
+  DEBUG("Number of collisions %lld\n", n_collisions);
   return n_collisions;
 }
 
@@ -210,6 +225,7 @@ simulation_result simulation(double side, long ncside, long long npart,
   res.number_of_collisions = 0;
   fill_cells(size, ncside, npart, par, cells);
   for (long long i = 0; i < nstep; i++) {
+    DEBUG("--------STEP: %lld --------------\n", i);
     compute_centers_of_mass(side, ncside, cells);
     compute_accelerations(ncside, cells, accs);
     compute_new_positions_and_velocities(side, size, ncside, cells, accs);

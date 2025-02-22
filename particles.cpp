@@ -32,12 +32,12 @@ double calc_distance(const particle_t &par1, const particle_t &par2) {
 
 void update_position_and_velocity(double side, particle_t &par,
                                   const vec_t &acc) {
-  par.x += par.vx + 0.5 * (DELTAT * DELTAT) * acc.x;
+  par.x += DELTAT * par.vx + 0.5 * (DELTAT * DELTAT) * acc.x;
   if (par.x > side)
     par.x -= side;
   if (par.x < 0)
     par.x += side;
-  par.y += par.vy + 0.5 * (DELTAT * DELTAT) * acc.y;
+  par.y += DELTAT * par.vy + 0.5 * (DELTAT * DELTAT) * acc.y;
   if (par.y > side)
     par.y -= side;
   if (par.y < 0)
