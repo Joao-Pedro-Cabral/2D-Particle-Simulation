@@ -6,7 +6,7 @@
 long find_particle_cell(const particle_t &par, double size, long ncside) {
   long xpart = par.x / size;
   long ypart = par.y / size;
-  return ypart * ncside + xpart;
+  return POS(xpart, ypart, ncside);
 }
 
 void copy_particle(particle_t &par1, const particle_t &par2) {
@@ -46,11 +46,10 @@ void update_position_and_velocity(double side, particle_t &par,
   par.vy += DELTAT * acc.y;
 }
 
-// TODO: Maybe is -force
 vec_t calc_gravitacional_force(const particle_t &par1, const particle_t &par2) {
   vec_t force;
-  double dx = par1.x - par2.x;
-  double dy = par1.y - par2.y;
+  double dx = par2.x - par1.x;
+  double dy = par2.y - par1.y;
   double distance = dx * dx + dy * dy;
   double hypotenuse = sqrt(distance);
   double cos = dx / hypotenuse;

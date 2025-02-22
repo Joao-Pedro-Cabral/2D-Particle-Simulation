@@ -23,6 +23,8 @@ typedef struct {
   double y;
 } vec_t;
 
+#define POS(x, y, ncside) ((y + 1) * (ncside + 2) + (x + 1))
+
 long find_particle_cell(const particle_t &par, double size, long ncside);
 void copy_particle(particle_t &par1, const particle_t &par2);
 void remove_and_swap(std::vector<cell_t> &cells, long i, long long j);
