@@ -16,7 +16,7 @@ void debug_center(long ncside, const std::vector<cell_t> &cells) {
   for (long iy = 0; iy < ncside + 2; iy++) {
     for (long ix = 0; ix < ncside + 2; ix++) {
       long i = iy * (ncside + 2) + ix;
-      DEBUG("Cell %ld x: %.3lf y: %.3lf m: %.3lf\n", i, cells[i].center.x,
+      DEBUG("Cell %ld x: %.6lf y: %.6lf m: %.6lf\n", i, cells[i].center.x,
             cells[i].center.y, cells[i].center.m);
     }
   }
@@ -27,7 +27,7 @@ void compute_centers_of_mass(double side, long ncside,
 
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
-      long i = POS(ix, iy, ncside);
+      long i = INDEX(ix, iy, ncside);
       double total_mass = 0.0;
       double weighted_x = 0.0;
       double weighted_y = 0.0;
@@ -88,7 +88,7 @@ void compute_centers_of_mass(double side, long ncside,
 }
 
 void debug_accelerations(const vec_t &force, long ind) {
-  DEBUG("Force x: %.3lf, y: %.3lf, ind : %ld\n", force.x, force.y, ind);
+  DEBUG("Force x: %.6lf, y: %.6lf, ind : %ld\n", force.x, force.y, ind);
 }
 
 void compute_accelerations(long ncside, const std::vector<cell_t> &cells,
@@ -96,7 +96,7 @@ void compute_accelerations(long ncside, const std::vector<cell_t> &cells,
   long long l = 0;
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
-      long i = POS(ix, iy, ncside);
+      long i = INDEX(ix, iy, ncside);
       for (long long j = 0; j < cells[i].par.size(); j++) {
         double resultant_x = 0.0;
         double resultant_y = 0.0;
@@ -132,9 +132,9 @@ void compute_accelerations(long ncside, const std::vector<cell_t> &cells,
 void debug_compute_new_positions_and_velocities(long ncside, std::vector<cell_t> &cells) {
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
-      long i = POS(ix, iy, ncside);
+      long i = INDEX(ix, iy, ncside);
       for (long long j = 0; j < cells[i].par.size(); j++) {
-        DEBUG("Particle %lld: m: %.3f, x: %.6f, y: %.6f, vx: %.3f, vy: %.3f\n", cells[i].par[j].ind, cells[i].par[j].m,
+        DEBUG("Particle %lld: m: %.6f, x: %.6f, y: %.6f, vx: %.6f, vy: %.6f\n", cells[i].par[j].ind, cells[i].par[j].m,
                                         cells[i].par[j].x, cells[i].par[j].y, cells[i].par[j].vx, cells[i].par[j].vy);
       }
     }
@@ -147,7 +147,7 @@ void compute_new_positions_and_velocities(double side, double size, long ncside,
   long long l = 0;
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
-      long i = POS(ix, iy, ncside);
+      long i = INDEX(ix, iy, ncside);
       for (long long j = 0; j < cells[i].par.size(); j++) {
         update_position_and_velocity(side, cells[i].par[j], accs[l]);
         l++;
@@ -157,7 +157,7 @@ void compute_new_positions_and_velocities(double side, double size, long ncside,
 
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
-      long i = POS(ix, iy, ncside);
+      long i = INDEX(ix, iy, ncside);
       for (long long j = cells[i].par.size() - 1; j > 0; j--) {
         long ind = find_particle_cell(cells[i].par[j], size, ncside);
         if (ind == i)
@@ -175,7 +175,7 @@ long long detect_collisions(long ncside, std::vector<cell_t> &cells,
   long long n_collisions = 0;
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
-      long i = POS(ix, iy, ncside);
+      long i = INDEX(ix, iy, ncside);
       for (long long j = 0; j < cells[i].par.size(); j++) {
         collisions[j] = false;
         for (long long k = 0; k < j; k++) {
@@ -204,7 +204,7 @@ long long detect_collisions(long ncside, std::vector<cell_t> &cells,
 particle_t find_particle_zero(long ncside, std::vector<cell_t> &cells) {
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
-      long i = POS(ix, iy, ncside);
+      long i = INDEX(ix, iy, ncside);
       for (long long j = 0; j < cells[i].par.size(); j++) {
         if (cells[i].par[j].ind == 0)
           return cells[i].par[j];

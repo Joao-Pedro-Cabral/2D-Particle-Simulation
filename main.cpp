@@ -53,8 +53,8 @@ int main(int argc, char *argv[]) {
   exec_time = -omp_get_wtime();
   simulation_result res = simulation(side, ncside, npart, nstep, par);
   exec_time += omp_get_wtime();
-  fprintf(stderr, "%.1fs\n", exec_time);
   print_result(res);
+  fprintf(stderr, "%.1fs\n", exec_time);
 
   return 0;
 }

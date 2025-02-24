@@ -6,7 +6,7 @@
 long find_particle_cell(const particle_t &par, double size, long ncside) {
   long xpart = par.x / size;
   long ypart = par.y / size;
-  return POS(xpart, ypart, ncside);
+  return INDEX(xpart, ypart, ncside);
 }
 
 void copy_particle(particle_t &par1, const particle_t &par2) {
