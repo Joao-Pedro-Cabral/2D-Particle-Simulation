@@ -134,8 +134,8 @@ void debug_compute_new_positions_and_velocities(long ncside, std::vector<cell_t>
     for (long ix = 0; ix < ncside; ix++) {
       long i = INDEX(ix, iy, ncside);
       for (long long j = 0; j < cells[i].par.size(); j++) {
-        DEBUG("Particle %lld: m: %.6f, x: %.6f, y: %.6f, vx: %.6f, vy: %.6f\n", cells[i].par[j].ind, cells[i].par[j].m,
-                                        cells[i].par[j].x, cells[i].par[j].y, cells[i].par[j].vx, cells[i].par[j].vy);
+        DEBUG("Particle %lld: m: %.6f, x: %.6f, y: %.6f, vx: %.6f, vy: %.6f, cell: %ld\n", cells[i].par[j].ind, cells[i].par[j].m,
+                                        cells[i].par[j].x, cells[i].par[j].y, cells[i].par[j].vx, cells[i].par[j].vy, iy*ncside + ix);
       }
     }
   }
@@ -158,7 +158,7 @@ void compute_new_positions_and_velocities(double side, double size, long ncside,
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
       long i = INDEX(ix, iy, ncside);
-      for (long long j = cells[i].par.size() - 1; j > 0; j--) {
+      for (long long j = 0; j < cells[i].par.size(); j++) {
         long ind = find_particle_cell(cells[i].par[j], size, ncside);
         if (ind == i)
           continue;
@@ -177,16 +177,18 @@ long long detect_collisions(long ncside, std::vector<cell_t> &cells,
     for (long ix = 0; ix < ncside; ix++) {
       long i = INDEX(ix, iy, ncside);
       for (long long j = 0; j < cells[i].par.size(); j++) {
+        DEBUG("Size: %ld, i: %ld, j: %lld\n", cells[i].par.size(), ix + iy*ncside, cells[i].par[j].ind);
         collisions[j] = false;
         for (long long k = 0; k < j; k++) {
           double distance = calc_distance(cells[i].par[j], cells[i].par[k]);
-          if(cells[i].par[j].ind == 5) DEBUG("Distance: %.6lf, j: %lld, k: %lld\n", distance, j, k);
+          DEBUG("Distance: %.6lf, ix: %ld, iy: %ld, j: %lld, k: %lld\n", distance, ix, iy, cells[i].par[j].ind, cells[i].par[k].ind);
           if (distance > EPSILON2)
             continue;
-          if (collisions[i] == false)
+          if (collisions[k] == false) {
             n_collisions++;
+            collisions[k] = true;
+          }
           collisions[j] = true;
-          collisions[i] = true;
         }
       }
       for (long long j = 0; j < cells[i].par.size(); j++) {
@@ -223,6 +225,7 @@ simulation_result simulation(double side, long ncside, long long npart,
   std::vector<bool> collisions(npart);
   simulation_result res;
   res.number_of_collisions = 0;
+  DEBUG("Size: %lf", size);
   fill_cells(size, ncside, npart, par, cells);
   for (long long i = 0; i < nstep; i++) {
     DEBUG("--------STEP: %lld --------------\n", i);
