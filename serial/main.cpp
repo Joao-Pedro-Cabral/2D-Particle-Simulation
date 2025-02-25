@@ -9,7 +9,7 @@
 
 void print_result(const simulation_result &res) {
   printf("%.3lf %.3lf\n", res.particle_zero.x, res.particle_zero.y);
-  printf("%lld\n", res.number_of_collisions);
+  printf("%lu\n", res.number_of_collisions);
 }
 
 int main(int argc, char *argv[]) {
@@ -18,10 +18,10 @@ int main(int argc, char *argv[]) {
     ERROR("Incorrect number of arguments\n");
   }
 
-  long seed;
+  uint32_t seed;
   double side;
-  long ncside;
-  long long npart, nstep;
+  uint32_t ncside;
+  uint64_t npart, nstep;
 
   if (!cast_to_long(argv[1], &seed)) {
     ERROR("Unexpected format for seed\n");
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
     ERROR("Unexpected format for nstep\n");
   }
 
-  DEBUG("%ld, %lf, %ld, %lld, %lld\n", seed, side, ncside, npart, nstep);
+  DEBUG("%u, %lf, %d, %ld, %ld\n", seed, side, ncside, npart, nstep);
 
   std::vector<particle_t> par(npart);
 

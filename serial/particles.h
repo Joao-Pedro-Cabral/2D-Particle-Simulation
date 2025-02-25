@@ -3,6 +3,7 @@
 #define __PARTICLES_H
 
 #include <vector>
+#include <cstdint>
 
 typedef struct {
   double x;
@@ -10,7 +11,7 @@ typedef struct {
   double vx;
   double vy;
   double m;
-  long long ind;
+  uint64_t ind;
 } particle_t;
 
 typedef struct {
@@ -25,12 +26,12 @@ typedef struct {
 
 #define INDEX(x, y, ncside) ((y + 1) * (ncside + 2) + (x + 1))
 
-long find_particle_cell(const particle_t &par, double size, long ncside);
+uint32_t find_particle_cell(const particle_t &par, double size, uint32_t ncside);
 void copy_particle(particle_t &par1, const particle_t &par2);
-void remove_and_swap(std::vector<cell_t> &cells, long i, long long j);
-double calc_distance(const particle_t &par1, const particle_t &par2);
+void remove_and_swap(std::vector<cell_t> &cells, uint32_t i, uint64_t j);
+double calc_squared_distance(const particle_t &par1, const particle_t &par2);
 void update_position_and_velocity(double side, particle_t &par,
                                   const vec_t &acc);
-vec_t calc_gravitacional_force(const particle_t &par1, const particle_t &par2);
+vec_t calc_gravitational_force(const particle_t &par1, const particle_t &par2);
 
 #endif // __PARTICLES_H

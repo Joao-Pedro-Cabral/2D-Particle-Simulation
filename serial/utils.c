@@ -5,13 +5,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-bool cast_to_long(const char *str, long *out) {
+
+bool cast_to_long(const char *str, uint32_t *out) {
   if (str == NULL || *str == '\0')
     return false;
 
   char *endptr = NULL;
   errno = 0;
-  long val = strtol(str, &endptr, 10);
+  uint32_t val = strtol(str, &endptr, 10);
 
   if (errno == ERANGE)
     return false;
@@ -20,13 +21,13 @@ bool cast_to_long(const char *str, long *out) {
   return true;
 }
 
-bool cast_to_long_long(const char *str, long long *out) {
+bool cast_to_long_long(const char *str, uint64_t *out) {
   if (str == NULL || *str == '\0')
     return false;
 
   char *endptr = NULL;
   errno = 0;
-  long long val = strtoll(str, &endptr, 10);
+  uint64_t val = strtoll(str, &endptr, 10);
 
   if (errno == ERANGE)
     return false;
