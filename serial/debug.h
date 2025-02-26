@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#ifdef DEBUG_H
+#ifdef DEBUG_MODE
 #define DEBUG(str, ...) printf(str, ##__VA_ARGS__)
 #define ERROR(str, ...)                                                        \
   do {                                                                         \
@@ -14,5 +14,5 @@
 #else
 #define DEBUG(str, ...) ((void)0)
 #define ERROR(str, ...) exit(1)
-#endif // DEBUG_H
+#endif // DEBUG_MODE
 #endif // __DEBUG_H
