@@ -25,7 +25,7 @@ double rnd_normal01() {
 void init_particles(int32_t seed, double side, uint32_t ncside, uint64_t n_part,
                     particle_t *par) {
   double (*rnd01)() = rnd_uniform01;
-  long long i;
+  uint64_t i;
 
   if (seed < 0) {
     rnd01 = rnd_normal01;
