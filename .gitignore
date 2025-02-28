@@ -1,3 +1,4 @@
 .vscode
 parsim
 serial/parsim
+omp/parsim

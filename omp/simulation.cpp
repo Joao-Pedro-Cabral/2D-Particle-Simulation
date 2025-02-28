@@ -24,7 +24,7 @@ void debug_center(long ncside, const std::vector<cell_t> &cells) {
 
 void compute_centers_of_mass(double side, long ncside,
                              std::vector<cell_t> &cells) {
-
+  #pragma omp parallel for collapse(2) //TODO ask professor if it is better to use a separate clause for parallel/for
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
       long i = INDEX(ix, iy, ncside);
@@ -32,6 +32,7 @@ void compute_centers_of_mass(double side, long ncside,
       double weighted_x = 0.0;
       double weighted_y = 0.0;
 
+      #pragma omp for reduction (+: total_mass, weighted_x, weighted_y)
       for (long long j = 0; j < cells[i].par.size(); j++) {
         total_mass += cells[i].par[j].m;
         weighted_x += cells[i].par[j].m * cells[i].par[j].x;
@@ -52,6 +53,8 @@ void compute_centers_of_mass(double side, long ncside,
       }
     }
   }
+
+  #pragma omp parallel for collapse(2) nowait
   for (long i = 0; i < ncside + 2; i += ncside + 1) {
     for (long j = 0; j < ncside + 2; j++) {
       long ind = i * (ncside + 2) + j;
@@ -73,6 +76,8 @@ void compute_centers_of_mass(double side, long ncside,
       }
     }
   }
+
+  #pragma omp parallel for collapse(2) 
   for (long j = 0; j < ncside + 2; j += ncside + 1) {
     for (long i = 1; i < ncside + 1; i++) {
       long ind = i * (ncside + 2) + j;
@@ -91,15 +96,16 @@ void debug_accelerations(const vec_t &force, long ind) {
   DEBUG("Force x: %.6lf, y: %.6lf, ind : %ld\n", force.x, force.y, ind);
 }
 
-void compute_accelerations(long ncside, const std::vector<cell_t> &cells,
-                           std::vector<vec_t> &accs) {
-  long long l = 0;
+void compute_accelerations(long ncside, std::vector<cell_t> &cells) {
+  #pragma omp parallel for collapse(3)
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
-      long i = INDEX(ix, iy, ncside);
-      for (long long j = 0; j < cells[i].par.size(); j++) {
+      for (long long j = 0; j < cells[INDEX(ix, iy, ncside)].par.size(); j++) {
+        long i = INDEX(ix, iy, ncside);
         double resultant_x = 0.0;
         double resultant_y = 0.0;
+
+        #pragma omp for reduction (+: resultant_x, resultant_y)
         for (long long k = 0; k < cells[i].par.size(); k++) {
           if (k == j)
             continue;
@@ -110,6 +116,8 @@ void compute_accelerations(long ncside, const std::vector<cell_t> &cells,
           if (cells[i].par[j].ind == 0)
             debug_accelerations(force, 0);
         }
+
+        #pragma omp for reduction (+: resultant_x, resultant_y) // TOTODODO test wether performs better or not 
         for (long long k = 0; k < 9; k++) {
           if (k == 4)
             continue;
@@ -121,9 +129,8 @@ void compute_accelerations(long ncside, const std::vector<cell_t> &cells,
           if (cells[i].par[j].ind == 0)
             debug_accelerations(force, ind);
         }
-        accs[l].x = resultant_x / cells[i].par[j].m;
-        accs[l].y = resultant_y / cells[i].par[j].m;
-        l++;
+        cells[i].par[j].ax = resultant_x / cells[i].par[j].m;
+        cells[i].par[j].ay = resultant_y / cells[i].par[j].m;
       }
     }
   }
@@ -146,15 +153,12 @@ void debug_compute_new_positions_and_velocities(long ncside,
 }
 
 void compute_new_positions_and_velocities(double side, double size, long ncside,
-                                          std::vector<cell_t> &cells,
-                                          const std::vector<vec_t> &accs) {
-  long long l = 0;
+                                          std::vector<cell_t> &cells) {
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
       long i = INDEX(ix, iy, ncside);
       for (long long j = 0; j < cells[i].par.size(); j++) {
-        update_position_and_velocity(side, cells[i].par[j], accs[l]);
-        l++;
+        update_position_and_velocity(side, cells[i].par[j]);
       }
     }
   }

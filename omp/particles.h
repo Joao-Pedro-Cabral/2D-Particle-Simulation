@@ -9,6 +9,8 @@ typedef struct {
   double y;
   double vx;
   double vy;
+  double ax;
+  double ay;
   double m;
   long long ind;
 } particle_t;
