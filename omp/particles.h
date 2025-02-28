@@ -31,8 +31,7 @@ long find_particle_cell(const particle_t &par, double size, long ncside);
 void copy_particle(particle_t &par1, const particle_t &par2);
 void remove_and_swap(std::vector<cell_t> &cells, long i, long long j);
 double calc_squared_distance(const particle_t &par1, const particle_t &par2);
-void update_position_and_velocity(double side, particle_t &par,
-                                  const vec_t &acc);
+void update_position_and_velocity(double side, particle_t &par);
 vec_t calc_gravitational_force(const particle_t &par1, const particle_t &par2);
 
 #endif // __PARTICLES_H

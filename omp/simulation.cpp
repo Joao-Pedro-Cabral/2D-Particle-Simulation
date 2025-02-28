@@ -117,7 +117,7 @@ void compute_accelerations(long ncside, std::vector<cell_t> &cells) {
             debug_accelerations(force, 0);
         }
 
-        #pragma omp for reduction (+: resultant_x, resultant_y) // TOTODODO test wether performs better or not 
+        #pragma omp for reduction (+: resultant_x, resultant_y) // TODO test wether performs better or not 
         for (long long k = 0; k < 9; k++) {
           if (k == 4)
             continue;
@@ -154,15 +154,17 @@ void debug_compute_new_positions_and_velocities(long ncside,
 
 void compute_new_positions_and_velocities(double side, double size, long ncside,
                                           std::vector<cell_t> &cells) {
+  #pragma omp parallel for collapse(3)                                              
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
-      long i = INDEX(ix, iy, ncside);
-      for (long long j = 0; j < cells[i].par.size(); j++) {
+      for (long long j = 0; j < cells[INDEX(ix, iy, ncside)].par.size(); j++) {
+        long i = INDEX(ix, iy, ncside);
         update_position_and_velocity(side, cells[i].par[j]);
       }
     }
   }
 
+  // TODO think how to parallelize this
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
       long i = INDEX(ix, iy, ncside);
@@ -181,6 +183,7 @@ void compute_new_positions_and_velocities(double side, double size, long ncside,
 long long detect_collisions(long ncside, std::vector<cell_t> &cells,
                             std::vector<bool> &collisions) {
   long long n_collisions = 0;
+  #pragma omp parallel for collapse(2)
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
       long i = INDEX(ix, iy, ncside);
@@ -188,6 +191,7 @@ long long detect_collisions(long ncside, std::vector<cell_t> &cells,
         DEBUG("Size: %ld, i: %ld, j: %lld\n", cells[i].par.size(),
               ix + iy * ncside, cells[i].par[j].ind);
         collisions[j] = false;
+        // TODO think
         for (long long k = 0; k < j; k++) {
           double squared_distance =
               calc_squared_distance(cells[i].par[j], cells[i].par[k]);
@@ -203,6 +207,7 @@ long long detect_collisions(long ncside, std::vector<cell_t> &cells,
           collisions[j] = true;
         }
       }
+      // TODO mass = 0 instead of deleting it
       for (long long j = 0; j < cells[i].par.size(); j++) {
         if (collisions[j] == false)
           continue;
@@ -217,16 +222,18 @@ long long detect_collisions(long ncside, std::vector<cell_t> &cells,
 }
 
 particle_t find_particle_zero(long ncside, std::vector<cell_t> &cells) {
+  particle_t par0;
+  #pragma omp parallel for collapse(3)
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
-      long i = INDEX(ix, iy, ncside);
-      for (long long j = 0; j < cells[i].par.size(); j++) {
+      for (long long j = 0; j < cells[INDEX(ix, iy, ncside)].par.size(); j++) {
+        long i = INDEX(ix, iy, ncside);
         if (cells[i].par[j].ind == 0)
-          return cells[i].par[j];
+          copy_particle(par0, cells[i].par[j]);
       }
     }
   }
-  ERROR("Particle zero not found\n");
+  return par0;
 }
 
 simulation_result simulation(double side, long ncside, long long npart,
