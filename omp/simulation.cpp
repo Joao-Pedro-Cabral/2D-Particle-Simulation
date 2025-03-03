@@ -64,9 +64,6 @@ void compute_centers_of_mass(double side, long ncside,
         cells[i].center.x = weighted_x / total_mass;
         cells[i].center.y = weighted_y / total_mass;
       } else {
-        // DEBUG("Warning: Cell %ld has no particles. Setting default center of "
-        //       "mass to (-2side, -2side)\n",
-        //       i);
         cells[i].center.x = -2 * side;
         cells[i].center.y = -2 * side;
       }
@@ -108,12 +105,8 @@ void compute_centers_of_mass(double side, long ncside,
       cells[ind].center.m = cells[ind2].center.m;
     }
   }
-  #pragma omp single
-  debug_center(ncside, cells);
-}
-
-void debug_accelerations(const vec_t &force, long ind) {
-  DEBUG("Force x: %.6lf, y: %.6lf, ind : %ld\n", force.x, force.y, ind);
+  // #pragma omp single
+  // debug_center(ncside, cells);
 }
 
 void compute_kinectics(double side, long ncside, std::vector<cell_t> &cells) {
@@ -132,8 +125,6 @@ void compute_kinectics(double side, long ncside, std::vector<cell_t> &cells) {
               calc_gravitational_force(cells[i].par[j], cells[i].par[k]);
           resultant_x += force.x;
           resultant_y += force.y;
-          // if (cells[i].par[j].ind == 0)
-          //   debug_accelerations(force, 0);
         }
 
         for (long long k = 0; k < 9; k++) {
@@ -144,8 +135,6 @@ void compute_kinectics(double side, long ncside, std::vector<cell_t> &cells) {
               calc_gravitational_force(cells[i].par[j], cells[ind].center);
           resultant_x += force.x;
           resultant_y += force.y;
-          // if (cells[i].par[j].ind == 0)
-          //   debug_accelerations(force, ind);
         }
         cells[i].par[j].ax = resultant_x / cells[i].par[j].m;
         cells[i].par[j].ay = resultant_y / cells[i].par[j].m;
@@ -195,8 +184,8 @@ void compute_new_particle_cell(double size, long ncside,
       }
     }
   }
-  #pragma omp single
-  debug_particles(ncside, cells);
+  // #pragma omp single
+  // debug_particles(ncside, cells);
 }
 
 void detect_collisions(long ncside, std::vector<cell_t> &cells) {
@@ -244,9 +233,8 @@ void detect_collisions(long ncside, std::vector<cell_t> &cells) {
       }
     }
   }
-  #pragma omp single
-  debug_particles(ncside, cells);
-  // DEBUG("Number of collisions %lld\n", n_collisions);
+  // #pragma omp single
+  // debug_particles(ncside, cells);
 }
 
 particle_t find_particle_zero(long ncside, std::vector<cell_t> &cells) {
@@ -273,8 +261,8 @@ simulation_result simulation(double side, long ncside, long long npart,
   init_cells_lock(ncside, cells);
   #pragma omp parallel 
   for (long long i = 0; i < nstep; i++) {
-    #pragma omp single
-    DEBUG("--------STEP: %lld --------------\n", i);
+    // #pragma omp single
+    // DEBUG("--------STEP: %lld --------------\n", i);
     compute_centers_of_mass(side, ncside, cells);
     compute_kinectics(side, ncside, cells);
     compute_new_particle_cell(size, ncside, cells);
