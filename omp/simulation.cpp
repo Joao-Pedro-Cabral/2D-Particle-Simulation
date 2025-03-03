@@ -15,14 +15,20 @@ void fill_cells(double size, long ncside, long long n_part,
 }
 
 void init_cells_lock(long ncside, std::vector<cell_t> &cells) {
-  for (long long i = 0; i < (ncside*ncside); i++) {
-    omp_init_lock(cells[i].lock);
+   for (long iy = 0; iy < ncside; iy++) {
+    for (long ix = 0; ix < ncside; ix++) {
+      long i = INDEX(ix, iy, ncside);
+      omp_init_lock(&cells[i].lock);
+    }
   }
 }
 
 void destroy_cells_lock(long ncside, std::vector<cell_t> &cells) {
-  for (long long i = 0; i < (ncside*ncside); i++) {
-    omp_destroy_lock(cells[i].lock);
+  for (long iy = 0; iy < ncside; iy++) {
+    for (long ix = 0; ix < ncside; ix++) {
+      long i = INDEX(ix, iy, ncside);
+      omp_destroy_lock(&cells[i].lock);
+    }
   }
 }
 
@@ -173,16 +179,16 @@ void compute_new_particle_cell(double size, long ncside,
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
       long i = INDEX(ix, iy, ncside);
-      omp_set_lock(cells[i].lock);
+      omp_set_lock(&cells[i].lock);
       long long cell_size = cells[i].par.size();
-      omp_unset_lock(cells[i].lock);
+      omp_unset_lock(&cells[i].lock);
       for (long long j = 0; j < cell_size; j++) {
         long ind = find_particle_cell(cells[i].par[j], size, ncside);
         if (ind == i)
           continue;
-        omp_set_lock(cells[ind].lock);
+        omp_set_lock(&cells[ind].lock);
         cells[ind].par.push_back(cells[i].par[j]);
-        omp_unset_lock(cells[ind].lock);
+        omp_unset_lock(&cells[ind].lock);
         cells[i].par[j].m = 0;
       }
     }

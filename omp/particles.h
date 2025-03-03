@@ -20,7 +20,7 @@ typedef struct {
 typedef struct {
   particle_t center;
   std::vector<particle_t> par;
-  omp_lock_t *lock;
+  omp_lock_t lock;
 } cell_t;
 
 typedef struct {

@@ -1,4 +1,4 @@
 .vscode
 parsim
 serial/parsim
-omp/parsim
+omp/parsim*
