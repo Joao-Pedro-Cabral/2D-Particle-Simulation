@@ -12,6 +12,18 @@ void fill_cells(double size, long ncside, long long n_part,
   }
 }
 
+void init_cells_lock(long ncside, std::vector<cell_t> &cells) {
+  for (long long i = 0; i < (ncside*ncside); i++) {
+    omp_init_lock(cells[i].lock);
+  }
+}
+
+void destroy_cells_lock(long ncside, std::vector<cell_t> &cells) {
+  for (long long i = 0; i < (ncside*ncside); i++) {
+    omp_destroy_lock(cells[i].lock);
+  }
+}
+
 void debug_center(long ncside, const std::vector<cell_t> &cells) {
   for (long iy = 0; iy < ncside + 2; iy++) {
     for (long ix = 0; ix < ncside + 2; ix++) {
@@ -24,7 +36,7 @@ void debug_center(long ncside, const std::vector<cell_t> &cells) {
 
 void compute_centers_of_mass(double side, long ncside,
                              std::vector<cell_t> &cells) {
-  #pragma omp parallel for collapse(2) //TODO ask professor if it is better to use a separate clause for parallel/for
+  #pragma omp for collapse(2) schedule(dynamic, CHUNK_SIZE)
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
       long i = INDEX(ix, iy, ncside);
@@ -32,7 +44,6 @@ void compute_centers_of_mass(double side, long ncside,
       double weighted_x = 0.0;
       double weighted_y = 0.0;
 
-      #pragma omp for reduction (+: total_mass, weighted_x, weighted_y)
       for (long long j = 0; j < cells[i].par.size(); j++) {
         total_mass += cells[i].par[j].m;
         weighted_x += cells[i].par[j].m * cells[i].par[j].x;
@@ -54,7 +65,7 @@ void compute_centers_of_mass(double side, long ncside,
     }
   }
 
-  #pragma omp parallel for collapse(2) nowait
+  #pragma omp for collapse(2) nowait
   for (long i = 0; i < ncside + 2; i += ncside + 1) {
     for (long j = 0; j < ncside + 2; j++) {
       long ind = i * (ncside + 2) + j;
@@ -77,7 +88,7 @@ void compute_centers_of_mass(double side, long ncside,
     }
   }
 
-  #pragma omp parallel for collapse(2) 
+  #pragma omp for collapse(2) 
   for (long j = 0; j < ncside + 2; j += ncside + 1) {
     for (long i = 1; i < ncside + 1; i++) {
       long ind = i * (ncside + 2) + j;
@@ -96,16 +107,15 @@ void debug_accelerations(const vec_t &force, long ind) {
   DEBUG("Force x: %.6lf, y: %.6lf, ind : %ld\n", force.x, force.y, ind);
 }
 
-void compute_accelerations(long ncside, std::vector<cell_t> &cells) {
-  #pragma omp parallel for collapse(3)
+void compute_kinectics(double side, long ncside, std::vector<cell_t> &cells) {
+  #pragma omp for collapse(2) schedule(dynamic, CHUNK_SIZE)
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
-      for (long long j = 0; j < cells[INDEX(ix, iy, ncside)].par.size(); j++) {
-        long i = INDEX(ix, iy, ncside);
+      long i = INDEX(ix, iy, ncside);
+      for (long long j = 0; j < cells[i].par.size(); j++) {
         double resultant_x = 0.0;
         double resultant_y = 0.0;
 
-        #pragma omp for reduction (+: resultant_x, resultant_y)
         for (long long k = 0; k < cells[i].par.size(); k++) {
           if (k == j)
             continue;
@@ -117,7 +127,6 @@ void compute_accelerations(long ncside, std::vector<cell_t> &cells) {
             debug_accelerations(force, 0);
         }
 
-        #pragma omp for reduction (+: resultant_x, resultant_y) // TODO test wether performs better or not 
         for (long long k = 0; k < 9; k++) {
           if (k == 4)
             continue;
@@ -132,11 +141,15 @@ void compute_accelerations(long ncside, std::vector<cell_t> &cells) {
         cells[i].par[j].ax = resultant_x / cells[i].par[j].m;
         cells[i].par[j].ay = resultant_y / cells[i].par[j].m;
       }
+
+      for (long long j = 0; j < cells[i].par.size(); j++) {
+        update_position_and_velocity(side, cells[i].par[j]);
+      }
     }
   }
 }
 
-void debug_compute_new_positions_and_velocities(long ncside,
+void debug_compute_new_particle_cell(long ncside,
                                                 std::vector<cell_t> &cells) {
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
@@ -152,46 +165,39 @@ void debug_compute_new_positions_and_velocities(long ncside,
   }
 }
 
-void compute_new_positions_and_velocities(double side, double size, long ncside,
+void compute_new_particle_cell(double size, long ncside,
                                           std::vector<cell_t> &cells) {
-  #pragma omp parallel for collapse(3)                                              
-  for (long iy = 0; iy < ncside; iy++) {
-    for (long ix = 0; ix < ncside; ix++) {
-      for (long long j = 0; j < cells[INDEX(ix, iy, ncside)].par.size(); j++) {
-        long i = INDEX(ix, iy, ncside);
-        update_position_and_velocity(side, cells[i].par[j]);
-      }
-    }
-  }
-
-  // TODO think how to parallelize this
+  #pragma omp for collapse(2) schedule(dynamic, CHUNK_SIZE)                                          
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
       long i = INDEX(ix, iy, ncside);
-      for (long long j = 0; j < cells[i].par.size(); j++) {
+      omp_set_lock(cells[i].lock);
+      long long cell_size = cells[i].par.size();
+      omp_unset_lock(cells[i].lock);
+      for (long long j = 0; j < cell_size; j++) {
         long ind = find_particle_cell(cells[i].par[j], size, ncside);
         if (ind == i)
           continue;
+        omp_set_lock(cells[ind].lock);
         cells[ind].par.push_back(cells[i].par[j]);
-        remove_and_swap(cells, i, j);
+        omp_unset_lock(cells[ind].lock);
+        cells[i].par[j].m = 0;
       }
     }
   }
-  debug_compute_new_positions_and_velocities(ncside, cells);
+  debug_compute_new_particle_cell(ncside, cells);
 }
 
-long long detect_collisions(long ncside, std::vector<cell_t> &cells,
-                            std::vector<bool> &collisions) {
-  long long n_collisions = 0;
-  #pragma omp parallel for collapse(2)
+long long detect_collisions(long ncside, std::vector<cell_t> &cells, long long &n_collisions) {
+  #pragma omp for collapse(2) reduction (+:n_collisions) schedule(dynamic, CHUNK_SIZE)
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
       long i = INDEX(ix, iy, ncside);
+      long long cell_collisions = 0;
       for (long long j = 0; j < cells[i].par.size(); j++) {
         DEBUG("Size: %ld, i: %ld, j: %lld\n", cells[i].par.size(),
               ix + iy * ncside, cells[i].par[j].ind);
-        collisions[j] = false;
-        // TODO think
+        cells[i].par[j].collided = false;
         for (long long k = 0; k < j; k++) {
           double squared_distance =
               calc_squared_distance(cells[i].par[j], cells[i].par[k]);
@@ -200,20 +206,21 @@ long long detect_collisions(long ncside, std::vector<cell_t> &cells,
                 cells[i].par[k].ind);
           if (squared_distance > EPSILON2)
             continue;
-          if (collisions[k] == false) {
-            n_collisions++;
-            collisions[k] = true;
+          if (cells[i].par[k].collided == false) {
+            cell_collisions++;
+            cells[i].par[k].collided = true;
           }
-          collisions[j] = true;
+          cells[i].par[j].collided = true;
         }
       }
-      // TODO mass = 0 instead of deleting it
+      n_collisions += cell_collisions;
+  
       for (long long j = 0; j < cells[i].par.size(); j++) {
-        if (collisions[j] == false)
-          continue;
-        DEBUG("Removing Particle %lld from cells[%ld].par[%lld]\n",
-              cells[i].par[j].ind, i, j);
-        remove_and_swap(cells, i, j);
+        if (cells[i].par[j].collided == true || cells[i].par[j].m == 0) {
+          DEBUG("Removing Particle %lld from cells[%ld].par[%lld]\n",
+            cells[i].par[j].ind, i, j);
+          remove_and_swap(cells, i, j);
+        }        
       }
     }
   }
@@ -222,18 +229,16 @@ long long detect_collisions(long ncside, std::vector<cell_t> &cells,
 }
 
 particle_t find_particle_zero(long ncside, std::vector<cell_t> &cells) {
-  particle_t par0;
-  #pragma omp parallel for collapse(3)
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
-      for (long long j = 0; j < cells[INDEX(ix, iy, ncside)].par.size(); j++) {
-        long i = INDEX(ix, iy, ncside);
+      long i = INDEX(ix, iy, ncside);
+      for (long long j = 0; j < cells[i].par.size(); j++) {
         if (cells[i].par[j].ind == 0)
-          copy_particle(par0, cells[i].par[j]);
+          return cells[i].par[j];
       }
     }
   }
-  return par0;
+  ERROR("Particle 0 not found\n");
 }
 
 simulation_result simulation(double side, long ncside, long long npart,
@@ -241,19 +246,21 @@ simulation_result simulation(double side, long ncside, long long npart,
                              const std::vector<particle_t> &par) {
   double size = side / ncside;
   std::vector<cell_t> cells((ncside + 2) * (ncside + 2));
-  std::vector<vec_t> accs(npart);
   std::vector<bool> collisions(npart);
   simulation_result res;
   res.number_of_collisions = 0;
   DEBUG("Size: %lf", size);
   fill_cells(size, ncside, npart, par, cells);
+  init_cells_lock(ncside, cells);
+  #pragma omp parallel 
   for (long long i = 0; i < nstep; i++) {
     DEBUG("--------STEP: %lld --------------\n", i);
     compute_centers_of_mass(side, ncside, cells);
-    compute_accelerations(ncside, cells, accs);
-    compute_new_positions_and_velocities(side, size, ncside, cells, accs);
-    res.number_of_collisions += detect_collisions(ncside, cells, collisions);
+    compute_kinectics(side, ncside, cells);
+    compute_new_particle_cell(size, ncside, cells);
+    res.number_of_collisions += detect_collisions(ncside, cells, res.number_of_collisions);
   }
+  destroy_cells_lock(ncside, cells);
   res.particle_zero = find_particle_zero(ncside, cells);
   return res;
 }

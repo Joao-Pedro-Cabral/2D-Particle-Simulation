@@ -3,6 +3,7 @@
 #define __PARTICLES_H
 
 #include <vector>
+#include <omp.h>
 
 typedef struct {
   double x;
@@ -13,11 +14,13 @@ typedef struct {
   double ay;
   double m;
   long long ind;
+  bool collided;
 } particle_t;
 
 typedef struct {
   particle_t center;
   std::vector<particle_t> par;
+  omp_lock_t *lock;
 } cell_t;
 
 typedef struct {
