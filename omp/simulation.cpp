@@ -17,6 +17,7 @@ void fill_cells(double size, long ncside, long long n_part,
 }
 
 void init_cells_lock(long ncside, std::vector<cell_t> &cells) {
+  #pragma omp for collapse(2)
    for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
       long i = INDEX(ix, iy, ncside);
@@ -26,6 +27,7 @@ void init_cells_lock(long ncside, std::vector<cell_t> &cells) {
 }
 
 void destroy_cells_lock(long ncside, std::vector<cell_t> &cells) {
+  #pragma omp for collapse(2)
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
       long i = INDEX(ix, iy, ncside);
@@ -229,18 +231,18 @@ void detect_collisions(long ncside, std::vector<cell_t> &cells, long long &n_col
   // debug_particles(ncside, cells);
 }
 
-particle_t find_particle_zero(long ncside, std::vector<cell_t> &cells) {
+void find_particle_zero(long ncside, std::vector<cell_t> &cells, particle_t& par0) {
+  #pragma omp for collapse(2) schedule(dynamic, CHUNK_SIZE)
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
       long i = INDEX(ix, iy, ncside);
       long long cell_size = cells[i].par.size();
       for (long long j = 0; j < cell_size; j++) {
         if (cells[i].par[j].ind == 0)
-          return cells[i].par[j];
+          copy_particle(par0, cells[i].par[j]);
       }
     }
   }
-  ERROR("Particle 0 not found\n");
 }
 
 simulation_result simulation(double side, long ncside, long long npart,
@@ -251,17 +253,19 @@ simulation_result simulation(double side, long ncside, long long npart,
   simulation_result res;
   res.number_of_collisions = 0;
   fill_cells(size, ncside, npart, par, cells);
-  init_cells_lock(ncside, cells);
-  #pragma omp parallel 
-  for (long long i = 0; i < nstep; i++) {
-    // #pragma omp single
-    // DEBUG("--------STEP: %lld --------------\n", i);
-    compute_centers_of_mass(side, ncside, cells);
-    compute_kinetics(side, ncside, cells);
-    compute_new_particle_cell(size, ncside, cells);
-    detect_collisions(ncside, cells, res.number_of_collisions);
+  #pragma omp parallel
+  {
+    init_cells_lock(ncside, cells);
+    for (long long i = 0; i < nstep; i++) {
+      // #pragma omp single
+      // DEBUG("--------STEP: %lld --------------\n", i);
+      compute_centers_of_mass(side, ncside, cells);
+      compute_kinetics(side, ncside, cells);
+      compute_new_particle_cell(size, ncside, cells);
+      detect_collisions(ncside, cells, res.number_of_collisions);
+    }
+    destroy_cells_lock(ncside, cells);
+    find_particle_zero(ncside, cells, res.particle_zero);
   }
-  destroy_cells_lock(ncside, cells);
-  res.particle_zero = find_particle_zero(ncside, cells);
   return res;
 }
