@@ -4,8 +4,6 @@
 #include "particles.h"
 #include <vector>
 
-static long long n_collisions;
-
 void fill_cells(double size, long ncside, long long n_part,
                 const std::vector<particle_t> &par,
                 std::vector<cell_t> &cells) {
@@ -109,7 +107,7 @@ void compute_centers_of_mass(double side, long ncside,
   // debug_center(ncside, cells);
 }
 
-void compute_kinectics(double side, long ncside, std::vector<cell_t> &cells) {
+void compute_kinetics(double side, long ncside, std::vector<cell_t> &cells) {
   #pragma omp for collapse(2) schedule(dynamic, CHUNK_SIZE)
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
@@ -188,7 +186,7 @@ void compute_new_particle_cell(double size, long ncside,
   // debug_particles(ncside, cells);
 }
 
-void detect_collisions(long ncside, std::vector<cell_t> &cells) {
+void detect_collisions(long ncside, std::vector<cell_t> &cells, long long &n_collisions) {
   #pragma omp for collapse(2) reduction (+:n_collisions) schedule(dynamic, CHUNK_SIZE)
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
@@ -255,8 +253,8 @@ simulation_result simulation(double side, long ncside, long long npart,
                              const std::vector<particle_t> &par) {
   double size = side / ncside;
   std::vector<cell_t> cells((ncside + 2) * (ncside + 2));
-  std::vector<bool> collisions(npart);
   simulation_result res;
+  res.number_of_collisions = 0;
   fill_cells(size, ncside, npart, par, cells);
   init_cells_lock(ncside, cells);
   #pragma omp parallel 
@@ -264,12 +262,11 @@ simulation_result simulation(double side, long ncside, long long npart,
     // #pragma omp single
     // DEBUG("--------STEP: %lld --------------\n", i);
     compute_centers_of_mass(side, ncside, cells);
-    compute_kinectics(side, ncside, cells);
+    compute_kinetics(side, ncside, cells);
     compute_new_particle_cell(size, ncside, cells);
-    detect_collisions(ncside, cells);
+    detect_collisions(ncside, cells, res.number_of_collisions);
   }
   destroy_cells_lock(ncside, cells);
-  res.number_of_collisions = n_collisions;
   res.particle_zero = find_particle_zero(ncside, cells);
   return res;
 }

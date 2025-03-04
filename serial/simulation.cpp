@@ -44,9 +44,6 @@ void compute_centers_of_mass(double side, long ncside,
         cells[i].center.x = weighted_x / total_mass;
         cells[i].center.y = weighted_y / total_mass;
       } else {
-        DEBUG("Warning: Cell %ld has no particles. Setting default center of "
-              "mass to (-2side, -2side)\n",
-              i);
         cells[i].center.x = -2 * side;
         cells[i].center.y = -2 * side;
       }
@@ -87,13 +84,7 @@ void compute_centers_of_mass(double side, long ncside,
   debug_center(ncside, cells);
 }
 
-void debug_accelerations(const vec_t &force, long ind) {
-  DEBUG("Force x: %.6lf, y: %.6lf, ind : %ld\n", force.x, force.y, ind);
-}
-
-void compute_accelerations(long ncside, const std::vector<cell_t> &cells,
-                           std::vector<vec_t> &accs) {
-  long long l = 0;
+void compute_kinetics(double side, long ncside, std::vector<cell_t> &cells) {
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
       long i = INDEX(ix, iy, ncside);
@@ -107,8 +98,6 @@ void compute_accelerations(long ncside, const std::vector<cell_t> &cells,
               calc_gravitational_force(cells[i].par[j], cells[i].par[k]);
           resultant_x += force.x;
           resultant_y += force.y;
-          if (cells[i].par[j].ind == 0)
-            debug_accelerations(force, 0);
         }
         for (long long k = 0; k < 9; k++) {
           if (k == 4)
@@ -118,47 +107,36 @@ void compute_accelerations(long ncside, const std::vector<cell_t> &cells,
               calc_gravitational_force(cells[i].par[j], cells[ind].center);
           resultant_x += force.x;
           resultant_y += force.y;
-          if (cells[i].par[j].ind == 0)
-            debug_accelerations(force, ind);
         }
-        accs[l].x = resultant_x / cells[i].par[j].m;
-        accs[l].y = resultant_y / cells[i].par[j].m;
-        l++;
+        cells[i].par[j].ax = resultant_x / cells[i].par[j].m;
+        cells[i].par[j].ay = resultant_y / cells[i].par[j].m;
+      }
+
+      for (long long j = 0; j < cells[i].par.size(); j++) {
+        update_position_and_velocity(side, cells[i].par[j]);
       }
     }
   }
 }
 
-void debug_compute_new_positions_and_velocities(long ncside,
-                                                std::vector<cell_t> &cells) {
+void debug_particles(long ncside, std::vector<cell_t> &cells) {
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
       long i = INDEX(ix, iy, ncside);
       for (long long j = 0; j < cells[i].par.size(); j++) {
         DEBUG("Particle %lld: m: %.6f, x: %.6f, y: %.6f, vx: %.6f, vy: %.6f, "
-              "cell: %ld\n",
+              "ax: %.6f, ay: %.6f, collided: %d, cell: %ld\n",
               cells[i].par[j].ind, cells[i].par[j].m, cells[i].par[j].x,
               cells[i].par[j].y, cells[i].par[j].vx, cells[i].par[j].vy,
+              cells[i].par[j].ax, cells[i].par[j].ay, cells[i].par[j].collided,
               iy * ncside + ix);
       }
     }
   }
 }
 
-void compute_new_positions_and_velocities(double side, double size, long ncside,
-                                          std::vector<cell_t> &cells,
-                                          const std::vector<vec_t> &accs) {
-  long long l = 0;
-  for (long iy = 0; iy < ncside; iy++) {
-    for (long ix = 0; ix < ncside; ix++) {
-      long i = INDEX(ix, iy, ncside);
-      for (long long j = 0; j < cells[i].par.size(); j++) {
-        update_position_and_velocity(side, cells[i].par[j], accs[l]);
-        l++;
-      }
-    }
-  }
-
+void compute_new_particle_cell(double size, long ncside,
+                                          std::vector<cell_t> &cells) {                                      
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
       long i = INDEX(ix, iy, ncside);
@@ -167,23 +145,30 @@ void compute_new_positions_and_velocities(double side, double size, long ncside,
         if (ind == i)
           continue;
         cells[ind].par.push_back(cells[i].par[j]);
-        remove_and_swap(cells, i, j);
+        cells[i].par[j].m = 0;
       }
     }
   }
-  debug_compute_new_positions_and_velocities(ncside, cells);
+  debug_particles(ncside, cells);
 }
 
-long long detect_collisions(long ncside, std::vector<cell_t> &cells,
-                            std::vector<bool> &collisions) {
-  long long n_collisions = 0;
+void detect_collisions(long ncside, std::vector<cell_t> &cells, long long &n_collisions) {
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
       long i = INDEX(ix, iy, ncside);
+      long long cell_collisions = 0;
+      for (long long j = 0; j < cells[i].par.size(); j++) {
+        if (cells[i].par[j].m == 0) {
+          DEBUG("Removing mass null Particle %lld from cells[%ld].par[%lld]\n",
+            cells[i].par[j].ind, i, j);
+          remove_and_swap(cells, i, j);
+          j--;
+        }
+      }
       for (long long j = 0; j < cells[i].par.size(); j++) {
         DEBUG("Size: %ld, i: %ld, j: %lld\n", cells[i].par.size(),
               ix + iy * ncside, cells[i].par[j].ind);
-        collisions[j] = false;
+        cells[i].par[j].collided = false;
         for (long long k = 0; k < j; k++) {
           double squared_distance =
               calc_squared_distance(cells[i].par[j], cells[i].par[k]);
@@ -192,24 +177,27 @@ long long detect_collisions(long ncside, std::vector<cell_t> &cells,
                 cells[i].par[k].ind);
           if (squared_distance > EPSILON2)
             continue;
-          if (collisions[k] == false) {
-            n_collisions++;
-            collisions[k] = true;
+          if (cells[i].par[k].collided == false) {
+            cell_collisions++;
+            cells[i].par[k].collided = true;
           }
-          collisions[j] = true;
+          cells[i].par[j].collided = true;
         }
       }
+      n_collisions += cell_collisions;
+  
       for (long long j = 0; j < cells[i].par.size(); j++) {
-        if (collisions[j] == false)
+        if (cells[i].par[j].collided == false)
           continue;
         DEBUG("Removing Particle %lld from cells[%ld].par[%lld]\n",
               cells[i].par[j].ind, i, j);
         remove_and_swap(cells, i, j);
+        j--;
       }
     }
   }
   DEBUG("Number of collisions %lld\n", n_collisions);
-  return n_collisions;
+  debug_particles(ncside, cells);
 }
 
 particle_t find_particle_zero(long ncside, std::vector<cell_t> &cells) {
@@ -222,7 +210,7 @@ particle_t find_particle_zero(long ncside, std::vector<cell_t> &cells) {
       }
     }
   }
-  ERROR("Particle zero not found\n");
+  ERROR("Particle 0 not found\n");
 }
 
 simulation_result simulation(double side, long ncside, long long npart,
@@ -230,18 +218,15 @@ simulation_result simulation(double side, long ncside, long long npart,
                              const std::vector<particle_t> &par) {
   double size = side / ncside;
   std::vector<cell_t> cells((ncside + 2) * (ncside + 2));
-  std::vector<vec_t> accs(npart);
-  std::vector<bool> collisions(npart);
   simulation_result res;
   res.number_of_collisions = 0;
-  DEBUG("Size: %lf", size);
   fill_cells(size, ncside, npart, par, cells);
   for (long long i = 0; i < nstep; i++) {
     DEBUG("--------STEP: %lld --------------\n", i);
     compute_centers_of_mass(side, ncside, cells);
-    compute_accelerations(ncside, cells, accs);
-    compute_new_positions_and_velocities(side, size, ncside, cells, accs);
-    res.number_of_collisions += detect_collisions(ncside, cells, collisions);
+    compute_kinetics(side, ncside, cells);
+    compute_new_particle_cell(size, ncside, cells);
+    detect_collisions(ncside, cells, res.number_of_collisions);
   }
   res.particle_zero = find_particle_zero(ncside, cells);
   return res;

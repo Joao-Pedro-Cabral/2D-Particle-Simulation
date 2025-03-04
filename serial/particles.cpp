@@ -14,8 +14,11 @@ void copy_particle(particle_t &par1, const particle_t &par2) {
   par1.y = par2.y;
   par1.vx = par2.vx;
   par1.vy = par2.vy;
+  par1.ax = par2.ax;
+  par1.ay = par2.ay;
   par1.m = par2.m;
   par1.ind = par2.ind;
+  par1.collided = par2.collided;
 }
 
 void remove_and_swap(std::vector<cell_t> &cells, long i, long long j) {
@@ -30,20 +33,19 @@ double calc_squared_distance(const particle_t &par1, const particle_t &par2) {
   return dx * dx + dy * dy;
 }
 
-void update_position_and_velocity(double side, particle_t &par,
-                                  const vec_t &acc) {
-  par.x += DELTAT * par.vx + 0.5 * (DELTAT * DELTAT) * acc.x;
+void update_position_and_velocity(double side, particle_t &par) {
+  par.x += DELTAT * par.vx + 0.5 * (DELTAT * DELTAT) * par.ax;
   if (par.x > side)
     par.x -= side;
   if (par.x < 0)
     par.x += side;
-  par.y += DELTAT * par.vy + 0.5 * (DELTAT * DELTAT) * acc.y;
+  par.y += DELTAT * par.vy + 0.5 * (DELTAT * DELTAT) * par.ay;
   if (par.y > side)
     par.y -= side;
   if (par.y < 0)
     par.y += side;
-  par.vx += DELTAT * acc.x;
-  par.vy += DELTAT * acc.y;
+  par.vx += DELTAT * par.ax;
+  par.vy += DELTAT * par.ay;
 }
 
 vec_t calc_gravitational_force(const particle_t &par1, const particle_t &par2) {
