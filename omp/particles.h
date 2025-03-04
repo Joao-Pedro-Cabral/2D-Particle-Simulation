@@ -2,8 +2,8 @@
 #ifndef __PARTICLES_H
 #define __PARTICLES_H
 
-#include <vector>
 #include <omp.h>
+#include <vector>
 
 typedef struct {
   double x;
