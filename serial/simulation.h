@@ -10,7 +10,6 @@ typedef struct {
 } simulation_result;
 
 simulation_result simulation(double side, long ncside, long long npart,
-                             long long nstep,
-                             std::vector<particle_t> &par);
+                             long long nstep, std::vector<particle_t> &par);
 
 #endif // __PARSIM_H

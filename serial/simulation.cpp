@@ -5,8 +5,7 @@
 #include <vector>
 
 void fill_cells(double size, long ncside, long long n_part,
-                std::vector<particle_t> &par,
-                std::vector<cell_t> &cells) {
+                std::vector<particle_t> &par, std::vector<cell_t> &cells) {
   for (long long i = 0; i < n_part; i++) {
     par[i].ax = 0.0;
     par[i].ay = 0.0;
@@ -137,7 +136,7 @@ void debug_particles(long ncside, std::vector<cell_t> &cells) {
 }
 
 void compute_new_particle_cell(double size, long ncside,
-                                          std::vector<cell_t> &cells) {                                      
+                               std::vector<cell_t> &cells) {
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
       long i = INDEX(ix, iy, ncside);
@@ -153,7 +152,8 @@ void compute_new_particle_cell(double size, long ncside,
   }
 }
 
-void detect_collisions(long ncside, std::vector<cell_t> &cells, long long &n_collisions) {
+void detect_collisions(long ncside, std::vector<cell_t> &cells,
+                       long long &n_collisions) {
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
       long i = INDEX(ix, iy, ncside);
@@ -162,7 +162,7 @@ void detect_collisions(long ncside, std::vector<cell_t> &cells, long long &n_col
       for (long long j = cell_size - 1; j >= 0; j--) {
         if (cells[i].par[j].m == 0) {
           DEBUG("Removing mass null Particle %lld from cells[%ld].par[%lld]\n",
-            cells[i].par[j].ind, i, j);
+                cells[i].par[j].ind, i, j);
           cell_size--;
           copy_particle(cells[i].par[j], cells[i].par[cell_size]);
         }
@@ -212,8 +212,7 @@ particle_t find_particle_zero(long ncside, std::vector<cell_t> &cells) {
 }
 
 simulation_result simulation(double side, long ncside, long long npart,
-                             long long nstep,
-                            std::vector<particle_t> &par) {
+                             long long nstep, std::vector<particle_t> &par) {
   double size = side / ncside;
   std::vector<cell_t> cells((ncside + 2) * (ncside + 2));
   simulation_result res;
