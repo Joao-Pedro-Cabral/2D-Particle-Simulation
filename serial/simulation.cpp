@@ -167,8 +167,8 @@ void detect_collisions(long ncside, std::vector<cell_t> &cells, long long &n_col
           copy_particle(cells[i].par[j], cells[i].par[cell_size]);
         }
       }
-      for (long long j = 0; j < cell_size; j++) {
-        for (long long k = j + 1; k < cell_size; k++) {
+      for (long long j = cell_size - 1; j >= 0; j--) {
+        for (long long k = j - 1; k >= 0; k--) {
           double squared_distance =
               calc_squared_distance(cells[i].par[j], cells[i].par[k]);
           if (squared_distance > EPSILON2)
@@ -182,16 +182,14 @@ void detect_collisions(long ncside, std::vector<cell_t> &cells, long long &n_col
           }
           cells[i].par[j].collided = true;
         }
+        if (cells[i].par[j].collided == true) {
+          DEBUG("Removing Particle %lld from cells[%ld].par[%lld]\n",
+                cells[i].par[j].ind, i, j);
+          cell_size--;
+          copy_particle(cells[i].par[j], cells[i].par[cell_size]);
+        }
       }
       n_collisions += cell_collisions;
-      for (long long j = cell_size - 1; j >= 0; j--) {
-        if (cells[i].par[j].collided == false)
-          continue;
-        DEBUG("Removing Particle %lld from cells[%ld].par[%lld]\n",
-              cells[i].par[j].ind, i, j);
-        cell_size--;
-        copy_particle(cells[i].par[j], cells[i].par[cell_size]);
-      }
       cells[i].par.resize(cell_size);
     }
   }
