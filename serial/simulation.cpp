@@ -89,15 +89,13 @@ void compute_kinetics(double side, long ncside, std::vector<cell_t> &cells) {
     for (long ix = 0; ix < ncside; ix++) {
       long i = INDEX(ix, iy, ncside);
       for (long long j = 0; j < cells[i].par.size(); j++) {
-        double resultant_x = 0.0;
-        double resultant_y = 0.0;
-        for (long long k = 0; k < cells[i].par.size(); k++) {
-          if (k == j)
-            continue;
+        for (long long k = 0; k < j; k++) {
           vec_t force =
               calc_gravitational_force(cells[i].par[j], cells[i].par[k]);
-          resultant_x += force.x;
-          resultant_y += force.y;
+          cells[i].par[j].ax += force.x;
+          cells[i].par[j].ay += force.y;
+          cells[i].par[k].ax += force.x;
+          cells[i].par[k].ay += force.y;
         }
         for (long long k = 0; k < 9; k++) {
           if (k == 4)
@@ -105,11 +103,11 @@ void compute_kinetics(double side, long ncside, std::vector<cell_t> &cells) {
           long ind = i + ((k % 3) - 1) + (k / 3 - 1) * (ncside + 2);
           vec_t force =
               calc_gravitational_force(cells[i].par[j], cells[ind].center);
-          resultant_x += force.x;
-          resultant_y += force.y;
+          cells[i].par[j].ax += force.x;
+          cells[i].par[j].ay += force.y;
         }
-        cells[i].par[j].ax = resultant_x / cells[i].par[j].m;
-        cells[i].par[j].ay = resultant_y / cells[i].par[j].m;
+        cells[i].par[j].ax /= cells[i].par[j].m;
+        cells[i].par[j].ay /= cells[i].par[j].m;
       }
 
       for (long long j = 0; j < cells[i].par.size(); j++) {
@@ -222,7 +220,7 @@ simulation_result simulation(double side, long ncside, long long npart,
   res.number_of_collisions = 0;
   fill_cells(size, ncside, npart, par, cells);
   for (long long i = 0; i < nstep; i++) {
-    DEBUG("--------STEP: %lld --------------\n", i);
+    printf("--------STEP: %lld --------------\n", i);
     compute_centers_of_mass(side, ncside, cells);
     compute_kinetics(side, ncside, cells);
     compute_new_particle_cell(size, ncside, cells);
