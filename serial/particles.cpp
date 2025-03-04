@@ -21,12 +21,6 @@ void copy_particle(particle_t &par1, const particle_t &par2) {
   par1.collided = par2.collided;
 }
 
-void remove_and_swap(std::vector<cell_t> &cells, long i, long long j) {
-  long long last = cells[i].par.size() - 1;
-  copy_particle(cells[i].par[j], cells[i].par[last]);
-  cells[i].par.resize(last);
-}
-
 double calc_squared_distance(const particle_t &par1, const particle_t &par2) {
   double dx = par1.x - par2.x;
   double dy = par1.y - par2.y;

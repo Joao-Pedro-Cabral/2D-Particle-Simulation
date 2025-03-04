@@ -39,9 +39,6 @@ void init_particles(long seed, double side, long ncside, long long n_part,
     par[i].y = rnd01() * side;
     par[i].vx = (rnd01() - 0.5) * side / ncside / 5.0;
     par[i].vy = (rnd01() - 0.5) * side / ncside / 5.0;
-    par[i].ax = 0.0;
-    par[i].ay = 0.0;
     par[i].m = rnd01() * 0.01 * (ncside * ncside) / n_part / G * EPSILON2;
-    par[i].ind = i;
   }
 }
