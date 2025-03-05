@@ -48,11 +48,11 @@ vec_t calc_gravitational_force(const particle_t &par1, const particle_t &par2) {
   vec_t force;
   double dx = par2.x - par1.x;
   double dy = par2.y - par1.y;
-  double squared_distance = dx * dx + dy * dy;
-  double hypotenuse = sqrt(squared_distance);
-  double cos = dx / hypotenuse;
-  double sin = dy / hypotenuse;
-  force.x = cos * (G * par1.m * par2.m) / squared_distance;
-  force.y = sin * (G * par1.m * par2.m) / squared_distance;
+  double denominator = dx * dx + dy * dy;
+  denominator *= sqrt(denominator);
+  double numerator = G * par1.m * par2.m;
+  double F = numerator;
+  force.x = dx * F;
+  force.y = dy * F;
   return force;
 }
