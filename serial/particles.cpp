@@ -51,7 +51,7 @@ vec_t calc_gravitational_force(const particle_t &par1, const particle_t &par2) {
   double denominator = dx * dx + dy * dy;
   denominator *= sqrt(denominator);
   double numerator = G * par1.m * par2.m;
-  double F = numerator;
+  double F = numerator/denominator;
   force.x = dx * F;
   force.y = dy * F;
   return force;
