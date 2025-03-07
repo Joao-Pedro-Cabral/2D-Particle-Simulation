@@ -7,8 +7,8 @@
 void fill_cells(double size, long ncside, long long npart,
                 const std::vector<particle_t> &par,
                 std::vector<cell_t> &cells) {
-  std::vector<int> count((ncside+2)*(ncside+2));
-  for(int i = 0; i < count.size(); i++) {
+  std::vector<long long> count((ncside+2)*(ncside+2));
+  for(long i = 0; i < (ncside+2)*(ncside+2); i++) {
     count[i] = 0;
   }
   for (long long i = 0; i < npart; i++) {
@@ -17,7 +17,7 @@ void fill_cells(double size, long ncside, long long npart,
   for (long iy = 0; iy < ncside; iy++) {
     for (long ix = 0; ix < ncside; ix++) {
       long i = INDEX(ix, iy, ncside);
-      cells[i].reserve(max(2*count[i], (npart/(ncside*ncside))));
+      cells[i].reserve(std::max(2*count[i], (npart/(ncside*ncside))));
     }
   }
   for (long long i = 0; i < npart; i++) {
