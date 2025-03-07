@@ -9,7 +9,8 @@ long find_particle_cell(const particle_t &par, double size, long ncside) {
   return INDEX(xpart, ypart, ncside);
 }
 
-long find_particle_cell(const cell_t &cell, long long i, double size, long ncside) {
+long find_particle_cell(const cell_t &cell, long long i, double size,
+                        long ncside) {
   long xpart = cell.x[i] / size;
   long ypart = cell.y[i] / size;
   return INDEX(xpart, ypart, ncside);
@@ -61,57 +62,58 @@ vec_t calc_gravitational_force(const cell_t &cell, long long i, long long j) {
   double denominator = dx * dx + dy * dy;
   denominator *= sqrt(denominator);
   double numerator = G * cell.m[i] * cell.m[j];
-  double F = numerator/denominator;
+  double F = numerator / denominator;
   force.x = dx * F;
   force.y = dy * F;
   return force;
 }
 
-vec_t calc_gravitational_force(const cell_t &cell, long long i, const particle_t & center) {
+vec_t calc_gravitational_force(const cell_t &cell, long long i,
+                               const particle_t &center) {
   vec_t force;
   double dx = center.x - cell.x[i];
   double dy = center.x - cell.y[i];
   double denominator = dx * dx + dy * dy;
   denominator *= sqrt(denominator);
   double numerator = G * cell.m[i] * center.m;
-  double F = numerator/denominator;
+  double F = numerator / denominator;
   force.x = dx * F;
   force.y = dy * F;
   return force;
 }
 
-  void cell_t::push_back(const particle_t & par, long long i) {
-    x.push_back(par.x);
-    y.push_back(par.y);
-    vx.push_back(par.vx);
-    vy.push_back(par.vy);
-    ax.push_back(0.0);
-    ay.push_back(0.0);
-    m.push_back(par.m);
-    ind.push_back(i);
-    collided.push_back(false);
-  }
+void cell_t::push_back(const particle_t &par, long long i) {
+  x.push_back(par.x);
+  y.push_back(par.y);
+  vx.push_back(par.vx);
+  vy.push_back(par.vy);
+  ax.push_back(0.0);
+  ay.push_back(0.0);
+  m.push_back(par.m);
+  ind.push_back(i);
+  collided.push_back(false);
+}
 
-  void cell_t::push_back(const cell_t& cell, long long i) {
-    x.push_back(cell.x[i]);
-    y.push_back(cell.y[i]);
-    vx.push_back(cell.vx[i]);
-    vy.push_back(cell.vy[i]);
-    ax.push_back(cell.ax[i]);
-    ay.push_back(cell.ay[i]);
-    m.push_back(cell.m[i]);
-    ind.push_back(i);
-    collided.push_back(cell.collided[i]);
-  }
+void cell_t::push_back(const cell_t &cell, long long i) {
+  x.push_back(cell.x[i]);
+  y.push_back(cell.y[i]);
+  vx.push_back(cell.vx[i]);
+  vy.push_back(cell.vy[i]);
+  ax.push_back(cell.ax[i]);
+  ay.push_back(cell.ay[i]);
+  m.push_back(cell.m[i]);
+  ind.push_back(i);
+  collided.push_back(cell.collided[i]);
+}
 
 void cell_t::resize(long long size) {
-    x.resize(size);
-    y.resize(size);
-    vx.resize(size);
-    vy.resize(size);
-    ax.resize(size);
-    ay.resize(size);
-    m.resize(size);
-    ind.resize(size);
-    collided.resize(size);
+  x.resize(size);
+  y.resize(size);
+  vx.resize(size);
+  vy.resize(size);
+  ax.resize(size);
+  ay.resize(size);
+  m.resize(size);
+  ind.resize(size);
+  collided.resize(size);
 }
