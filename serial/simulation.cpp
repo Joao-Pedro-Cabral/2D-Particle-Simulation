@@ -96,6 +96,9 @@ void compute_kinetics(double side, long ncside, std::vector<cell_t> &cells) {
       for (long long j = 0; j < cell_size; j++) {
         for (long long k = j + 1; k < cell_size; k++) {
           vec_t force = calc_gravitational_force(cell, j, k);
+          if(cell.ind[j] == 0) {
+            DEBUG("F %lld and 0: x: %.6f y: %.6lf\n", cell.ind[k], force.x, force.y);
+          }
           cell.ax[j] += force.x;
           cell.ay[j] += force.y;
           cell.ax[k] -= force.x;
@@ -106,6 +109,9 @@ void compute_kinetics(double side, long ncside, std::vector<cell_t> &cells) {
             continue;
           long ind = i + ((k % 3) - 1) + (k / 3 - 1) * (ncside + 2);
           vec_t force = calc_gravitational_force(cell, j, cells[ind].center);
+          if(cell.ind[j] == 0) {
+            DEBUG("F center %ld and 0: x: %.6f y: %.6lf\n", ind, force.x, force.y);
+          }
           cell.ax[j] += force.x;
           cell.ay[j] += force.y;
         }
@@ -164,7 +170,7 @@ void detect_collisions(long ncside, std::vector<cell_t> &cells,
           DEBUG("Removing mass null Particle %lld from cells[%ld].par[%lld]\n",
                 cell.ind[j], i, j);
           cell_size--;
-          copy_particle(cell, cell_size, j);
+          copy_particle(cell, j, cell_size);
         }
       }
       for (long long j = cell_size - 1; j >= 0; j--) {
@@ -184,7 +190,7 @@ void detect_collisions(long ncside, std::vector<cell_t> &cells,
           DEBUG("Removing Particle %lld from cells[%ld].par[%lld]\n",
                 cells[i].ind[j], i, j);
           cell_size--;
-          copy_particle(cell, cell_size, j);
+          copy_particle(cell, j, cell_size);
         }
       }
       n_collisions += cell_collisions;

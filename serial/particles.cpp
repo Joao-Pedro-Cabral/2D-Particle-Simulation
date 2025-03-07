@@ -29,7 +29,11 @@ void copy_particle(cell_t &cell, long long i, long long j) {
   cell.y[i] = cell.y[j];
   cell.vx[i] = cell.vx[j];
   cell.vy[i] = cell.vy[j];
+  cell.ax[i] = cell.ax[j];
+  cell.ay[i] = cell.ay[j];
   cell.m[i] = cell.m[j];
+  cell.ind[i] = cell.ind[j];
+  cell.collided[i] = cell.collided[j];
 }
 
 double calc_squared_distance(const cell_t &cell, long long i, long long j) {
@@ -72,7 +76,7 @@ vec_t calc_gravitational_force(const cell_t &cell, long long i,
                                const particle_t &center) {
   vec_t force;
   double dx = center.x - cell.x[i];
-  double dy = center.x - cell.y[i];
+  double dy = center.y - cell.y[i];
   double denominator = dx * dx + dy * dy;
   denominator *= sqrt(denominator);
   double numerator = G * cell.m[i] * center.m;
@@ -102,7 +106,7 @@ void cell_t::push_back(const cell_t &cell, long long i) {
   ax.push_back(cell.ax[i]);
   ay.push_back(cell.ay[i]);
   m.push_back(cell.m[i]);
-  ind.push_back(i);
+  ind.push_back(cell.ind[i]);
   collided.push_back(cell.collided[i]);
 }
 
