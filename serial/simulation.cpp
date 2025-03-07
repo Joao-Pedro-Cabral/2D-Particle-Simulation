@@ -4,10 +4,23 @@
 #include "particles.h"
 #include <vector>
 
-void fill_cells(double size, long ncside, long long n_part,
+void fill_cells(double size, long ncside, long long npart,
                 const std::vector<particle_t> &par,
                 std::vector<cell_t> &cells) {
-  for (long long i = 0; i < n_part; i++) {
+  std::vector<int> count((ncside+2)*(ncside+2));
+  for(int i = 0; i < count.size(); i++) {
+    count[i] = 0;
+  }
+  for (long long i = 0; i < npart; i++) {
+    count[find_particle_cell(par[i], size, ncside)] ++;
+  }
+  for (long iy = 0; iy < ncside; iy++) {
+    for (long ix = 0; ix < ncside; ix++) {
+      long i = INDEX(ix, iy, ncside);
+      cells[i].reserve(max(2*count[i], (npart/(ncside*ncside))));
+    }
+  }
+  for (long long i = 0; i < npart; i++) {
     cell_t &cell = cells[find_particle_cell(par[i], size, ncside)];
     cell.push_back(par[i], i);
   }

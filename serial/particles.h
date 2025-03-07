@@ -29,6 +29,7 @@ typedef struct cell_t {
   void push_back(const particle_t &par, long long i);
   void push_back(const cell_t &cell, long long i);
   void resize(long long size);
+  void reserve(long long size);
 } cell_t;
 
 typedef struct {

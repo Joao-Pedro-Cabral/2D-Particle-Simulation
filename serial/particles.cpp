@@ -121,3 +121,15 @@ void cell_t::resize(long long size) {
   ind.resize(size);
   collided.resize(size);
 }
+
+void cell_t::reserve(long long size) {
+  x.reserve(size);
+  y.reserve(size);
+  vx.reserve(size);
+  vy.reserve(size);
+  ax.reserve(size);
+  ay.reserve(size);
+  m.reserve(size);
+  ind.reserve(size);
+  collided.reserve(size);
+}
