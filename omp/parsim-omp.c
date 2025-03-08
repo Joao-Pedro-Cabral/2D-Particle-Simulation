@@ -5,9 +5,8 @@
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <vector>
 
-void print_result(const simulation_result &res) {
+void print_result(simulation_result res) {
   printf("%.3lf %.3lf\n", res.particle_zero.x, res.particle_zero.y);
   printf("%lld\n", res.number_of_collisions);
 }
@@ -45,16 +44,15 @@ int main(int argc, char *argv[]) {
 
   DEBUG("%ld, %lf, %ld, %lld, %lld\n", seed, side, ncside, npart, nstep);
 
-  std::vector<particle_t> par(npart);
+  particle_t *par = (particle_t *)malloc(sizeof(particle_t) * npart);
 
   double exec_time;
-  init_particles(seed, side, ncside, npart,
-                 par.data()); // .data() to provide C compatibility
+  init_particles(seed, side, ncside, npart, par);
   exec_time = -omp_get_wtime();
   simulation_result res = simulation(side, ncside, npart, nstep, par);
   exec_time += omp_get_wtime();
   print_result(res);
   fprintf(stderr, "%.1fs\n", exec_time);
-
+  free(par);
   return 0;
 }

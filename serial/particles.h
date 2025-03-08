@@ -2,8 +2,6 @@
 #ifndef __PARTICLES_H
 #define __PARTICLES_H
 
-#include <omp.h>
-
 typedef struct {
   double x;
   double y;
