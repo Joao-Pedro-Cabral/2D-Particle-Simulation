@@ -3,6 +3,7 @@
 #include "init_particles.h"
 #include "particles.h"
 #include "cells.h"
+#include <math.h>
 
 static long long ncollisions = 0;
 
@@ -110,9 +111,25 @@ void compute_kinetics(double side, long ncside, long ncside2,
   for (long i = 0; i < ncside2; i++) {
       long long cell_size = cells[i].size;
       for (long long j = 0; j < cell_size; j++) {
+        double resx = 0.0;
+        double resy = 0.0;
+        double mg = G * cells[i].m[j];
         for (long long k = j + 1; k < cell_size; k++) {
-          gravitational_force_pp(&cells[i], j, k);
+          double dx = cells[i].x[k] - cells[i].x[j];
+          double dy = cells[i].y[k] - cells[i].y[j];
+          double denominator = dx * dx + dy * dy;
+          denominator *= sqrt(denominator);
+          double numerator = mg * cells[i].m[k];
+          double F = numerator / denominator;
+          double forcex = dx * F;
+          double forcey = dy * F;
+          cells[i].ax[k] -= forcex;
+          cells[i].ay[k] -= forcey;
+          resx += forcex;
+          resy += forcey;
         }
+        cells[i].ax[j] += resx;
+        cells[i].ay[j] += resy;
         for (long long k = 0; k < 9; k++) {
           if (k == 4)
             continue;
@@ -152,7 +169,7 @@ void compute_new_particle_cell(double size, long ncside, long ncside2,
         omp_set_lock(&cells[ind].lock);
         cell_push_back_c(&cells[ind], &cells[i], j);
         omp_unset_lock(&cells[ind].lock);
-        cells[i].m[j] = -1.0;
+        cells[i].ind[j] = -1;
       }
   }
 }
@@ -163,7 +180,7 @@ void detect_collisions(long ncside2, cell_t *cells) {
       long long cell_collisions = 0;
       long long cell_size = cells[i].size;
       for (long long j = cell_size - 1; j >= 0; j--) {
-        if (cells[i].m[j] < 0) {
+        if (cells[i].ind[j] == -1) {
           DEBUG("Removing mass null Particle %lld from cells[%ld].par[%lld]\n",
                 cells[i].ind[j], i, j);
           cell_size--;
@@ -171,8 +188,11 @@ void detect_collisions(long ncside2, cell_t *cells) {
         }
       }
       for (long long j = cell_size - 1; j >= 0; j--) {
+        bool collided = cells[i].collided[j];
         for (long long k = j - 1; k >= 0; k--) {
-          double distance = squared_distance(&cells[i], j, k);
+          double dx = cells[i].x[j] - cells[i].x[k];
+          double dy = cells[i].y[j] - cells[i].y[k];
+          double distance = dx * dx + dy * dy;
           if (distance > EPSILON2)
             continue;
           DEBUG("Distance: %.6lf, i: %ld, j: %lld, k: %lld\n",
@@ -181,8 +201,9 @@ void detect_collisions(long ncside2, cell_t *cells) {
             cell_collisions++;
             cells[i].collided[k] = true;
           }
-          cells[i].collided[j] = true;
+          collided |= true;
         }
+        cells[i].collided[j] = collided;
         if (cells[i].collided[j] == true) {
           DEBUG("Removing Particle %lld from cells[%ld].par[%lld]\n",
                 cells[i].ind[j], i, j);
