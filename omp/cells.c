@@ -1,8 +1,8 @@
 
 #include "cells.h"
 #include "init_particles.h"
-#include <stdlib.h>
 #include <math.h>
+#include <stdlib.h>
 
 long find_cell_p(particle_t *par, double size, long ncside) {
   long xpart = par->x / size;
@@ -25,7 +25,7 @@ void cell_init(cell_t *cell, long long capacity, long center) {
   cell->ay = (double *)malloc(capacity * sizeof(double));
   cell->m = (double *)malloc(capacity * sizeof(double));
   cell->ind = (long long *)malloc(capacity * sizeof(long long));
-  cell->collided = (bool *)malloc(capacity * sizeof(bool)); 
+  cell->collided = (bool *)malloc(capacity * sizeof(bool));
   cell->size = 0;
   cell->capacity = capacity;
   cell->center = center;
@@ -44,12 +44,12 @@ void cell_resize(cell_t *cell, long long size) {
     cell->ay = (double *)realloc(cell->ay, capacity * sizeof(double));
     cell->m = (double *)realloc(cell->m, capacity * sizeof(double));
     cell->ind = (long long *)realloc(cell->ind, capacity * sizeof(long long));
-    cell->collided = (bool *)realloc(cell->collided, capacity * sizeof(bool)); 
+    cell->collided = (bool *)realloc(cell->collided, capacity * sizeof(bool));
     cell->capacity = capacity;
   }
 }
 
-void cell_push_back_c(cell_t *cell, cell_t* cell2, long long i) {
+void cell_push_back_c(cell_t *cell, cell_t *cell2, long long i) {
   cell->x[cell->size] = cell2->x[i];
   cell->y[cell->size] = cell2->y[i];
   cell->vx[cell->size] = cell2->vx[i];
@@ -63,7 +63,7 @@ void cell_push_back_c(cell_t *cell, cell_t* cell2, long long i) {
   cell_resize(cell, cell->size);
 }
 
-void cell_push_back_p(cell_t *cell, particle_t* par, long long i) {
+void cell_push_back_p(cell_t *cell, particle_t *par, long long i) {
   cell->x[cell->size] = par->x;
   cell->y[cell->size] = par->y;
   cell->vx[cell->size] = par->vx;

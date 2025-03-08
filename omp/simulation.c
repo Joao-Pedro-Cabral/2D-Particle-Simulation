@@ -1,8 +1,8 @@
 #include "simulation.h"
+#include "cells.h"
 #include "debug.h"
 #include "init_particles.h"
 #include "particles.h"
-#include "cells.h"
 #include <math.h>
 
 static long long ncollisions = 0;
@@ -44,31 +44,31 @@ void debug_centers(long ncside, particle_t *centers) {
   }
 }
 
-void compute_centers_of_mass(double side, long ncside, long ncside2, cell_t *cells,
-                             particle_t *centers) {
+void compute_centers_of_mass(double side, long ncside, long ncside2,
+                             cell_t *cells, particle_t *centers) {
 #pragma omp for schedule(dynamic, CHUNK_SIZE)
   for (long i = 0; i < ncside2; i++) {
-      double total_mass = 0.0;
-      double weighted_x = 0.0;
-      double weighted_y = 0.0;
-      long long cell_size = cells[i].size;
+    double total_mass = 0.0;
+    double weighted_x = 0.0;
+    double weighted_y = 0.0;
+    long long cell_size = cells[i].size;
 
-      for (long long j = 0; j < cell_size; j++) {
-        total_mass += cells[i].m[j];
-        weighted_x += cells[i].m[j] * cells[i].x[j];
-        weighted_y += cells[i].m[j] * cells[i].y[j];
-      }
+    for (long long j = 0; j < cell_size; j++) {
+      total_mass += cells[i].m[j];
+      weighted_x += cells[i].m[j] * cells[i].x[j];
+      weighted_y += cells[i].m[j] * cells[i].y[j];
+    }
 
-      long ind = cells[i].center;
-      centers[ind].m = total_mass;
+    long ind = cells[i].center;
+    centers[ind].m = total_mass;
 
-      if (total_mass > 0) {
-        centers[ind].x = weighted_x / total_mass;
-        centers[ind].y = weighted_y / total_mass;
-      } else {
-        centers[ind].x = -2 * side;
-        centers[ind].y = -2 * side;
-      }
+    if (total_mass > 0) {
+      centers[ind].x = weighted_x / total_mass;
+      centers[ind].y = weighted_y / total_mass;
+    } else {
+      centers[ind].x = -2 * side;
+      centers[ind].y = -2 * side;
+    }
   }
 #pragma omp for collapse(2) nowait
   for (long i = 0; i < ncside + 2; i += ncside + 1) {
@@ -78,16 +78,16 @@ void compute_centers_of_mass(double side, long ncside, long ncside2, cell_t *cel
       if (j == 0 || j == ncside + 1) {
         long j2 = (j == 0) ? ncside : 1;
         long ind2 = i2 * (ncside + 2) + j2;
-        centers[ind].x = (j == 0) ? centers[ind2].x - side
-                                       : centers[ind2].x + side;
-        centers[ind].y = (i == 0) ? centers[ind2].y - side
-                                       : centers[ind2].y + side;
+        centers[ind].x =
+            (j == 0) ? centers[ind2].x - side : centers[ind2].x + side;
+        centers[ind].y =
+            (i == 0) ? centers[ind2].y - side : centers[ind2].y + side;
         centers[ind].m = centers[ind2].m;
       } else {
         long ind2 = i2 * (ncside + 2) + j;
         centers[ind].x = centers[ind2].x;
-        centers[ind].y = (i == 0) ? centers[ind2].y - side
-                                       : centers[ind2].y + side;
+        centers[ind].y =
+            (i == 0) ? centers[ind2].y - side : centers[ind2].y + side;
         centers[ind].m = centers[ind2].m;
       }
     }
@@ -107,134 +107,134 @@ void compute_centers_of_mass(double side, long ncside, long ncside2, cell_t *cel
   debug_centers(ncside, centers);
 }
 
-void compute_kinetics(double side, long ncside, long ncside2,
-                      cell_t *cells, particle_t *centers) {
+void compute_kinetics(double side, long ncside, long ncside2, cell_t *cells,
+                      particle_t *centers) {
 #pragma omp for schedule(dynamic, CHUNK_SIZE)
   for (long i = 0; i < ncside2; i++) {
-      long long cell_size = cells[i].size;
-      for (long long j = 0; j < cell_size; j++) {
-        double resx = 0.0;
-        double resy = 0.0;
-        double mg = G * cells[i].m[j];
-        for (long long k = j + 1; k < cell_size; k++) {
-          double dx = cells[i].x[k] - cells[i].x[j];
-          double dy = cells[i].y[k] - cells[i].y[j];
-          double denominator = dx * dx + dy * dy;
-          denominator *= sqrt(denominator);
-          double numerator = mg * cells[i].m[k];
-          double F = numerator / denominator;
-          double forcex = dx * F;
-          double forcey = dy * F;
-          cells[i].ax[k] -= forcex;
-          cells[i].ay[k] -= forcey;
-          resx += forcex;
-          resy += forcey;
-        }
-        cells[i].ax[j] += resx;
-        cells[i].ay[j] += resy;
-        for (long long k = 0; k < 9; k++) {
-          if (k == 4)
-            continue;
-          long ind = cells[i].center + ((k % 3) - 1) + (k / 3 - 1) * (ncside + 2);
-          gravitational_force_pc(&cells[i], j, &centers[ind]);
-        }
-        cells[i].ax[j] /= cells[i].m[j];
-        cells[i].ay[j] /= cells[i].m[j];
-        update_position_and_velocity(&cells[i], j, side);
+    long long cell_size = cells[i].size;
+    for (long long j = 0; j < cell_size; j++) {
+      double resx = 0.0;
+      double resy = 0.0;
+      double mg = G * cells[i].m[j];
+      for (long long k = j + 1; k < cell_size; k++) {
+        double dx = cells[i].x[k] - cells[i].x[j];
+        double dy = cells[i].y[k] - cells[i].y[j];
+        double denominator = dx * dx + dy * dy;
+        denominator *= sqrt(denominator);
+        double numerator = mg * cells[i].m[k];
+        double F = numerator / denominator;
+        double forcex = dx * F;
+        double forcey = dy * F;
+        cells[i].ax[k] -= forcex;
+        cells[i].ay[k] -= forcey;
+        resx += forcex;
+        resy += forcey;
       }
+      cells[i].ax[j] += resx;
+      cells[i].ay[j] += resy;
+      for (long long k = 0; k < 9; k++) {
+        if (k == 4)
+          continue;
+        long ind = cells[i].center + ((k % 3) - 1) + (k / 3 - 1) * (ncside + 2);
+        gravitational_force_pc(&cells[i], j, &centers[ind]);
+      }
+      cells[i].ax[j] /= cells[i].m[j];
+      cells[i].ay[j] /= cells[i].m[j];
+      update_position_and_velocity(&cells[i], j, side);
+    }
   }
 }
 
-void debug_particles(long ncside2, cell_t* cells) {
+void debug_particles(long ncside2, cell_t *cells) {
   for (long i = 0; i < ncside2; i++) {
-      long long cell_size = cells[i].size;
-      for (long long j = 0; j < cell_size; j++) {
-        DEBUG("Particle %lld: m: %.6f, x: %.6f, y: %.6f, vx: %.6f, vy: %.6f, "
-              "ax: %.6f, ay: %.6f, collided: %d, cell: %ld\n",
-              cells[i].ind[j], cells[i].m[j], cells[i].x[j], cells[i].y[j],
-              cells[i].vx[j], cells[i].vy[j], cells[i].ax[j], cells[i].ay[j],
-              (int)cells[i].collided[j], i);
-      }
+    long long cell_size = cells[i].size;
+    for (long long j = 0; j < cell_size; j++) {
+      DEBUG("Particle %lld: m: %.6f, x: %.6f, y: %.6f, vx: %.6f, vy: %.6f, "
+            "ax: %.6f, ay: %.6f, collided: %d, cell: %ld\n",
+            cells[i].ind[j], cells[i].m[j], cells[i].x[j], cells[i].y[j],
+            cells[i].vx[j], cells[i].vy[j], cells[i].ax[j], cells[i].ay[j],
+            (int)cells[i].collided[j], i);
+    }
   }
 }
 
 void compute_new_particle_cell(double size, long ncside, long ncside2,
-                              cell_t* cells) {
+                               cell_t *cells) {
 #pragma omp for schedule(dynamic, CHUNK_SIZE)
   for (long i = 0; i < ncside2; i++) {
-      omp_set_lock(&cells[i].lock);
-      long long cell_size = cells[i].size;
-      omp_unset_lock(&cells[i].lock);
-      for (long long j = 0; j < cell_size; j++) {
-        long ind = find_cell_c(&cells[i], j, size, ncside);
-        if (ind == i)
-          continue;
-        omp_set_lock(&cells[ind].lock);
-        cell_push_back_c(&cells[ind], &cells[i], j);
-        omp_unset_lock(&cells[ind].lock);
-        cells[i].ind[j] = -1;
-      }
+    omp_set_lock(&cells[i].lock);
+    long long cell_size = cells[i].size;
+    omp_unset_lock(&cells[i].lock);
+    for (long long j = 0; j < cell_size; j++) {
+      long ind = find_cell_c(&cells[i], j, size, ncside);
+      if (ind == i)
+        continue;
+      omp_set_lock(&cells[ind].lock);
+      cell_push_back_c(&cells[ind], &cells[i], j);
+      omp_unset_lock(&cells[ind].lock);
+      cells[i].ind[j] = -1;
+    }
   }
 }
 
 void detect_collisions(long ncside2, cell_t *cells) {
-#pragma omp for reduction(+ : ncollisions) schedule(dynamic, CHUNK_SIZE)    
+#pragma omp for reduction(+ : ncollisions) schedule(dynamic, CHUNK_SIZE)
   for (long i = 0; i < ncside2; i++) {
-      long long cell_collisions = 0;
-      long long cell_size = cells[i].size;
-      for (long long j = cell_size - 1; j >= 0; j--) {
-        if (cells[i].ind[j] == -1) {
-          DEBUG("Removing mass null Particle %lld from cells[%ld].par[%lld]\n",
-                cells[i].ind[j], i, j);
-          cell_size--;
-          cell_remove_particle(&cells[i], j);
-        }
+    long long cell_collisions = 0;
+    long long cell_size = cells[i].size;
+    for (long long j = cell_size - 1; j >= 0; j--) {
+      if (cells[i].ind[j] == -1) {
+        DEBUG("Removing mass null Particle %lld from cells[%ld].par[%lld]\n",
+              cells[i].ind[j], i, j);
+        cell_size--;
+        cell_remove_particle(&cells[i], j);
       }
-      for (long long j = cell_size - 1; j >= 0; j--) {
-        bool collided = cells[i].collided[j];
-        for (long long k = j - 1; k >= 0; k--) {
-          double dx = cells[i].x[j] - cells[i].x[k];
-          double dy = cells[i].y[j] - cells[i].y[k];
-          double distance = dx * dx + dy * dy;
-          if (distance > EPSILON2)
-            continue;
-          DEBUG("Distance: %.6lf, i: %ld, j: %lld, k: %lld\n",
-                distance, i, cells[i].ind[j], cells[i].ind[k]);
-          if (cells[i].collided[k] == false) {
-            cell_collisions++;
-            cells[i].collided[k] = true;
-          }
-          collided |= true;
+    }
+    for (long long j = cell_size - 1; j >= 0; j--) {
+      bool collided = cells[i].collided[j];
+      for (long long k = j - 1; k >= 0; k--) {
+        double dx = cells[i].x[j] - cells[i].x[k];
+        double dy = cells[i].y[j] - cells[i].y[k];
+        double distance = dx * dx + dy * dy;
+        if (distance > EPSILON2)
+          continue;
+        DEBUG("Distance: %.6lf, i: %ld, j: %lld, k: %lld\n", distance, i,
+              cells[i].ind[j], cells[i].ind[k]);
+        if (cells[i].collided[k] == false) {
+          cell_collisions++;
+          cells[i].collided[k] = true;
         }
-        cells[i].collided[j] = collided;
-        if (cells[i].collided[j] == true) {
-          DEBUG("Removing Particle %lld from cells[%ld].par[%lld]\n",
-                cells[i].ind[j], i, j);
-          cell_size--;
-          cell_remove_particle(&cells[i], j);
-        }
+        collided |= true;
       }
-      ncollisions += cell_collisions;
-      cell_resize(&cells[i], cell_size);
+      cells[i].collided[j] = collided;
+      if (cells[i].collided[j] == true) {
+        DEBUG("Removing Particle %lld from cells[%ld].par[%lld]\n",
+              cells[i].ind[j], i, j);
+        cell_size--;
+        cell_remove_particle(&cells[i], j);
+      }
+    }
+    ncollisions += cell_collisions;
+    cell_resize(&cells[i], cell_size);
   }
   DEBUG("Number of collisions %lld\n", ncollisions);
   debug_particles(ncside2, cells);
 }
 
-particle_t find_particle_zero(long ncside2, cell_t* cells) {
+particle_t find_particle_zero(long ncside2, cell_t *cells) {
   particle_t par0;
   for (long i = 0; i < ncside2; i++) {
-      long long cell_size = cells[i].size;
-      for (long long j = 0; j < cell_size; j++) {
-        if (cells[i].ind[j] == 0) {
-          par0.x = cells[i].x[j];
-          par0.y = cells[i].y[j];
-          par0.vx = cells[i].vx[j];
-          par0.vy = cells[i].vy[j];
-          par0.m = cells[i].m[j];
-          return par0;
-        }
+    long long cell_size = cells[i].size;
+    for (long long j = 0; j < cell_size; j++) {
+      if (cells[i].ind[j] == 0) {
+        par0.x = cells[i].x[j];
+        par0.y = cells[i].y[j];
+        par0.vx = cells[i].vx[j];
+        par0.vy = cells[i].vy[j];
+        par0.m = cells[i].m[j];
+        return par0;
       }
+    }
   }
   ERROR("Particle 0 not found\n");
 }
@@ -248,7 +248,7 @@ simulation_result simulation(double side, long ncside, long long npart,
       malloc(sizeof(particle_t) * (ncside + 2) * (ncside + 2));
   simulation_result res;
   init_structures(size, ncside, ncside2, npart, par, cells);
-  #pragma omp parallel
+#pragma omp parallel
   for (long long i = 0; i < nstep; i++) {
     // printf("--------STEP: %lld --------------\n", i);
     compute_centers_of_mass(side, ncside, ncside2, cells, centers);
