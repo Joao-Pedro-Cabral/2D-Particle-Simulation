@@ -1,0 +1,240 @@
+#include "simulation.h"
+#include "debug.h"
+#include "init_particles.h"
+#include "particles.h"
+#include "cells.h"
+
+static long long ncollisions = 0;
+
+void init_structures(double size, long ncside, long ncside2, long long npart,
+                     particle_t *par, cell_t *cells) {
+  long long *count = malloc(sizeof(long long) * ncside2);
+  for (long i = 0; i < ncside2; i++) {
+    count[i] = 0;
+  }
+  for (long long i = 0; i < npart; i++) {
+    count[find_cell_p(&par[i], size, ncside)]++;
+  }
+  long long min_size = npart / ncside;
+  min_size = (min_size > 10) ? min_size : 10;
+  for (long i = 0; i < ncside2; i++) {
+    count[i] *= 2;
+    long long capacity =
+        count[i] > npart ? npart : (count[i] > min_size ? count[i] : min_size);
+    cell_init(&cells[i], capacity,
+              (i % ncside + 1) + (i / ncside + 1) * (ncside + 2));
+  }
+  for (long long i = 0; i < npart; i++) {
+    cell_push_back_p(&cells[find_cell_p(&par[i], size, ncside)], &par[i], i);
+  }
+  free(count);
+}
+
+void clean_cells(long ncside2, cell_t *cells) {
+  for (long i = 0; i < ncside2; i++) {
+    cell_clean(&cells[i]);
+  }
+}
+
+void debug_centers(long ncside, particle_t *centers) {
+  for (long i = 0; i < (ncside + 2) * (ncside + 2); i++) {
+    DEBUG("Center %ld x: %.6lf y: %.6lf m: %.6lf\n", i, centers[i].x,
+          centers[i].y, centers[i].m);
+  }
+}
+
+void compute_centers_of_mass(double side, long ncside, long ncside2, cell_t *cells,
+                             particle_t *centers) {
+
+  for (long i = 0; i < ncside2; i++) {
+      double total_mass = 0.0;
+      double weighted_x = 0.0;
+      double weighted_y = 0.0;
+      long long cell_size = cells[i].size;
+
+      for (long long j = 0; j < cell_size; j++) {
+        total_mass += cells[i].m[j];
+        weighted_x += cells[i].m[j] * cells[i].x[j];
+        weighted_y += cells[i].m[j] * cells[i].y[j];
+      }
+
+      long ind = cells[i].center;
+      centers[ind].m = total_mass;
+
+      if (total_mass > 0) {
+        centers[ind].x = weighted_x / total_mass;
+        centers[ind].y = weighted_y / total_mass;
+      } else {
+        centers[ind].x = -2 * side;
+        centers[ind].y = -2 * side;
+      }
+  }
+  for (long i = 0; i < ncside + 2; i += ncside + 1) {
+    for (long j = 0; j < ncside + 2; j++) {
+      long ind = i * (ncside + 2) + j;
+      long i2 = (i == 0) ? ncside : 1;
+      if (j == 0 || j == ncside + 1) {
+        long j2 = (j == 0) ? ncside : 1;
+        long ind2 = i2 * (ncside + 2) + j2;
+        centers[ind].x = (j == 0) ? centers[ind2].x - side
+                                       : centers[ind2].x + side;
+        centers[ind].y = (i == 0) ? centers[ind2].y - side
+                                       : centers[ind2].y + side;
+        centers[ind].m = centers[ind2].m;
+      } else {
+        long ind2 = i2 * (ncside + 2) + j;
+        centers[ind].x = centers[ind2].x;
+        centers[ind].y = (i == 0) ? centers[ind2].y - side
+                                       : centers[ind2].y + side;
+        centers[ind].m = centers[ind2].m;
+      }
+    }
+  }
+  for (long j = 0; j < ncside + 2; j += ncside + 1) {
+    for (long i = 1; i < ncside + 1; i++) {
+      long ind = i * (ncside + 2) + j;
+      long j2 = (j == 0) ? ncside : 1;
+      long ind2 = i * (ncside + 2) + j2;
+      centers[ind].x =
+          (j == 0) ? centers[ind2].x - side : centers[ind2].x + side;
+      centers[ind].y = centers[ind2].y;
+      centers[ind].m = centers[ind2].m;
+    }
+  }
+  debug_centers(ncside, centers);
+}
+
+void compute_kinetics(double side, long ncside, long ncside2,
+                      cell_t *cells, particle_t *centers) {
+
+  for (long i = 0; i < ncside2; i++) {
+      long long cell_size = cells[i].size;
+      for (long long j = 0; j < cell_size; j++) {
+        for (long long k = j + 1; k < cell_size; k++) {
+          gravitational_force_pp(&cells[i], j, k);
+        }
+        for (long long k = 0; k < 9; k++) {
+          if (k == 4)
+            continue;
+          long ind = cells[i].center + ((k % 3) - 1) + (k / 3 - 1) * (ncside + 2);
+          gravitational_force_pc(&cells[i], j, &centers[ind]);
+        }
+        cells[i].ax[j] /= cells[i].m[j];
+        cells[i].ay[j] /= cells[i].m[j];
+        update_position_and_velocity(&cells[i], j, side);
+      }
+  }
+}
+
+void debug_particles(long ncside2, cell_t* cells) {
+  for (long i = 0; i < ncside2; i++) {
+      long long cell_size = cells[i].size;
+      for (long long j = 0; j < cell_size; j++) {
+        DEBUG("Particle %lld: m: %.6f, x: %.6f, y: %.6f, vx: %.6f, vy: %.6f, "
+              "ax: %.6f, ay: %.6f, collided: %d, cell: %ld\n",
+              cells[i].ind[j], cells[i].m[j], cells[i].x[j], cells[i].y[j],
+              cells[i].vx[j], cells[i].vy[j], cells[i].ax[j], cells[i].ay[j],
+              (int)cells[i].collided[j], i);
+      }
+  }
+}
+
+void compute_new_particle_cell(double size, long ncside, long ncside2,
+                              cell_t* cells) {
+  for (long i = 0; i < ncside2; i++) {
+      omp_set_lock(&cells[i].lock);
+      long long cell_size = cells[i].size;
+      omp_unset_lock(&cells[i].lock);
+      for (long long j = 0; j < cell_size; j++) {
+        long ind = find_cell_c(&cells[i], j, size, ncside);
+        if (ind == i)
+          continue;
+        omp_set_lock(&cells[ind].lock);
+        cell_push_back_c(&cells[ind], &cells[i], j);
+        omp_unset_lock(&cells[ind].lock);
+        cells[i].m[j] = -1.0;
+      }
+  }
+}
+
+void detect_collisions(long ncside2, cell_t *cells) {
+
+  for (long i = 0; i < ncside2; i++) {
+      long long cell_collisions = 0;
+      long long cell_size = cells[i].size;
+      for (long long j = cell_size - 1; j >= 0; j--) {
+        if (cells[i].m[j] < 0) {
+          DEBUG("Removing mass null Particle %lld from cells[%ld].par[%lld]\n",
+                cells[i].ind[j], i, j);
+          cell_size--;
+          cell_remove_particle(&cells[i], j);
+        }
+      }
+      for (long long j = cell_size - 1; j >= 0; j--) {
+        for (long long k = j - 1; k >= 0; k--) {
+          double distance = squared_distance(&cells[i], j, k);
+          if (distance > EPSILON2)
+            continue;
+          DEBUG("Distance: %.6lf, i: %ld, j: %lld, k: %lld\n",
+                distance, i, cells[i].ind[j], cells[i].ind[k]);
+          if (cells[i].collided[k] == false) {
+            cell_collisions++;
+            cells[i].collided[k] = true;
+          }
+          cells[i].collided[j] = true;
+        }
+        if (cells[i].collided[j] == true) {
+          DEBUG("Removing Particle %lld from cells[%ld].par[%lld]\n",
+                cells[i].ind[j], i, j);
+          cell_size--;
+          cell_remove_particle(&cells[i], j);
+        }
+      }
+      ncollisions += cell_collisions;
+      cell_resize(&cells[i], cell_size);
+  }
+  DEBUG("Number of collisions %lld\n", ncollisions);
+  debug_particles(ncside2, cells);
+}
+
+particle_t find_particle_zero(long ncside2, cell_t* cells) {
+  particle_t par0;
+  for (long i = 0; i < ncside2; i++) {
+      long long cell_size = cells[i].size;
+      for (long long j = 0; j < cell_size; j++) {
+        if (cells[i].ind[j] == 0) {
+          par0.x = cells[i].x[j];
+          par0.y = cells[i].y[j];
+          par0.vx = cells[i].vx[j];
+          par0.vy = cells[i].vy[j];
+          par0.m = cells[i].m[j];
+          return par0;
+        }
+      }
+  }
+  ERROR("Particle 0 not found\n");
+}
+
+simulation_result simulation(double side, long ncside, long long npart,
+                             long long nstep, particle_t *par) {
+  double size = side / ncside;
+  long ncside2 = ncside * ncside;
+  cell_t *cells = malloc(sizeof(cell_t) * ncside2);
+  particle_t *centers =
+      malloc(sizeof(particle_t) * (ncside + 2) * (ncside + 2));
+  simulation_result res;
+  init_structures(size, ncside, ncside2, npart, par, cells);
+  for (long long i = 0; i < nstep; i++) {
+    // printf("--------STEP: %lld --------------\n", i);
+    compute_centers_of_mass(side, ncside, ncside2, cells, centers);
+    compute_kinetics(side, ncside, ncside2, cells, centers);
+    compute_new_particle_cell(size, ncside, ncside2, cells);
+    detect_collisions(ncside2, cells);
+  }
+  res.number_of_collisions = ncollisions;
+  res.particle_zero = find_particle_zero(ncside2, cells);
+  clean_cells(ncside2, cells);
+  free(cells);
+  free(centers);
+  return res;
+}

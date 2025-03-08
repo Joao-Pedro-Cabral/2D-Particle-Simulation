@@ -1,6 +1,6 @@
 
-#ifndef __PARSIM_H
-#define __PARSIM_H
+#ifndef __SIMULATION_H
+#define __SIMULATION_H
 
 #include "particles.h"
 
@@ -10,6 +10,6 @@ typedef struct {
 } simulation_result;
 
 simulation_result simulation(double side, long ncside, long long npart,
-                             long long nstep, std::vector<particle_t> &par);
+                             long long nstep, particle_t *par);
 
-#endif // __PARSIM_H
+#endif // __SIMULATION_H
