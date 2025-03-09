@@ -197,11 +197,11 @@ void detect_collisions(long ncside2, cell_t *cells) {
           continue;
         DEBUG("Distance: %.6lf, i: %ld, j: %lld, k: %lld\n", distance, i,
               cells[i].ind[j], cells[i].ind[k]);
-        if (cells[i].collided[k] == false) {
-          cell_collisions++;
-          cells[i].collided[k] = true;
+        if (cells[i].collided[k] == false && !collided) {
+          cell_collisions++; 
         }
-        collided |= true;
+        cells[i].collided[k] = true;
+        collided = true;
       }
       cells[i].collided[j] = collided;
       if (cells[i].collided[j] == true) {

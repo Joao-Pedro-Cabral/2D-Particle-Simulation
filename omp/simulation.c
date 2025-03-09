@@ -45,8 +45,8 @@ void debug_centers(long ncside, particle_t *centers) {
 }
 
 void compute_centers_of_mass(double side, long ncside, long ncside2,
-                             cell_t *cells, particle_t *centers) {
-#pragma omp for schedule(dynamic, CHUNK_SIZE)
+                             cell_t *cells, particle_t *centers, long chunk_size) {
+#pragma omp for schedule(dynamic, chunk_size)
   for (long i = 0; i < ncside2; i++) {
     double total_mass = 0.0;
     double weighted_x = 0.0;
@@ -108,8 +108,8 @@ void compute_centers_of_mass(double side, long ncside, long ncside2,
 }
 
 void compute_kinetics(double side, long ncside, long ncside2, cell_t *cells,
-                      particle_t *centers) {
-#pragma omp for schedule(dynamic, CHUNK_SIZE)
+                      particle_t *centers, long chunk_size) {
+#pragma omp for schedule(dynamic, chunk_size)
   for (long i = 0; i < ncside2; i++) {
     long long cell_size = cells[i].size;
     for (long long j = 0; j < cell_size; j++) {
@@ -159,8 +159,8 @@ void debug_particles(long ncside2, cell_t *cells) {
 }
 
 void compute_new_particle_cell(double size, long ncside, long ncside2,
-                               cell_t *cells) {
-#pragma omp for schedule(dynamic, CHUNK_SIZE)
+                               cell_t *cells, long chunk_size) {
+#pragma omp for schedule(dynamic, chunk_size)
   for (long i = 0; i < ncside2; i++) {
     omp_set_lock(&cells[i].lock);
     long long cell_size = cells[i].size;
@@ -177,8 +177,8 @@ void compute_new_particle_cell(double size, long ncside, long ncside2,
   }
 }
 
-void detect_collisions(long ncside2, cell_t *cells) {
-#pragma omp for reduction(+ : ncollisions) schedule(dynamic, CHUNK_SIZE)
+void detect_collisions(long ncside2, cell_t *cells, long chunk_size) {
+#pragma omp for reduction(+ : ncollisions) schedule(dynamic, chunk_size)
   for (long i = 0; i < ncside2; i++) {
     long long cell_collisions = 0;
     long long cell_size = cells[i].size;
@@ -200,11 +200,11 @@ void detect_collisions(long ncside2, cell_t *cells) {
           continue;
         DEBUG("Distance: %.6lf, i: %ld, j: %lld, k: %lld\n", distance, i,
               cells[i].ind[j], cells[i].ind[k]);
-        if (cells[i].collided[k] == false) {
-          cell_collisions++;
-          cells[i].collided[k] = true;
+        if (cells[i].collided[k] == false && !collided) {
+          cell_collisions++; 
         }
-        collided |= true;
+        cells[i].collided[k] = true;
+        collided = true;
       }
       cells[i].collided[j] = collided;
       if (cells[i].collided[j] == true) {
@@ -248,13 +248,15 @@ simulation_result simulation(double side, long ncside, long long npart,
       malloc(sizeof(particle_t) * (ncside + 2) * (ncside + 2));
   simulation_result res;
   init_structures(size, ncside, ncside2, npart, par, cells);
+  long chunk_size = (ncside2 >= 20*omp_get_max_threads()) ? 5 : (ncside2/(4*omp_get_max_threads()));
+  chunk_size = chunk_size > 0 ? chunk_size : 1; 
 #pragma omp parallel
   for (long long i = 0; i < nstep; i++) {
     // printf("--------STEP: %lld --------------\n", i);
-    compute_centers_of_mass(side, ncside, ncside2, cells, centers);
-    compute_kinetics(side, ncside, ncside2, cells, centers);
-    compute_new_particle_cell(size, ncside, ncside2, cells);
-    detect_collisions(ncside2, cells);
+    compute_centers_of_mass(side, ncside, ncside2, cells, centers, chunk_size);
+    compute_kinetics(side, ncside, ncside2, cells, centers, chunk_size);
+    compute_new_particle_cell(size, ncside, ncside2, cells, chunk_size);
+    detect_collisions(ncside2, cells, chunk_size);
   }
   res.number_of_collisions = ncollisions;
   res.particle_zero = find_particle_zero(ncside2, cells);
