@@ -17,7 +17,7 @@ void init_structures(double size, long ncside, long ncside2, long long npart,
   for (long long i = 0; i < npart; i++) {
     count[find_cell_p(&par[i], size, ncside)]++;
   }
-  long long min_size = npart / ncside;
+  long long min_size = 2*npart / ncside2;
   min_size = (min_size > 10) ? min_size : 10;
   for (long i = 0; i < ncside2; i++) {
     count[i] *= 2;
