@@ -138,8 +138,8 @@ void compute_kinetics(double side, long ncside, long ncside2, cell_t *cells,
       __m256d resy_vec = _mm256_setzero_pd();
       double mg = G * cells[i].m[j];
       __m256d mg2 = _mm256_set1_pd(mg);
-      __m256d xj =  _mm256_loadu_pd(&cells[i].x[j]);
-      __m256d yj =  _mm256_loadu_pd(&cells[i].y[j]);
+      __m256d xj =  _mm256_set1_pd(cells[i].x[j]);
+      __m256d yj =  _mm256_set1_pd(cells[i].y[j]);
       long long iter = (cell_size) - ((cell_size - (j+1)) & 3);
       long long k;
       for (k = j + 1; k < iter; k+= 4) {
