@@ -116,6 +116,7 @@ void compute_kinetics(double side, long ncside, long ncside2, cell_t *cells,
       double resx = 0.0;
       double resy = 0.0;
       double mg = G * cells[i].m[j];
+      #pragma omp simd reduction(+ : resx, resy)
       for (long long k = j + 1; k < cell_size; k++) {
         double dx = cells[i].x[k] - cells[i].x[j];
         double dy = cells[i].y[k] - cells[i].y[j];
