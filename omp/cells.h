@@ -16,7 +16,7 @@ typedef struct {
   double *ay;
   double *m;
   long long *ind;
-  bool *collided;
+  long long *collided;
   long long size;
   long long capacity;
   omp_lock_t lock;

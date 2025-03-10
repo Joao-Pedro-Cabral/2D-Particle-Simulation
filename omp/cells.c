@@ -25,7 +25,7 @@ void cell_init(cell_t *cell, long long capacity, long center) {
   cell->ay = (double *)malloc(capacity * sizeof(double));
   cell->m = (double *)malloc(capacity * sizeof(double));
   cell->ind = (long long *)malloc(capacity * sizeof(long long));
-  cell->collided = (bool *)malloc(capacity * sizeof(bool));
+  cell->collided = (long long *)malloc(capacity * sizeof(long long));
   cell->size = 0;
   cell->capacity = capacity;
   cell->center = center;
@@ -44,7 +44,7 @@ void cell_resize(cell_t *cell, long long size) {
     cell->ay = (double *)realloc(cell->ay, capacity * sizeof(double));
     cell->m = (double *)realloc(cell->m, capacity * sizeof(double));
     cell->ind = (long long *)realloc(cell->ind, capacity * sizeof(long long));
-    cell->collided = (bool *)realloc(cell->collided, capacity * sizeof(bool));
+    cell->collided = (long long *)realloc(cell->collided, capacity * sizeof(long long));
     cell->capacity = capacity;
   }
 }
@@ -72,7 +72,7 @@ void cell_push_back_p(cell_t *cell, particle_t *par, long long i) {
   cell->ay[cell->size] = 0.0;
   cell->m[cell->size] = par->m;
   cell->ind[cell->size] = i;
-  cell->collided[cell->size] = false;
+  cell->collided[cell->size] = 0;
   cell->size++;
   cell_resize(cell, cell->size);
 }
