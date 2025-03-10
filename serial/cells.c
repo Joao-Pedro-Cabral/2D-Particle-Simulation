@@ -29,7 +29,6 @@ void cell_init(cell_t *cell, long long capacity, long center) {
   cell->size = 0;
   cell->capacity = capacity;
   cell->center = center;
-  omp_init_lock(&cell->lock);
 }
 
 void cell_resize(cell_t *cell, long long size) {
@@ -112,7 +111,6 @@ void cell_clean(cell_t *cell) {
   cell->size = 0;
   cell->capacity = 0;
   cell->center = 0;
-  omp_destroy_lock(&cell->lock);
 }
 
 double squared_distance(cell_t *cell, long long i, long long j) {

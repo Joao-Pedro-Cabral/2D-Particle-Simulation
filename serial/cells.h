@@ -18,7 +18,6 @@ typedef struct {
   long long *collided;
   long long size;
   long long capacity;
-  omp_lock_t lock;
 } cell_t;
 
 long find_cell_p(particle_t *par, double size, long ncside);

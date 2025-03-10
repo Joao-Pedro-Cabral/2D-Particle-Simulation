@@ -165,10 +165,8 @@ void compute_kinetics(double side, long ncside, long ncside2, cell_t *cells,
         resx_vec = _mm256_add_pd(resx_vec, forcex);
         resy_vec = _mm256_add_pd(resy_vec, forcey);
       }
-      resx_vec = _mm256_hadd_pd(resx_vec, resx_vec);
-      double resx = ((double*)&resx_vec)[0] + ((double*)&resx_vec)[2];
-      resy_vec = _mm256_hadd_pd(resy_vec, resy_vec);
-      double resy = ((double*)&resy_vec)[0] + ((double*)&resy_vec)[2];
+      double resx = sum_lanes(resx_vec);
+      double resy = sum_lanes(resy_vec);
       while(k < cell_size) {
         double dx = cells[i].x[k] - cells[i].x[j];
         double dy = cells[i].y[k] - cells[i].y[j];
@@ -215,16 +213,12 @@ void debug_particles(long ncside2, cell_t *cells) {
 void compute_new_particle_cell(double size, long ncside, long ncside2,
                                cell_t *cells) {
   for (long i = 0; i < ncside2; i++) {
-    omp_set_lock(&cells[i].lock);
     long long cell_size = cells[i].size;
-    omp_unset_lock(&cells[i].lock);
     for (long long j = 0; j < cell_size; j++) {
       long ind = find_cell_c(&cells[i], j, size, ncside);
       if (ind == i)
         continue;
-      omp_set_lock(&cells[ind].lock);
       cell_push_back_c(&cells[ind], &cells[i], j);
-      omp_unset_lock(&cells[ind].lock);
       cells[i].ind[j] = -1;
     }
   }
