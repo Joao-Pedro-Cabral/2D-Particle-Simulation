@@ -224,26 +224,6 @@ void compute_new_particle_cell(double size, long ncside, long ncside2,
   }
 }
 
-void print_m256d(__m256d vec) {
-    // 4x long long (64-bit)
-    double ll_values[4];
-    _mm256_storeu_pd(ll_values, vec);
-    for (int i = 0; i < 4; i++) {
-        printf("%.9lf ", ll_values[i]);
-    }
-    printf("\n");
-}
-
-void print_m256i(__m256i vec) {
-    // 4x long long (64-bit)
-    long long ll_values[4];
-    _mm256_storeu_si256((__m256i*)ll_values, vec);
-    for (int i = 0; i < 4; i++) {
-        printf("%lld ", ll_values[i]);
-    }
-    printf("\n");
-}
-
 void detect_collisions(long ncside2, cell_t *cells) {
 
   for (long i = 0; i < ncside2; i++) {
@@ -273,12 +253,14 @@ void detect_collisions(long ncside2, cell_t *cells) {
         __m256d distance = _mm256_mul_pd(dx, dx);
         distance = _mm256_fmadd_pd(dy, dy, distance);
         __m256d cmp = _mm256_cmp_pd(distance, epsilon2, _CMP_LT_OQ);
+        if(_mm256_testz_pd(cmp, cmp)) {
+          continue;
+        }
         __m256i near = _mm256_castpd_si256(cmp);
-        __m256i collidedk = _mm256_loadu_si256((__m256i*)&cells[i].collided[k]);
-        _mm256_storeu_si256((__m256i*)&cells[i].collided[k], near);
-        near = _mm256_andnot_si256(collidedj, near);
-        near = _mm256_andnot_si256(collidedk, near);
-        collision += (_mm256_movemask_epi8(near) != 0);
+        __m256i collided = _mm256_loadu_si256((__m256i*)&cells[i].collided[k]);
+        __m256i mask = _mm256_andnot_si256(collided, near);
+        collision += (_mm256_movemask_epi8(mask) != 0);
+        _mm256_storeu_si256((__m256i*)&cells[i].collided[k], _mm256_or_si256(near, collided));
       }
       while(k < j) {
         double dx = cells[i].x[j] - cells[i].x[k];
