@@ -10,6 +10,9 @@ TESTS=(
     "-1 1000 30 100000 1000" "575.878 370.663" "1203"
 )
 
+# Thread counts to test
+THREADS=(1 2 4 8)
+
 declare -A serial_times
 declare -A omp_times
 
@@ -19,8 +22,9 @@ function check_output() {
     local expected_coords=$3
     local expected_collisions=$4
     local version=$5
+    local threads=$6
 
-    echo "$ $cmd $params" >> output.txt
+    echo "$ $cmd $params (threads: $threads)" >> output.txt
     output=$($cmd $params)
     echo "$output" >> output.txt
 
@@ -33,11 +37,11 @@ function check_output() {
     if [ "$version" == "serial" ]; then
         serial_times[$params]=$execution_time
     else
-        omp_times[$params]=$execution_time
+        omp_times["${params}_${threads}"]=$execution_time
         # Calculate and print speedup
         serial_time=${serial_times[$params]}
         speedup=$(echo "scale=2; $serial_time / $execution_time" | bc)
-        echo "Speedup for test [$params]: $speedup" >> output.txt
+        echo "Speedup for test [$params] with $threads threads: $speedup" >> output.txt
     fi
 
     # Check if output matches expected values
@@ -53,23 +57,29 @@ echo "Serial version" >> output.txt
 cd serial
 make profile
 
-# Run serial tests
 for ((i=0; i<${#TESTS[@]}; i+=3)); do
-    check_output "./parsim" "${TESTS[i]}" "${TESTS[i+1]}" "${TESTS[i+2]}" "serial"
+    check_output "./parsim" "${TESTS[i]}" "${TESTS[i+1]}" "${TESTS[i+2]}" "serial" "1"
 done
 
 echo "OMP version" >> output.txt
 cd ../omp
 make profile
 
-# Run OMP tests and compute speedups
-for ((i=0; i<${#TESTS[@]}; i+=3)); do
-    check_output "./parsim-omp" "${TESTS[i]}" "${TESTS[i+1]}" "${TESTS[i+2]}" "omp"
+for threads in "${THREADS[@]}"; do
+    echo -e "\nRunning with $threads threads:" >> output.txt
+    export OMP_NUM_THREADS=$threads
+    for ((i=0; i<${#TESTS[@]}; i+=3)); do
+        check_output "./parsim-omp" "${TESTS[i]}" "${TESTS[i+1]}" "${TESTS[i+2]}" "omp" "$threads"
+    done
 done
 
 # Print summary of all speedups
 echo -e "\nSpeedup Summary:" >> output.txt
-for params in "${!serial_times[@]}"; do
-    speedup=$(echo "scale=2; ${serial_times[$params]} / ${omp_times[$params]}" | bc)
-    echo "Test [$params]: $speedup" >> output.txt
+for ((i=0; i<${#TESTS[@]}; i+=3)); do
+    params="${TESTS[i]}"
+    echo "Test [$params]:" >> output.txt
+    for threads in "${THREADS[@]}"; do
+        speedup=$(echo "scale=2; ${serial_times[$params]} / ${omp_times[${params}_${threads}]}" | bc)
+        echo "  $threads threads: $speedup" >> output.txt
+    done
 done
