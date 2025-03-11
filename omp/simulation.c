@@ -329,8 +329,7 @@ simulation_result simulation(double side, long ncside, long long npart,
       malloc(sizeof(particle_t) * (ncside + 2) * (ncside + 2));
   simulation_result res;
   init_structures(size, ncside, ncside2, npart, par, cells);
-  long chunk_size = (ncside2 >= 20*omp_get_max_threads()) ? 5 : (ncside2/(4*omp_get_max_threads()));
-  chunk_size = chunk_size > 0 ? chunk_size : 1; 
+  long chunk_size = (ncside2 >= 4*omp_get_max_threads()) ? 2 : 1;
 #pragma omp parallel
   for (long long i = 0; i < nstep; i++) {
     // printf("--------STEP: %lld --------------\n", i);

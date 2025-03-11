@@ -4,8 +4,6 @@
 
 #include "particles.h"
 
-#define CHUNK_SIZE 10
-
 typedef struct {
   particle_t particle_zero;
   long long number_of_collisions;
