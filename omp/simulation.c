@@ -50,10 +50,12 @@ static inline double sum_lanes(__m256d vec) {
   return ((double*)&vec)[0] + ((double*)&vec)[2];
 }
 
-void compute_centers_of_mass(double side, long ncside, long ncside2,
+void compute_centers_of_mass(double side, long ncside,
                              cell_t *cells, particle_t *centers, long chunk_size) {
-#pragma omp for schedule(dynamic, chunk_size)
-  for (long i = 0; i < ncside2; i++) {
+#pragma omp for collapse(2) schedule(dynamic, chunk_size)
+  for (long ix = 0; ix < ncside; ix++) {
+    for (long iy = 0; iy < ncside; iy++) {
+    long i = ix + ncside*iy;
     double total_mass = 0.0;
     double weighted_x = 0.0;
     double weighted_y = 0.0;
@@ -92,42 +94,38 @@ void compute_centers_of_mass(double side, long ncside, long ncside2,
       centers[ind].x = -2 * side;
       centers[ind].y = -2 * side;
     }
-  }
-#pragma omp for collapse(2) nowait
-  for (long i = 0; i < ncside + 2; i += ncside + 1) {
-    for (long j = 0; j < ncside + 2; j++) {
-      long ind = i * (ncside + 2) + j;
-      long i2 = (i == 0) ? ncside : 1;
-      if (j == 0 || j == ncside + 1) {
-        long j2 = (j == 0) ? ncside : 1;
-        long ind2 = i2 * (ncside + 2) + j2;
-        centers[ind].x =
-            (j == 0) ? centers[ind2].x - side : centers[ind2].x + side;
-        centers[ind].y =
-            (i == 0) ? centers[ind2].y - side : centers[ind2].y + side;
-        centers[ind].m = centers[ind2].m;
-      } else {
-        long ind2 = i2 * (ncside + 2) + j;
-        centers[ind].x = centers[ind2].x;
-        centers[ind].y =
-            (i == 0) ? centers[ind2].y - side : centers[ind2].y + side;
-        centers[ind].m = centers[ind2].m;
+
+    if(ix == 0 || ix == ncside - 1) {
+      long ind2 = (ix == 0) ? ind + ncside : ind - ncside;
+      centers[ind2].x = (ix == 0) ? centers[ind].x + side : centers[ind].x - side;
+      centers[ind2].y = centers[ind].y;
+      centers[ind2].m = centers[ind].m;
+      if(iy == 0 || iy == ncside - 1) {
+        if(ix == 0) {
+          long ind3 = ind + ncside;
+          ind3 = (iy == 0) ? ind3 + ncside*(ncside + 2) : ind3 - ncside*(ncside + 2);
+          centers[ind3].x = centers[ind].x + side;
+          centers[ind3].y = (iy == 0) ? centers[ind].y + side : centers[ind].y - side;
+          centers[ind3].m = centers[ind].m;
+        }
+        if(ix == ncside-1) {
+          long ind3 = ind - ncside;
+          ind3 = (iy == 0) ? ind3 + ncside*(ncside + 2) : ind3 - ncside*(ncside + 2);
+          centers[ind3].x = centers[ind].x - side;
+          centers[ind3].y = (iy == 0) ? centers[ind].y + side : centers[ind].y - side;
+          centers[ind3].m = centers[ind].m;
+        }
       }
     }
-  }
-#pragma omp for collapse(2)
-  for (long j = 0; j < ncside + 2; j += ncside + 1) {
-    for (long i = 1; i < ncside + 1; i++) {
-      long ind = i * (ncside + 2) + j;
-      long j2 = (j == 0) ? ncside : 1;
-      long ind2 = i * (ncside + 2) + j2;
-      centers[ind].x =
-          (j == 0) ? centers[ind2].x - side : centers[ind2].x + side;
-      centers[ind].y = centers[ind2].y;
-      centers[ind].m = centers[ind2].m;
+
+    if(iy == 0 || iy == ncside - 1) {
+      long ind2 = (iy == 0) ? ind + ncside*(ncside + 2) : ind - ncside*(ncside + 2);
+      centers[ind2].x = centers[ind].x;
+      centers[ind2].y = (iy == 0) ? centers[ind].y + side : centers[ind].y - side;
+      centers[ind2].m = centers[ind].m;
     }
   }
-  debug_centers(ncside, centers);
+  }
 }
 
 void compute_kinetics(double side, long ncside, long ncside2, cell_t *cells,
@@ -333,7 +331,7 @@ simulation_result simulation(double side, long ncside, long long npart,
 #pragma omp parallel
   for (long long i = 0; i < nstep; i++) {
     // printf("--------STEP: %lld --------------\n", i);
-    compute_centers_of_mass(side, ncside, ncside2, cells, centers, chunk_size);
+    compute_centers_of_mass(side, ncside, cells, centers, chunk_size);
     compute_kinetics(side, ncside, ncside2, cells, centers, chunk_size);
     compute_new_particle_cell(size, ncside, ncside2, cells, chunk_size);
     detect_collisions(ncside2, cells, chunk_size);
