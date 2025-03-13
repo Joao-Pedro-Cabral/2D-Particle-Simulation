@@ -73,7 +73,7 @@ function check_output() {
     fi
 }
 
-echo "========== Serial version ==========" > output.txt
+echo -e "========== Serial version ==========\n" > output.txt
 cd serial
 make profile
 
