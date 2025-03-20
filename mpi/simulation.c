@@ -3,23 +3,29 @@
 #include "debug.h"
 #include "init_particles.h"
 #include "particles.h"
+#include "nodes.h"
 #include <math.h>
 #include <immintrin.h>
+#include <mpi.h>
 
 static long long ncollisions = 0;
 
 void init_structures(double size, long ncside, long ncside2, long long npart,
-                     particle_t *par, cell_t *cells) {
-  long long *count = malloc(sizeof(long long) * ncside2);
-  for (long i = 0; i < ncside2; i++) {
+                     int id, int p, particle_t *par, cell_t *cells) {
+  long long *count = malloc(sizeof(long long) * BLOCK_SIZE(id, p, ncside));
+  for (long i = 0; i < BLOCK_SIZE(id, p, ncside); i++) {
     count[i] = 0;
   }
+  long block_low = BLOCK_LOW(id, p, ncside);
+  long block_high = BLOCK_HIGH(id, p, ncside);
   for (long long i = 0; i < npart; i++) {
-    count[find_cell_p(&par[i], size, ncside)]++;
+    long cell = find_cell_p(&par[i], size, ncside);
+    if(block_low <= cell && cell <= block_high)
+      count[cell - block_low]++;
   }
   long long min_size = 2*npart / ncside2;
   min_size = (min_size > 10) ? min_size : 10;
-  for (long i = 0; i < ncside2; i++) {
+  for (long i = 0; i < BLOCK_SIZE(id, p, ncside); i++) {
     count[i] *= 2;
     long long capacity =
         count[i] > npart ? npart : (count[i] > min_size ? count[i] : min_size);
@@ -27,19 +33,21 @@ void init_structures(double size, long ncside, long ncside2, long long npart,
               (i % ncside + 1) + (i / ncside + 1) * (ncside + 2));
   }
   for (long long i = 0; i < npart; i++) {
-    cell_push_back_p(&cells[find_cell_p(&par[i], size, ncside)], &par[i], i);
+    long cell = find_cell_p(&par[i], size, ncside);
+    if(block_low <= cell && cell <= block_high)
+      cell_push_back_p(&cells[cell - block_low], &par[i], i);
   }
   free(count);
 }
 
-void clean_cells(long ncside2, cell_t *cells) {
-  for (long i = 0; i < ncside2; i++) {
+void clean_cells(long block_size, cell_t *cells) {
+  for (long i = 0; i < block_size; i++) {
     cell_clean(&cells[i]);
   }
 }
 
-void debug_centers(long ncside, particle_t *centers) {
-  for (long i = 0; i < (ncside + 2) * (ncside + 2); i++) {
+void debug_centers(long block_size, center_t *centers) {
+  for (long i = 0; i < block_size; i++) {
     DEBUG("Center %ld x: %.6lf y: %.6lf m: %.6lf\n", i, centers[i].x,
           centers[i].y, centers[i].m);
   }
@@ -50,10 +58,13 @@ static inline double sum_lanes(__m256d vec) {
   return ((double*)&vec)[0] + ((double*)&vec)[2];
 }
 
-void compute_centers_of_mass(double side, long ncside, long ncside2,
-                             cell_t *cells, particle_t *centers) {
+void compute_centers_of_mass(double side, long ncside, int id, int p,
+                             cell_t *cells, center_t *centers, center_t **centers_request,
+                             MPI_Request *requests) {
 
-  for (long i = 0; i < ncside2; i++) {
+  for (long iy = 0; iy < NUM_ROWS(id, p, ncside); iy++) {
+    for (long ix = 0; ix < NUM_COLUMNS(id, p, ncside); ix++) {
+    long i = ix + ncside*iy;
     double total_mass = 0.0;
     double weighted_x = 0.0;
     double weighted_y = 0.0;
@@ -92,46 +103,43 @@ void compute_centers_of_mass(double side, long ncside, long ncside2,
       centers[ind].x = -2 * side;
       centers[ind].y = -2 * side;
     }
-  }
-  for (long i = 0; i < ncside + 2; i += ncside + 1) {
-    for (long j = 0; j < ncside + 2; j++) {
-      long ind = i * (ncside + 2) + j;
-      long i2 = (i == 0) ? ncside : 1;
-      if (j == 0 || j == ncside + 1) {
-        long j2 = (j == 0) ? ncside : 1;
-        long ind2 = i2 * (ncside + 2) + j2;
-        centers[ind].x =
-            (j == 0) ? centers[ind2].x - side : centers[ind2].x + side;
-        centers[ind].y =
-            (i == 0) ? centers[ind2].y - side : centers[ind2].y + side;
-        centers[ind].m = centers[ind2].m;
-      } else {
-        long ind2 = i2 * (ncside + 2) + j;
-        centers[ind].x = centers[ind2].x;
-        centers[ind].y =
-            (i == 0) ? centers[ind2].y - side : centers[ind2].y + side;
-        centers[ind].m = centers[ind2].m;
-      }
+
+    if(ix == 0 || ix == NUM_COLUMNS(id, p, ncside) - 1) {
+      long ind2 = (ix == 0) ? ind + NUM_COLUMNS(id, p, ncside) : ind - NUM_COLUMNS(id, p, ncside);
+      centers[ind2].x = (ix == 0) ? centers[ind].x + side : centers[ind].x - side;
+      centers[ind2].y = centers[ind].y;
+      centers[ind2].m = centers[ind].m;
     }
   }
-  for (long j = 0; j < ncside + 2; j += ncside + 1) {
-    for (long i = 1; i < ncside + 1; i++) {
-      long ind = i * (ncside + 2) + j;
-      long j2 = (j == 0) ? ncside : 1;
-      long ind2 = i * (ncside + 2) + j2;
-      centers[ind].x =
-          (j == 0) ? centers[ind2].x - side : centers[ind2].x + side;
-      centers[ind].y = centers[ind2].y;
-      centers[ind].m = centers[ind2].m;
+  }
+  MPI_Isend(&centers[cells[0].center], sizeof(center_t)*NUM_COLUMNS(id, p, ncside), MPI_BYTE, (id-1)%p, TAG_CENTER_BOTTOM, MPI_COMM_WORLD, &requests[2]);
+  MPI_Isend(&centers[cells[ncside*(NUM_ROWS(id,p,ncside)-1)].center], sizeof(center_t)*NUM_COLUMNS(id, p, ncside), MPI_BYTE, (id+1)%p, TAG_CENTER_TOP, MPI_COMM_WORLD, &requests[3]);
+  MPI_Waitall(2*BLOCK_NUM_OF_NEIGHBORS(id,p,ncside), requests, MPI_STATUS_IGNORE);
+  for (long i = 0; i < NUM_COLUMNS(id, p, ncside); i++) {
+    long ind = i + 1;
+    centers[ind].x = received_centers[0][i].x;
+    centers[ind].y = (id == 0) ? received_centers[0][i].y - side : received_centers[0][i].y;
+    centers[ind].m = received_centers[0][i].m;
+    long ind2 = NUM_ROWS(id, p, ncside)*NUM_COLUMNS(id, p, ncside) + ind;
+    centers[ind2].x = received_centers[1][i].x;
+    centers[ind2].y = (id == p - 1) ? received_centers[1][i].y + side : received_centers[1][i].y;
+    centers[ind2].m = received_centers[1][i].m;
+    if(i == 0 || i == NUM_COLUMNS(id, p, ncside) - 1) {
+      long ind2 = (i == 0) ? ind + NUM_COLUMNS(id, p, ncside) : ind - NUM_COLUMNS(id, p, ncside);
+      centers[ind2].x = (i == 0) ? centers[ind].x + side : centers[ind].x - side;
+      centers[ind2].y = centers[ind].y;
+      centers[ind2].m = centers[ind].m;
     }
   }
-  debug_centers(ncside, centers);
+  MPI_Irecv(received_centers[0], sizeof(center_t)*NUM_COLUMNS(id, p, ncside), MPI_BYTE, (id-1)%p, TAG_CENTER_TOP, MPI_COMM_WORLD, &requests[0]);
+  MPI_Irecv(received_centers[1], sizeof(center_t)*NUM_COLUMNS(id, p, ncside), MPI_BYTE, (id+1)%p, TAG_CENTER_BOTTOM, MPI_COMM_WORLD, &requests[1]);
+  debug_centers(BLOCK_SIZE(id, p, ncside) + BLOCK_NEIGHBORHOOD(id, p, ncside), centers);
 }
 
-void compute_kinetics(double side, long ncside, long ncside2, cell_t *cells,
-                      particle_t *centers) {
+void compute_kinetics(double side, long ncside, int id, int p, cell_t *cells,
+                      center_t *centers) {
 
-  for (long i = 0; i < ncside2; i++) {
+  for (long i = 0; i < BLOCK_SIZE(id, p, ncside); i++) {
     long long cell_size = cells[i].size;
     for (long long j = 0; j < cell_size; j++) {
       __m256d resx_vec = _mm256_setzero_pd();
@@ -197,8 +205,8 @@ void compute_kinetics(double side, long ncside, long ncside2, cell_t *cells,
   }
 }
 
-void debug_particles(long ncside2, cell_t *cells) {
-  for (long i = 0; i < ncside2; i++) {
+void debug_particles(long block_size, cell_t *cells) {
+  for (long i = 0; i < block_size; i++) {
     long long cell_size = cells[i].size;
     for (long long j = 0; j < cell_size; j++) {
       DEBUG("Particle %lld: m: %.6f, x: %.6f, y: %.6f, vx: %.6f, vy: %.6f, "
@@ -210,23 +218,28 @@ void debug_particles(long ncside2, cell_t *cells) {
   }
 }
 
-void compute_new_particle_cell(double size, long ncside, long ncside2,
+void compute_new_particle_cell(double size, long ncside, int id, int p,
                                cell_t *cells) {
-  for (long i = 0; i < ncside2; i++) {
+  for (long i = 0; i < BLOCK_SIZE(id, p, ncside); i++) {
     long long cell_size = cells[i].size;
     for (long long j = 0; j < cell_size; j++) {
       long ind = find_cell_c(&cells[i], j, size, ncside);
       if (ind == i)
         continue;
-      cell_push_back_c(&cells[ind], &cells[i], j);
+      int owner = BLOCK_OWNER(ind, p, n);
+      if(owner == id) {
+        cell_push_back_c(&cells[ind], &cells[i], j);
+      } else {
+        // TODO: Particle buffer
+      }
       cells[i].ind[j] = -1;
     }
   }
 }
 
-void detect_collisions(long ncside2, cell_t *cells) {
+void detect_collisions(long ncside, int id, int p, cell_t *cells) {
 
-  for (long i = 0; i < ncside2; i++) {
+  for (long i = 0; i < BLOCK_SIZE(id, p, ncside); i++) {
     long long cell_collisions = 0;
     long long cell_size = cells[i].size;
     for (long long j = cell_size - 1; j >= 0; j--) {
@@ -311,29 +324,46 @@ particle_t find_particle_zero(long ncside2, cell_t *cells) {
       }
     }
   }
-  ERROR("Particle 0 not found\n");
+  par0.x = -1;
+  par0.y = -1;
+  par0.vx = 0.0;
+  par0.vy = 0.0;
+  par0.m = 0.0;
+  return par0;
 }
 
 simulation_result simulation(double side, long ncside, long long npart,
                              long long nstep, particle_t *par) {
   double size = side / ncside;
   long ncside2 = ncside * ncside;
-  cell_t *cells = malloc(sizeof(cell_t) * ncside2);
-  particle_t *centers =
-      malloc(sizeof(particle_t) * (ncside + 2) * (ncside + 2));
+  int id, p;
+  MPI_Comm_rank(MPI_COMM_WORLD, &id);
+  MPI_Comm_size(MPI_COMM_WORLD, &p);
+  cell_t *cells = malloc(sizeof(cell_t) * BLOCK_SIZE(id, p, ncside));
+  center_t *centers = malloc(sizeof(center_t) * (BLOCK_SIZE(id, p, ncside) + BLOCK_NEIGHBORHOOD(id, p, ncside)));
   simulation_result res;
-  init_structures(size, ncside, ncside2, npart, par, cells);
+  init_structures(size, ncside, ncside2, npart, id, p, par, cells);
+  // TODO: Add number of particles
+  MPI_Request centers_requests[2*BLOCK_NUM_OF_NEIGHBORS(id,p,ncside)];
+  MPI_Request collisions_requests[2*BLOCK_NUM_OF_NEIGHBORS(id,p,ncside)];
+  center_t* received_centers[2];
+  received_centers[0] = malloc(sizeof(center_t) * (BLOCK_FRONTIER(id, p, ncside)));
+  received_centers[1] = malloc(sizeof(center_t) * (BLOCK_FRONTIER(id, p, ncside)));
+  MPI_Irecv(received_centers[0], sizeof(center_t)*NUM_COLUMNS(id, p, ncside), MPI_BYTE, (id-1)%p, TAG_CENTER_TOP, MPI_COMM_WORLD, &centers_requests[0]);
+  MPI_Irecv(received_centers[1], sizeof(center_t)*NUM_COLUMNS(id, p, ncside), MPI_BYTE, (id+1)%p, TAG_CENTER_BOTTOM, MPI_COMM_WORLD, &centers_requests[1]);
   for (long long i = 0; i < nstep; i++) {
     // printf("--------STEP: %lld --------------\n", i);
-    compute_centers_of_mass(side, ncside, ncside2, cells, centers);
-    compute_kinetics(side, ncside, ncside2, cells, centers);
-    compute_new_particle_cell(size, ncside, ncside2, cells);
-    detect_collisions(ncside2, cells);
+    compute_centers_of_mass(side, ncside, id, p, cells, centers, received_centers, centers_requests);
+    compute_kinetics(side, ncside, id, p, cells, centers);
+    compute_new_particle_cell(size, ncside,  id, p, cells);
+    detect_collisions(ncside, id, p, cells);
   }
   res.number_of_collisions = ncollisions;
   res.particle_zero = find_particle_zero(ncside2, cells);
-  clean_cells(ncside2, cells);
+  clean_cells(BLOCK_SIZE(id, p, ncside), cells);
   free(cells);
   free(centers);
+  free(received_centers[0]);
+  free(received_centers[1]);
   return res;
 }

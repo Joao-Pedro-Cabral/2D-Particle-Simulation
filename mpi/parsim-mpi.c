@@ -7,8 +7,10 @@
 #include <stdlib.h>
 
 void print_result(simulation_result res) {
-  printf("%.3lf %.3lf\n", res.particle_zero.x, res.particle_zero.y);
-  printf("%lld\n", res.number_of_collisions);
+  if(res.particle_zero.x != -1 && res.particle_zero.y != -1) {
+    printf("%.3lf %.3lf\n", res.particle_zero.x, res.particle_zero.y);
+    printf("%lld\n", res.number_of_collisions);
+  }
 }
 
 int main(int argc, char *argv[]) {
@@ -45,6 +47,8 @@ int main(int argc, char *argv[]) {
   DEBUG("%ld, %lf, %ld, %lld, %lld\n", seed, side, ncside, npart, nstep);
 
   particle_t *par = (particle_t *)malloc(sizeof(particle_t) * npart);
+
+  MPI_Init(&argc, &argv); // TODO: Here?
 
   double exec_time;
   init_particles(seed, side, ncside, npart, par);
