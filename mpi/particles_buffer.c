@@ -10,8 +10,6 @@ void particles_buffer_init(particles_buffer_t *buffer, long num_counters, long l
     particles_buffer_clean_counters(buffer);
 }
 
-void particles_buffer_increment_counter(particles_buffer_t * buffer, long cell) {}
-
 void particles_buffer_clean_counters(particles_buffer_t *buffer) {
     for(long i = 0; i < buffer->num_counters; i ++) {
         buffer->counters[i] = 0;
