@@ -10,6 +10,7 @@
 
 static long long ncollisions = 0;
 
+//TODO suggest new name init_block
 void init_structures(double size, long ncside, long ncside2, long long npart,
                      int id, int p, particle_t *par, cell_t *cells) {
   long long *count = malloc(sizeof(long long) * BLOCK_SIZE(id, p, ncside));
@@ -218,8 +219,9 @@ void debug_particles(long block_size, cell_t *cells) {
   }
 }
 
-void compute_new_particle_cell(double size, long ncside, int id, int p,
-                               cell_t *cells) {
+void compute_new_particle_cell(double size, long ncside, int id, int p, cell_t *cells, 
+                               particle_t *send_buffer_up, particle_t *send_buffer_down, 
+                               long *send_count_up, long *send_count_down) {
   for (long i = 0; i < BLOCK_SIZE(id, p, ncside); i++) {
     long long cell_size = cells[i].size;
     for (long long j = 0; j < cell_size; j++) {
@@ -230,11 +232,17 @@ void compute_new_particle_cell(double size, long ncside, int id, int p,
       if(owner == id) {
         cell_push_back_c(&cells[ind], &cells[i], j);
       } else {
-        // TODO: Particle buffer
+        if (owner == (id - 1 + p) % p) { // send to the upper block
+          send_buffer_up[(*send_count_up)++] = cells[i].par[j]; 
+        } else if (owner == (id + 1) % p) { // send to the lower block
+          send_buffer_down[(*send_count_down)++] = cells[i].par[j]; 
+        }
       }
       cells[i].ind[j] = -1;
     }
   }
+  MPI_Send(send_buffer_up, send_count_up[0], MPI_BYTE, (id - 1 + p) % p, TAG_PARTICLE_UP, MPI_COMM_WORLD);
+  MPI_Send(send_buffer_down, send_count_down[0], MPI_BYTE, (id + 1) % p, TAG_PARTICLE_DOWN, MPI_COMM_WORLD);
 }
 
 void detect_collisions(long ncside, int id, int p, cell_t *cells) {
@@ -344,6 +352,12 @@ simulation_result simulation(double side, long ncside, long long npart,
   simulation_result res;
   init_structures(size, ncside, ncside2, npart, id, p, par, cells);
   // TODO: Add number of particles
+  long estimated_particles_per_row = 2 * npart / ncside;
+  particle_t *send_buffer_up = malloc(sizeof(particle_t) * estimated_particles_per_row);
+  particle_t *send_buffer_down = malloc(sizeof(particle_t) * estimated_particles_per_row);
+  particle_t *recv_buffer_up = malloc(sizeof(particle_t) * estimated_particles_per_row);
+  particle_t *recv_buffer_down = malloc(sizeof(particle_t) * estimated_particles_per_row);
+  long send_count_up = 0, send_count_down = 0;
   MPI_Request centers_requests[2*BLOCK_NUM_OF_NEIGHBORS(id,p,ncside)];
   MPI_Request collisions_requests[2*BLOCK_NUM_OF_NEIGHBORS(id,p,ncside)];
   center_t* received_centers[2];
@@ -351,11 +365,14 @@ simulation_result simulation(double side, long ncside, long long npart,
   received_centers[1] = malloc(sizeof(center_t) * (BLOCK_FRONTIER(id, p, ncside)));
   MPI_Irecv(received_centers[0], sizeof(center_t)*NUM_COLUMNS(id, p, ncside), MPI_BYTE, (id-1)%p, TAG_CENTER_TOP, MPI_COMM_WORLD, &centers_requests[0]);
   MPI_Irecv(received_centers[1], sizeof(center_t)*NUM_COLUMNS(id, p, ncside), MPI_BYTE, (id+1)%p, TAG_CENTER_BOTTOM, MPI_COMM_WORLD, &centers_requests[1]);
+  MPI_Irecv(recv_buffer_up, estimated_particles_per_row * sizeof(particle_t), MPI_BYTE, (id-1+p)%p, TAG_PARTICLE_UP, MPI_COMM_WORLD, &recv_requests[0]);
+  MPI_Irecv(recv_buffer_down, estimated_particles_per_row * sizeof(particle_t), MPI_BYTE, (id+1)%p, TAG_PARTICLE_DOWN, MPI_COMM_WORLD, &recv_requests[1]);
+
   for (long long i = 0; i < nstep; i++) {
     // printf("--------STEP: %lld --------------\n", i);
     compute_centers_of_mass(side, ncside, id, p, cells, centers, received_centers, centers_requests);
     compute_kinetics(side, ncside, id, p, cells, centers);
-    compute_new_particle_cell(size, ncside,  id, p, cells);
+    compute_new_particle_cell(size, ncside,  id, p, cells, &send_buffer_up, &send_buffer_down, &send_count_up, &send_count_down);
     detect_collisions(ncside, id, p, cells);
   }
   res.number_of_collisions = ncollisions;
@@ -365,5 +382,9 @@ simulation_result simulation(double side, long ncside, long long npart,
   free(centers);
   free(received_centers[0]);
   free(received_centers[1]);
+  free(send_buffer_up);
+  free(send_buffer_down);
+  free(recv_buffer_up);
+  free(recv_buffer_down);
   return res;
 }
