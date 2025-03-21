@@ -10,23 +10,20 @@
 
 static long long ncollisions = 0;
 
-//TODO suggest new name init_block
-void init_structures(double size, long ncside, long ncside2, long long npart,
+void init_blocks(double size, long ncside, long ncside2, long long npart,
                      int id, int p, particle_t *par, cell_t *cells) {
-  long long *count = malloc(sizeof(long long) * BLOCK_SIZE(id, p, ncside));
+  long long *count = malloc(sizeof(long long) * ncside2);
   for (long i = 0; i < BLOCK_SIZE(id, p, ncside); i++) {
     count[i] = 0;
   }
   long block_low = BLOCK_LOW(id, p, ncside);
   long block_high = BLOCK_HIGH(id, p, ncside);
   for (long long i = 0; i < npart; i++) {
-    long cell = find_cell_p(&par[i], size, ncside);
-    if(block_low <= cell && cell <= block_high)
-      count[cell - block_low]++;
+    count[find_cell_p(&par[i], size, ncside)]++;
   }
   long long min_size = 2*npart / ncside2;
   min_size = (min_size > 10) ? min_size : 10;
-  for (long i = 0; i < BLOCK_SIZE(id, p, ncside); i++) {
+  for (long i = BLOCK_LOW(id, p, ncside); i <= BLOCK_HIGH(id, p, ncside); i++) {
     count[i] *= 2;
     long long capacity =
         count[i] > npart ? npart : (count[i] > min_size ? count[i] : min_size);
@@ -350,7 +347,7 @@ simulation_result simulation(double side, long ncside, long long npart,
   cell_t *cells = malloc(sizeof(cell_t) * BLOCK_SIZE(id, p, ncside));
   center_t *centers = malloc(sizeof(center_t) * (BLOCK_SIZE(id, p, ncside) + BLOCK_NEIGHBORHOOD(id, p, ncside)));
   simulation_result res;
-  init_structures(size, ncside, ncside2, npart, id, p, par, cells);
+  init_blocks(size, ncside, ncside2, npart, id, p, par, cells);
   // TODO: Add number of particles
   long estimated_particles_per_row = 2 * npart / ncside;
   particle_t *send_buffer_up = malloc(sizeof(particle_t) * estimated_particles_per_row);
