@@ -11,8 +11,8 @@
 #define NUM_ROWS(id,p,n) ((id)*(n)/(p))
 #define NUM_COLUMNS(id,p,n) (n)
 #define BLOCK_OWNER(index,p,n) (((p)*((index)+1)-1)/(n*n))
-#define TAG_CENTER_TOP 0
-#define TAG_CENTER_BOTTOM 1
+#define TAG_CENTER_UP 0
+#define TAG_CENTER_DOWN 1
 #define TAG_PARTICLE_UP 2
 #define TAG_PARTICLE_DOWN 3
 

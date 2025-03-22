@@ -7,11 +7,13 @@
 #include <math.h>
 #include <immintrin.h>
 #include <mpi.h>
+#include "communication_buffers.h"
 
 static long long ncollisions = 0;
 
 void init_blocks(double size, long ncside, long ncside2, long long npart,
-                     int id, int p, particle_t *par, cell_t *cells) {
+                     int id, int p, particle_t *par, cell_t *cells,
+                     communication_buffers_t buffers) {
   long long *count = malloc(sizeof(long long) * ncside2);
   for (long i = 0; i < BLOCK_SIZE(id, p, ncside); i++) {
     count[i] = 0;
@@ -30,12 +32,43 @@ void init_blocks(double size, long ncside, long ncside2, long long npart,
     cell_init(&cells[i], capacity,
               (i % ncside + 1) + (i / ncside + 1) * (ncside + 2));
   }
+  long long min_row_size = min_size*ncside;
+  for(long i = 0; i < 2*BLOCK_NUM_OF_NEIGHBORS(id, p, ncside); i++) {
+    long ind;
+    particles_buffer_t* buffer;
+    switch (i) {
+    case 0:
+      ind = BLOCK_LOW(id, p, ncside) - NUM_COLUMNS(id, p, ncside);
+      buffer = &buffers.recv_particles_up;
+      break;
+    case 1:
+      ind = BLOCK_LOW(id, p, ncside);
+      buffer = &buffers.send_particles_up;
+      break;
+    case 2:
+      ind = BLOCK_HIGH(id, p, ncside) + 1 - NUM_COLUMNS(id, p, ncside);
+      buffer = &buffers.send_particles_down;
+      break;
+    default: // 3
+      ind = BLOCK_HIGH(id, p, ncside) + 1;
+      buffer = &buffers.recv_particles_down;
+      break;
+    }
+    long long row_count = 0;
+    for (long j = ind; j < ind + BLOCK_FRONTIER(id,p,ncside); j++) {
+      row_count += count[j];
+    }
+    row_count *= 2;
+    long long capacity = row_count > min_row_size ? row_count : min_row_size;
+    particles_buffer_realloc(buffer, capacity); 
+  }
   for (long long i = 0; i < npart; i++) {
     long cell = find_cell_p(&par[i], size, ncside);
     if(block_low <= cell && cell <= block_high)
       cell_push_back_p(&cells[cell - block_low], &par[i], i);
   }
   free(count);
+  free(par);
 }
 
 void clean_cells(long block_size, cell_t *cells) {
@@ -110,8 +143,8 @@ void compute_centers_of_mass(double side, long ncside, int id, int p,
     }
   }
   }
-  MPI_Isend(&centers[cells[0].center], sizeof(center_t)*NUM_COLUMNS(id, p, ncside), MPI_BYTE, (id-1)%p, TAG_CENTER_BOTTOM, MPI_COMM_WORLD, &requests[2]);
-  MPI_Isend(&centers[cells[ncside*(NUM_ROWS(id,p,ncside)-1)].center], sizeof(center_t)*NUM_COLUMNS(id, p, ncside), MPI_BYTE, (id+1)%p, TAG_CENTER_TOP, MPI_COMM_WORLD, &requests[3]);
+  MPI_Isend(&centers[cells[0].center], sizeof(center_t)*NUM_COLUMNS(id, p, ncside), MPI_BYTE, (id-1)%p, TAG_CENTER_DOWN, MPI_COMM_WORLD, &requests[2]);
+  MPI_Isend(&centers[cells[ncside*(NUM_ROWS(id,p,ncside)-1)].center], sizeof(center_t)*NUM_COLUMNS(id, p, ncside), MPI_BYTE, (id+1)%p, TAG_CENTER_UP, MPI_COMM_WORLD, &requests[3]);
   MPI_Waitall(2*BLOCK_NUM_OF_NEIGHBORS(id,p,ncside), requests, MPI_STATUS_IGNORE);
   for (long i = 0; i < NUM_COLUMNS(id, p, ncside); i++) {
     long ind = i + 1;
@@ -129,8 +162,8 @@ void compute_centers_of_mass(double side, long ncside, int id, int p,
       centers[ind2].m = centers[ind].m;
     }
   }
-  MPI_Irecv(received_centers[0], sizeof(center_t)*NUM_COLUMNS(id, p, ncside), MPI_BYTE, (id-1)%p, TAG_CENTER_TOP, MPI_COMM_WORLD, &requests[0]);
-  MPI_Irecv(received_centers[1], sizeof(center_t)*NUM_COLUMNS(id, p, ncside), MPI_BYTE, (id+1)%p, TAG_CENTER_BOTTOM, MPI_COMM_WORLD, &requests[1]);
+  MPI_Irecv(received_centers[0], sizeof(center_t)*NUM_COLUMNS(id, p, ncside), MPI_BYTE, (id-1)%p, TAG_CENTER_UP, MPI_COMM_WORLD, &requests[0]);
+  MPI_Irecv(received_centers[1], sizeof(center_t)*NUM_COLUMNS(id, p, ncside), MPI_BYTE, (id+1)%p, TAG_CENTER_DOWN, MPI_COMM_WORLD, &requests[1]);
   debug_centers(BLOCK_SIZE(id, p, ncside) + BLOCK_NEIGHBORHOOD(id, p, ncside), centers);
 }
 
@@ -347,23 +380,13 @@ simulation_result simulation(double side, long ncside, long long npart,
   cell_t *cells = malloc(sizeof(cell_t) * BLOCK_SIZE(id, p, ncside));
   center_t *centers = malloc(sizeof(center_t) * (BLOCK_SIZE(id, p, ncside) + BLOCK_NEIGHBORHOOD(id, p, ncside)));
   simulation_result res;
+  communication_buffers_t buffers;
+  communication_buffers_init(&buffers);
   init_blocks(size, ncside, ncside2, npart, id, p, par, cells);
-  // TODO: Add number of particles
-  long estimated_particles_per_row = 2 * npart / ncside;
-  particle_t *send_buffer_up = malloc(sizeof(particle_t) * estimated_particles_per_row);
-  particle_t *send_buffer_down = malloc(sizeof(particle_t) * estimated_particles_per_row);
-  particle_t *recv_buffer_up = malloc(sizeof(particle_t) * estimated_particles_per_row);
-  particle_t *recv_buffer_down = malloc(sizeof(particle_t) * estimated_particles_per_row);
-  long send_count_up = 0, send_count_down = 0;
-  MPI_Request centers_requests[2*BLOCK_NUM_OF_NEIGHBORS(id,p,ncside)];
-  MPI_Request collisions_requests[2*BLOCK_NUM_OF_NEIGHBORS(id,p,ncside)];
-  center_t* received_centers[2];
-  received_centers[0] = malloc(sizeof(center_t) * (BLOCK_FRONTIER(id, p, ncside)));
-  received_centers[1] = malloc(sizeof(center_t) * (BLOCK_FRONTIER(id, p, ncside)));
-  MPI_Irecv(received_centers[0], sizeof(center_t)*NUM_COLUMNS(id, p, ncside), MPI_BYTE, (id-1)%p, TAG_CENTER_TOP, MPI_COMM_WORLD, &centers_requests[0]);
-  MPI_Irecv(received_centers[1], sizeof(center_t)*NUM_COLUMNS(id, p, ncside), MPI_BYTE, (id+1)%p, TAG_CENTER_BOTTOM, MPI_COMM_WORLD, &centers_requests[1]);
-  MPI_Irecv(recv_buffer_up, estimated_particles_per_row * sizeof(particle_t), MPI_BYTE, (id-1+p)%p, TAG_PARTICLE_UP, MPI_COMM_WORLD, &recv_requests[0]);
-  MPI_Irecv(recv_buffer_down, estimated_particles_per_row * sizeof(particle_t), MPI_BYTE, (id+1)%p, TAG_PARTICLE_DOWN, MPI_COMM_WORLD, &recv_requests[1]);
+  MPI_Irecv(buffers.centers_up, sizeof(center_t)*NUM_COLUMNS(id, p, ncside), MPI_BYTE, (id-1)%p, TAG_CENTER_UP, MPI_COMM_WORLD, &buffers.centers_requests[0]);
+  MPI_Irecv(buffers.centers_down, sizeof(center_t)*NUM_COLUMNS(id, p, ncside), MPI_BYTE, (id+1)%p, TAG_CENTER_DOWN, MPI_COMM_WORLD, &buffers.centers_requests[1]);
+  MPI_Irecv(&buffers.recv_particles_up, estimated_particles_per_row * sizeof(particle_t), MPI_BYTE, (id-1+p)%p, TAG_PARTICLE_UP, MPI_COMM_WORLD, &buffers.particles_requests[0]);
+  MPI_Irecv(&buffers.recv_particles_down, estimated_particles_per_row * sizeof(particle_t), MPI_BYTE, (id+1)%p, TAG_PARTICLE_DOWN, MPI_COMM_WORLD, &buffers.particles_requests[1]);
 
   for (long long i = 0; i < nstep; i++) {
     // printf("--------STEP: %lld --------------\n", i);
@@ -377,11 +400,6 @@ simulation_result simulation(double side, long ncside, long long npart,
   clean_cells(BLOCK_SIZE(id, p, ncside), cells);
   free(cells);
   free(centers);
-  free(received_centers[0]);
-  free(received_centers[1]);
-  free(send_buffer_up);
-  free(send_buffer_down);
-  free(recv_buffer_up);
-  free(recv_buffer_down);
+  communication_buffers_clean(&buffers);
   return res;
 }

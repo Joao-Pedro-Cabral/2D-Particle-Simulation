@@ -57,6 +57,5 @@ int main(int argc, char *argv[]) {
   exec_time += omp_get_wtime();
   print_result(res);
   fprintf(stderr, "%.1fs\n", exec_time);
-  free(par);
   return 0;
 }
