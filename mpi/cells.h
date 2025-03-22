@@ -31,6 +31,6 @@ void cell_clean(cell_t *cell);
 double squared_distance(cell_t *cell, long long i, long long j);
 void update_position_and_velocity(cell_t *cell, long long i, double side);
 void gravitational_force_pp(cell_t *cell, long long i, long long j);
-void gravitational_force_pc(cell_t *cell, long long i, particle_t *center);
+void gravitational_force_pc(cell_t *cell, long long i, center_t *center);
 
 #endif // __CELL_H

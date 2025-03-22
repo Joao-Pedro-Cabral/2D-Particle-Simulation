@@ -22,6 +22,7 @@ void particles_buffer_add(particles_buffer_t* buffer, cell_t * cell, long long i
     buffer->particles[buffer->size].vx = cell->vx[i];
     buffer->particles[buffer->size].vy = cell->vy[i];
     buffer->particles[buffer->size].m = cell->m[i];
+    buffer->particles[buffer->size].ind = cell->ind[i];
     buffer->size++;
     particles_buffer_resize(buffer, buffer->size);
 }

@@ -151,7 +151,7 @@ void gravitational_force_pp(cell_t *cell, long long i, long long j) {
   cell->ay[j] -= force_y;
 }
 
-void gravitational_force_pc(cell_t *cell, long long i, particle_t *center) {
+void gravitational_force_pc(cell_t *cell, long long i, center_t *center) {
   double dx = center->x - cell->x[i];
   double dy = center->y - cell->y[i];
   double denominator = dx * dx + dy * dy;

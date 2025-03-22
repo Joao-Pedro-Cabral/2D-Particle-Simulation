@@ -2,7 +2,9 @@
 #include "init_particles.h"
 #include "simulation.h"
 #include "utils.h"
+#include "nodes.h"
 #include <omp.h>
+#include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -50,12 +52,18 @@ int main(int argc, char *argv[]) {
 
   MPI_Init(&argc, &argv); // TODO: Here?
 
+  int id, p;
+  MPI_Comm_rank(MPI_COMM_WORLD, &id);
+  MPI_Comm_size(MPI_COMM_WORLD, &p);
+
   double exec_time;
-  init_particles(seed, side, ncside, npart, par);
+  init_particles(seed, side, ncside, npart, par); // TODO: Sync initial particles
   exec_time = -omp_get_wtime();
-  simulation_result res = simulation(side, ncside, npart, nstep, par);
+  simulation_result res = simulation(side, ncside, npart, id, p, nstep, par);
   exec_time += omp_get_wtime();
   print_result(res);
   fprintf(stderr, "%.1fs\n", exec_time);
+  fflush(stdout);
+  MPI_Finalize(); // TODO: Here?
   return 0;
 }
