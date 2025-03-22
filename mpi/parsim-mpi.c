@@ -1,15 +1,15 @@
 #include "debug.h"
 #include "init_particles.h"
+#include "nodes.h"
 #include "simulation.h"
 #include "utils.h"
-#include "nodes.h"
-#include <omp.h>
 #include <mpi.h>
+#include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 void print_result(simulation_result res) {
-  if(res.particle_zero.x != -1 && res.particle_zero.y != -1) {
+  if (res.particle_zero.x != -1 && res.particle_zero.y != -1) {
     printf("%.3lf %.3lf\n", res.particle_zero.x, res.particle_zero.y);
     printf("%lld\n", res.number_of_collisions);
   }
@@ -57,7 +57,8 @@ int main(int argc, char *argv[]) {
   MPI_Comm_size(MPI_COMM_WORLD, &p);
 
   double exec_time;
-  init_particles(seed, side, ncside, npart, par); // TODO: Sync initial particles
+  init_particles(seed, side, ncside, npart,
+                 par); // TODO: Sync initial particles
   exec_time = -omp_get_wtime();
   simulation_result res = simulation(side, ncside, npart, id, p, nstep, par);
   exec_time += omp_get_wtime();

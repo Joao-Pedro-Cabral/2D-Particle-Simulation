@@ -43,7 +43,8 @@ void cell_resize(cell_t *cell, long long size) {
     cell->ay = (double *)realloc(cell->ay, capacity * sizeof(double));
     cell->m = (double *)realloc(cell->m, capacity * sizeof(double));
     cell->ind = (long long *)realloc(cell->ind, capacity * sizeof(long long));
-    cell->collided = (long long *)realloc(cell->collided, capacity * sizeof(long long));
+    cell->collided =
+        (long long *)realloc(cell->collided, capacity * sizeof(long long));
     cell->capacity = capacity;
   }
 }
