@@ -13,7 +13,8 @@ typedef struct {
   particles_buffer_t recv_particles_up;
   particles_buffer_t recv_particles_down;
   MPI_Request * centers_requests;
-  MPI_Request * particles_requests;
+  int * particles_flags;
+  MPI_Status * particles_status;
 } communication_buffers_t;
 
 void communication_buffers_init(communication_buffers_t *buffers, long ncside, int id, int p, long long npart);

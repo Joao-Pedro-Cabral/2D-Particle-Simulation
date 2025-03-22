@@ -62,7 +62,7 @@ void cell_push_back_c(cell_t *cell, cell_t *cell2, long long i) {
   cell_resize(cell, cell->size);
 }
 
-void cell_push_back_p(cell_t *cell, particle_t *par, long long i) {
+void cell_push_back_p(cell_t *cell, particle_t *par) {
   cell->x[cell->size] = par->x;
   cell->y[cell->size] = par->y;
   cell->vx[cell->size] = par->vx;
@@ -70,7 +70,7 @@ void cell_push_back_p(cell_t *cell, particle_t *par, long long i) {
   cell->ax[cell->size] = 0.0;
   cell->ay[cell->size] = 0.0;
   cell->m[cell->size] = par->m;
-  cell->ind[cell->size] = i;
+  cell->ind[cell->size] = par->ind;
   cell->collided[cell->size] = 0;
   cell->size++;
   cell_resize(cell, cell->size);

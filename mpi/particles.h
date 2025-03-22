@@ -8,6 +8,7 @@ typedef struct {
   double vx;
   double vy;
   double m;
+  long long ind;
 } particle_t;
 
 typedef struct {

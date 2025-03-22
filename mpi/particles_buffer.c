@@ -2,47 +2,33 @@
 #include "particles_buffer.h"
 #include <stdlib.h>
 
-void particles_buffer_init(particles_buffer_t *buffer, long num_counters) {
-    buffer->particles = NULL;
-    buffer->counters = (long long *)malloc(num_counters * sizeof(long long));
-    buffer->num_counters = num_counters;
+void particles_buffer_init(particles_buffer_t *buffer, long long capacity) {
+    buffer->particles = (particle_t *)malloc(capacity * sizeof(particle_t));
     buffer->size = 0;
-    buffer->total_num_particles = 0;
-    buffer->capacity = 0;
-    particles_buffer_clean_counters(buffer);
+    buffer->capacity = capacity;
 }
 
-void particles_buffer_increment_counter(particles_buffer_t * buffer, long cell) {
-    buffer->counters[cell] ++;
-    buffer->size ++;
-    if (buffer->size > buffer->capacity) {
-        long long capacity = (buffer->capacity == 0) ? 1 : buffer->capacity * 2;
-        particles_buffer_realloc(buffer, capacity);
+void particles_buffer_resize(particles_buffer_t* buffer, long long size) {
+    buffer->size = size;
+    if(size > buffer->capacity) {
+        buffer->capacity = 2*size;
+        buffer->particles = (particle_t *)realloc(buffer->particles, buffer->capacity * sizeof(particle_t));
     }
 }
 
-int particles_buffer_size(particles_buffer_t* buffer) {
-    return buffer->size*sizeof(long long) + buffer->capacity*sizeof(particle_t) + sizeof(particles_buffer_t);
-}
-
-void particles_buffer_realloc(particles_buffer_t* buffer, long long capacity) {
-    buffer->particles = (particle_t *)realloc(buffer->particles, capacity * sizeof(particle_t));
-    buffer->capacity = capacity; 
-}
-
-void particles_buffer_clean_counters(particles_buffer_t *buffer) {
-    for(long i = 0; i < buffer->num_counters; i ++) {
-        buffer->counters[i] = 0;
-    }
+void particles_buffer_add(particles_buffer_t* buffer, cell_t * cell, long long i) {
+    buffer->particles[buffer->size].x = cell->x[i];
+    buffer->particles[buffer->size].y = cell->y[i];
+    buffer->particles[buffer->size].vx = cell->vx[i];
+    buffer->particles[buffer->size].vy = cell->vy[i];
+    buffer->particles[buffer->size].m = cell->m[i];
+    buffer->size++;
+    particles_buffer_resize(buffer, buffer->size);
 }
 
 void particles_buffer_clean(particles_buffer_t *buffer) {
     free(buffer->particles);
-    free(buffer->counters);
     buffer->particles = NULL;
-    buffer->counters = NULL;
-    buffer->num_counters = 0;
     buffer->size = 0;
-    buffer->total_num_particles = 0;
     buffer->capacity = 0;
 }
