@@ -15,6 +15,7 @@ typedef struct {
   MPI_Request *centers_requests;
   int *particles_flags;
   MPI_Status *particles_status;
+  MPI_Request *particles_requests;
 } communication_buffers_t;
 
 void communication_buffers_init(communication_buffers_t *buffers, long ncside,

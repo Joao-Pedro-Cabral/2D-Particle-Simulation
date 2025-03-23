@@ -2,3 +2,4 @@
 parsim
 serial/parsim
 omp/parsim*
+mpi/parsim-mpi

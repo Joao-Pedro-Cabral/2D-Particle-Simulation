@@ -10,7 +10,7 @@
 #define NUM_COLUMNS(id, p, n) (n)
 #define NUM_ROWS(id, p, n) BLOCK_SIZE(id, p, n) / NUM_COLUMNS(id, p, n)
 #define BLOCK_NEIGHBORHOOD(id, p, n) (2 * (n + 2) + 2 * NUM_ROWS(id, p, n))
-#define BLOCK_OWNER(index, p, n) (((p) * ((index) + 1) - 1) / (n * n))
+#define BLOCK_OWNER(index, p, n) (((p) * ((index/n) + 1) - 1) / n)
 #define TAG_CENTER_UP 0
 #define TAG_CENTER_DOWN 1
 #define TAG_PARTICLE_UP 2

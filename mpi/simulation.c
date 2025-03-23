@@ -284,12 +284,14 @@ void compute_new_particle_cell(double size, long ncside, int id, int p,
       cells[i].ind[j] = -1;
     }
   }
-  MPI_Send(buffers->send_particles_up.particles,
+  MPI_Isend(buffers->send_particles_up.particles,
            buffers->send_particles_up.size * sizeof(particle_t), MPI_BYTE,
-           (id - 1 + p) % p, TAG_PARTICLE_DOWN, MPI_COMM_WORLD);
-  MPI_Send(buffers->send_particles_down.particles,
+           (id - 1 + p) % p, TAG_PARTICLE_DOWN, MPI_COMM_WORLD,
+           &buffers->particles_requests[0]);
+  MPI_Isend(buffers->send_particles_down.particles,
            buffers->send_particles_down.size * sizeof(particle_t), MPI_BYTE,
-           (id + 1 + p) % p, TAG_PARTICLE_UP, MPI_COMM_WORLD);
+           (id + 1 + p) % p, TAG_PARTICLE_UP, MPI_COMM_WORLD,
+           &buffers->particles_requests[1]);
   while (!buffers->particles_flags[0] || !buffers->particles_flags[1]) {
     MPI_Iprobe((id - 1 + p) % p, TAG_PARTICLE_UP, MPI_COMM_WORLD,
                &buffers->particles_flags[0], &buffers->particles_status[0]);
@@ -305,26 +307,30 @@ void compute_new_particle_cell(double size, long ncside, int id, int p,
                           bytes_up / sizeof(particle_t));
   particles_buffer_resize(&buffers->recv_particles_down,
                           bytes_down / sizeof(particle_t));
+  particles_buffer_resize(&buffers->send_particles_up, 0);
+  particles_buffer_resize(&buffers->send_particles_down, 0);
   MPI_Recv(buffers->recv_particles_up.particles, bytes_up, MPI_BYTE,
            (id - 1 + p) % p, TAG_PARTICLE_UP, MPI_COMM_WORLD,
            &buffers->particles_status[0]);
   MPI_Recv(buffers->recv_particles_down.particles, bytes_down, MPI_BYTE,
            (id + 1 + p) % p, TAG_PARTICLE_DOWN, MPI_COMM_WORLD,
            &buffers->particles_status[1]);
-  for (long long i = 0; i < bytes_up / sizeof(particle_t); i++) {
+  for (long long i = 0; i < buffers->recv_particles_up.size; i++) {
     long ind =
         find_cell_p(&buffers->recv_particles_up.particles[i], size, ncside);
     cell_push_back_p(&cells[ind - BLOCK_LOW(id, p, ncside)],
                      &buffers->recv_particles_up.particles[i]);
   }
-  for (long long i = 0; i < bytes_down / sizeof(particle_t); i++) {
+  for (long long i = 0; i < buffers->recv_particles_down.size; i++) {
     long ind =
         find_cell_p(&buffers->recv_particles_down.particles[i], size, ncside);
     cell_push_back_p(&cells[ind - BLOCK_LOW(id, p, ncside)],
                      &buffers->recv_particles_down.particles[i]);
   }
+  MPI_Waitall(BLOCK_NUM_OF_NEIGHBORS(id, p, ncside),
+              buffers->particles_requests, MPI_STATUS_IGNORE);
   MPI_Iprobe((id - 1 + p) % p, TAG_PARTICLE_UP, MPI_COMM_WORLD,
-             &buffers->particles_flags[0], &buffers->particles_status[0]);
+             &buffers->particles_flags[0], &buffers->particles_status[0]);  // TODO: Is it correct?
   MPI_Iprobe((id + 1 + p) % p, TAG_PARTICLE_DOWN, MPI_COMM_WORLD,
              &buffers->particles_flags[1], &buffers->particles_status[1]);
 }
@@ -438,7 +444,7 @@ simulation_result simulation(double side, long ncside, long long npart, int id,
   communication_buffers_t buffers;
   init_blocks(size, ncside, npart, id, p, par, cells, &buffers);
   for (long long i = 0; i < nstep; i++) {
-    DEBUG("--------STEP: %lld --------------\n", i);
+    // DEBUG("--------STEP %d: %lld --------------\n", id, i);
     compute_centers_of_mass(side, ncside, id, p, cells, centers, &buffers);
     compute_kinetics(side, ncside, id, p, cells, centers);
     compute_new_particle_cell(size, ncside, id, p, cells, &buffers);
