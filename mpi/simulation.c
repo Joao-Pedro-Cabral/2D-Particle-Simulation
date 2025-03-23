@@ -413,6 +413,7 @@ particle_t find_particle_zero(int id, int p, long ncside, cell_t *cells) {
         par0.vy = cells[i].vy[j];
         par0.m = cells[i].m[j];
         par0.ind = 0;
+        MPI_Send(&par0, sizeof(particle_t), MPI_BYTE, 0, TAG_PARTICLE_ZERO, MPI_COMM_WORLD);
         return par0;
       }
     }
@@ -422,7 +423,7 @@ particle_t find_particle_zero(int id, int p, long ncside, cell_t *cells) {
   par0.vx = 0.0;
   par0.vy = 0.0;
   par0.m = 0.0;
-  par0.ind = 0;
+  par0.ind = -1;
   return par0;
 }
 
@@ -443,8 +444,11 @@ simulation_result simulation(double side, long ncside, long long npart, int id,
     compute_new_particle_cell(size, ncside, id, p, cells, &buffers);
     detect_collisions(ncside, id, p, cells);
   }
-  res.number_of_collisions = ncollisions;
+  MPI_Reduce(&ncollisions, &res.number_of_collisions, 1, MPI_LONG_LONG_INT, MPI_SUM, 0, MPI_COMM_WORLD);
   res.particle_zero = find_particle_zero(id, p, ncside, cells);
+  if(id == 0 && res.particle_zero.ind == -1) {
+    MPI_Recv(&res.particle_zero, sizeof(particle_t), MPI_BYTE, MPI_ANY_SOURCE, TAG_PARTICLE_ZERO, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+  }
   clean_blocks(ncside, id, p, cells, centers, &buffers);
   return res;
 }

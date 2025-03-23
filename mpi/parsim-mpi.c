@@ -8,8 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void print_result(simulation_result res) {
-  if (res.particle_zero.x != -1 && res.particle_zero.y != -1) {
+void print_result(simulation_result res, int id) {
+  if (id == 0) {
     printf("%.3lf %.3lf\n", res.particle_zero.x, res.particle_zero.y);
     printf("%lld\n", res.number_of_collisions);
   }
@@ -62,8 +62,8 @@ int main(int argc, char *argv[]) {
   exec_time = -omp_get_wtime();
   simulation_result res = simulation(side, ncside, npart, id, p, nstep, par);
   exec_time += omp_get_wtime();
-  print_result(res);
-  fprintf(stderr, "%.1fs\n", exec_time);
+  print_result(res, id);
+  fprintf(stderr, "%.1fs\n", exec_time); // TODO: Print how many times?
   fflush(stdout);
   MPI_Finalize(); // TODO: Here?
   return 0;

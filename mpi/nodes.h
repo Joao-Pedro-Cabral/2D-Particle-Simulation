@@ -15,5 +15,6 @@
 #define TAG_CENTER_DOWN 1
 #define TAG_PARTICLE_UP 2
 #define TAG_PARTICLE_DOWN 3
+#define TAG_PARTICLE_ZERO 4
 
 #endif // __NODES_H
