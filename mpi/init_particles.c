@@ -1,5 +1,6 @@
 
 #include "init_particles.h"
+#include "nodes.h"
 #include <math.h>
 
 unsigned int seed;
@@ -22,7 +23,7 @@ double rnd_normal01() {
   return result;
 }
 
-void init_particles(long seed, double side, long ncside, long long n_part,
+void init_particles(long seed, double side, long ncside, int id, int p, long long n_part,
                     particle_t *par) {
   double (*rnd01)() = rnd_uniform01;
   long long i;
@@ -35,11 +36,17 @@ void init_particles(long seed, double side, long ncside, long long n_part,
   init_r4uni(seed);
 
   for (i = 0; i < n_part; i++) {
-    par[i].x = rnd01() * side;
-    par[i].y = rnd01() * side;
-    par[i].vx = (rnd01() - 0.5) * side / ncside / 5.0;
-    par[i].vy = (rnd01() - 0.5) * side / ncside / 5.0;
-    par[i].m = rnd01() * 0.01 * (ncside * ncside) / n_part / G * EPSILON2;
-    par[i].ind = i;
+    double x = rnd01();
+    double y = rnd01();
+    double vx = rnd01();
+    double vy = rnd01();
+    double m = rnd01();
+    if(PARTICLE_LOW(id, p, n_part) <= i && i <= PARTICLE_HIGH(id, p, n_part)) {
+      par[i - PARTICLE_LOW(id, p, n_part)].x = x * side;
+      par[i - PARTICLE_LOW(id, p, n_part)].y = y * side;
+      par[i - PARTICLE_LOW(id, p, n_part)].vx = (vx - 0.5) * side / ncside / 5.0;
+      par[i - PARTICLE_LOW(id, p, n_part)].vy = (vy - 0.5) * side / ncside / 5.0;
+      par[i - PARTICLE_LOW(id, p, n_part)].m = m * 0.01 * (ncside * ncside) / n_part / G * EPSILON2;
+    }
   }
 }

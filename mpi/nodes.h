@@ -2,6 +2,9 @@
 #ifndef __NODES_H
 #define __NODES_H
 
+#define PARTICLE_LOW(id, p, n) ((id) * (n) / (p))
+#define PARTICLE_HIGH(id, p, n) (PARTICLE_LOW((id) + 1, p, n) - 1)
+#define PARTICLE_SIZE(id, p, n) (PARTICLE_HIGH(id, p, n) - PARTICLE_LOW(id, p, n) + 1)
 #define BLOCK_LOW(id, p, n) ((id) * (n) / (p)) * n
 #define BLOCK_HIGH(id, p, n) (BLOCK_LOW((id) + 1, p, n) - 1)
 #define BLOCK_SIZE(id, p, n) (BLOCK_HIGH(id, p, n) - BLOCK_LOW(id, p, n) + 1)

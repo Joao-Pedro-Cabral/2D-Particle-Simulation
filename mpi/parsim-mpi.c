@@ -57,8 +57,7 @@ int main(int argc, char *argv[]) {
   MPI_Comm_size(MPI_COMM_WORLD, &p);
 
   double exec_time;
-  init_particles(seed, side, ncside, npart,
-                 par); // TODO: Sync initial particles
+  init_particles(seed, side, ncside, id, p, npart, par);
   exec_time = -omp_get_wtime();
   simulation_result res = simulation(side, ncside, npart, id, p, nstep, par);
   exec_time += omp_get_wtime();

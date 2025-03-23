@@ -11,19 +11,75 @@
 
 static long long ncollisions = 0;
 
+//TODO: int?
+int distribute_particles(double size, long ncside, long npart, int id, int p, particle_t *par, particle_t** recv_par) {
+  int * send_counters = (int*) malloc(sizeof(int) * p);
+  int * recv_counters = (int*) malloc(sizeof(int) * p);
+  for(int i = 0; i < p; i++) {
+    send_counters[i] = 0;
+  }
+  long long particle_low = PARTICLE_LOW(id, p, npart);
+  for(long long i = 0; i < PARTICLE_SIZE(id, p, npart); i++) {
+    par[i].ind = i + particle_low;
+    long cell = find_cell_p(&par[i], size, ncside);
+    int owner = BLOCK_OWNER(cell, p, ncside);
+    send_counters[owner] ++;
+  }
+  MPI_Alltoall(send_counters, 1, MPI_INT, recv_counters, 1, MPI_INT, MPI_COMM_WORLD);
+  int * send_displs = (int*) malloc(sizeof(int) * p);
+  int * recv_displs = (int*) malloc(sizeof(int) * p);
+  send_displs[0] = 0;
+  recv_displs[0] = 0;
+  for(int i = 1; i < p; i++) {
+    send_displs[i] = send_displs[i-1] + send_counters[i-1];
+    recv_displs[i] = recv_displs[i-1] + recv_counters[i-1];
+  }
+  int send_size = send_displs[p-1] + send_counters[p-1];
+  particle_t *send_par = (particle_t*) malloc(sizeof(particle_t) * send_size);
+  for(int i = 0; i < p; i++) {
+    send_counters[i] = 0;
+  }
+  for(long long i = 0; i < send_size; i++) {
+    long cell = find_cell_p(&par[i], size, ncside);
+    int owner = BLOCK_OWNER(cell, p, ncside);
+    long long j = send_counters[owner] + send_displs[owner];
+    send_par[j].x = par[i].x;
+    send_par[j].y = par[i].y;
+    send_par[j].vx = par[i].vx;
+    send_par[j].vy = par[i].vy;
+    send_par[j].m = par[i].m;
+    send_par[j].ind = par[i].ind;
+    send_counters[owner] ++;
+  }
+  int recv_size = recv_displs[p-1] + recv_counters[p-1];
+  *recv_par = (particle_t*) malloc(sizeof(particle_t) * recv_size);
+  for(int i = 0; i < p; i++) {
+    send_counters[i] *= sizeof(particle_t);
+    send_displs[i] *= sizeof(particle_t);
+    recv_counters[i] *= sizeof(particle_t);
+    recv_displs[i] *= sizeof(particle_t);
+  }
+  MPI_Alltoallv(send_par, send_counters, send_displs, MPI_BYTE, *recv_par, recv_counters, recv_displs, MPI_BYTE, MPI_COMM_WORLD);
+  free(par);
+  free(send_par);
+  free(send_counters);
+  free(recv_counters);
+  free(send_displs);
+  free(recv_displs);
+  return recv_size;
+}
+
 void init_blocks(double size, long ncside, long long npart, int id, int p,
-                 particle_t *par, cell_t *cells,
+                 int par_num, particle_t *par, cell_t *cells,
                  communication_buffers_t *buffers) {
   long long *count = malloc(sizeof(long long) * BLOCK_SIZE(id, p, ncside));
   for (long i = 0; i < BLOCK_SIZE(id, p, ncside); i++) {
     count[i] = 0;
   }
   long block_low = BLOCK_LOW(id, p, ncside);
-  long block_high = BLOCK_HIGH(id, p, ncside);
-  for (long long i = 0; i < npart; i++) {
+  for (long long i = 0; i < par_num; i++) {
     long cell = find_cell_p(&par[i], size, ncside);
-    if (block_low <= cell && cell <= block_high)
-      count[cell - block_low]++;
+    count[cell - block_low]++;
   }
   long long min_size = 2 * npart / (ncside * ncside);
   min_size = (min_size > 10) ? min_size : 10;
@@ -34,10 +90,9 @@ void init_blocks(double size, long ncside, long long npart, int id, int p,
     cell_init(&cells[i], capacity,
               (i % ncside + 1) + (i / ncside + 1) * (ncside + 2));
   }
-  for (long long i = 0; i < npart; i++) {
+  for (long long i = 0; i < par_num; i++) {
     long cell = find_cell_p(&par[i], size, ncside);
-    if (block_low <= cell && cell <= block_high)
-      cell_push_back_p(&cells[cell - block_low], &par[i]);
+    cell_push_back_p(&cells[cell - block_low], &par[i]);
   }
   free(count);
   free(par);
@@ -442,7 +497,9 @@ simulation_result simulation(double side, long ncside, long long npart, int id,
              (BLOCK_SIZE(id, p, ncside) + BLOCK_NEIGHBORHOOD(id, p, ncside)));
   simulation_result res;
   communication_buffers_t buffers;
-  init_blocks(size, ncside, npart, id, p, par, cells, &buffers);
+  particle_t *recv_par;
+  int recv_npart = distribute_particles(size, ncside, npart, id, p, par, &recv_par);
+  init_blocks(size, ncside, npart, id, p, recv_npart, recv_par, cells, &buffers);
   for (long long i = 0; i < nstep; i++) {
     // DEBUG("--------STEP %d: %lld --------------\n", id, i);
     compute_centers_of_mass(side, ncside, id, p, cells, centers, &buffers);
