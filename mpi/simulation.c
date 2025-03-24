@@ -211,7 +211,7 @@ void compute_centers_of_mass(double side, long ncside, int id, int p,
       }
     }
   }
-  for(long i = 0; i < BLOCK_NUM_OF_NEIGHBORS(id, p, ncside); i++) {
+  for(long i = 0; i < BLOCK_FRONTIER(id, p, ncside); i++) {
     buffers->send_centers_down[i].x = centers[cells[i].center].x;
     buffers->send_centers_down[i].y = centers[cells[i].center].y;
     buffers->send_centers_down[i].m = centers[cells[i].center].m;
