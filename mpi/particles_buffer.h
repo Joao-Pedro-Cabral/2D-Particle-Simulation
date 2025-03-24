@@ -12,7 +12,8 @@ typedef struct {
 
 void particles_buffer_init(particles_buffer_t *buffer, long long capacity);
 void particles_buffer_resize(particles_buffer_t *buffer, long long size);
-void particles_buffer_add(particles_buffer_t *buffer, cell_t *cell,
+void particles_buffer_add_p(particles_buffer_t *buffer, double x, double y, double vx, double vy, double m, long long ind);
+void particles_buffer_add_c(particles_buffer_t *buffer, cell_t *cell,
                           long long i);
 void particles_buffer_clean(particles_buffer_t *buffer);
 

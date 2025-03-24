@@ -1,6 +1,7 @@
 
 #include "init_particles.h"
 #include "nodes.h"
+#include "debug.h"
 #include <math.h>
 
 unsigned int seed;
@@ -24,7 +25,7 @@ double rnd_normal01() {
 }
 
 void init_particles(long seed, double side, long ncside, int id, int p, long long n_part,
-                    particle_t *par) {
+                    particles_buffer_t *par) {
   double (*rnd01)() = rnd_uniform01;
   long long i;
 
@@ -34,6 +35,7 @@ void init_particles(long seed, double side, long ncside, int id, int p, long lon
   }
 
   init_r4uni(seed);
+  double size = side / ncside;
 
   for (i = 0; i < n_part; i++) {
     double x = rnd01();
@@ -41,13 +43,16 @@ void init_particles(long seed, double side, long ncside, int id, int p, long lon
     double vx = rnd01();
     double vy = rnd01();
     double m = rnd01();
-    // TODO: My dear particle, who is your owner? Tell me, <3
-    if(PARTICLE_LOW(id, p, n_part) <= i && i <= PARTICLE_HIGH(id, p, n_part)) {
-      par[i - PARTICLE_LOW(id, p, n_part)].x = x * side;
-      par[i - PARTICLE_LOW(id, p, n_part)].y = y * side;
-      par[i - PARTICLE_LOW(id, p, n_part)].vx = (vx - 0.5) * side / ncside / 5.0;
-      par[i - PARTICLE_LOW(id, p, n_part)].vy = (vy - 0.5) * side / ncside / 5.0;
-      par[i - PARTICLE_LOW(id, p, n_part)].m = m * 0.01 * (ncside * ncside) / n_part / G * EPSILON2;
+    x = x * side;
+    y = y * side;
+    long xpart = x / size;
+    long ypart = y / size;
+    long cell = ncside * ypart + xpart;
+    if(id == BLOCK_OWNER(cell, p, ncside)) {
+      vx = (vx - 0.5) * side / ncside / 5.0;
+      vy = (vy - 0.5) * side / ncside / 5.0;
+      m = m * 0.01 * (ncside * ncside) / n_part / G * EPSILON2;
+      particles_buffer_add_p(par, x, y, vx, vy, m, i);
     }
   }
 }

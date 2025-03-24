@@ -3,6 +3,7 @@
 #define __SIMULATION_H
 
 #include "particles.h"
+#include "particles_buffer.h"
 
 typedef struct {
   particle_t particle_zero;
@@ -10,6 +11,6 @@ typedef struct {
 } simulation_result;
 
 simulation_result simulation(double side, long ncside, long long npart, int id,
-                             int p, long long nstep, particle_t *par);
+                             int p, long long nstep, particles_buffer_t *par);
 
 #endif // __SIMULATION_H

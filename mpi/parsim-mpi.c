@@ -3,6 +3,7 @@
 #include "nodes.h"
 #include "simulation.h"
 #include "utils.h"
+#include "particles_buffer.h"
 #include <mpi.h>
 #include <omp.h>
 #include <stdio.h>
@@ -46,18 +47,19 @@ int main(int argc, char *argv[]) {
 
   DEBUG("%ld, %lf, %ld, %lld, %lld\n", seed, side, ncside, npart, nstep);
 
-  particle_t *par = (particle_t *)malloc(sizeof(particle_t) * npart);
-
-  MPI_Init(&argc, &argv); // TODO: Here?
+  MPI_Init(&argc, &argv);
 
   int id, p;
   MPI_Comm_rank(MPI_COMM_WORLD, &id);
   MPI_Comm_size(MPI_COMM_WORLD, &p);
 
+  particles_buffer_t par;
+  particles_buffer_init(&par, 2*npart/p);
+
   double exec_time;
-  init_particles(seed, side, ncside, id, p, npart, par);
+  init_particles(seed, side, ncside, id, p, npart, &par);
   exec_time = -omp_get_wtime();
-  simulation_result res = simulation(side, ncside, npart, id, p, nstep, par);
+  simulation_result res = simulation(side, ncside, npart, id, p, nstep, &par);
   exec_time += omp_get_wtime();
   if(id == 0) {
     print_result(res);

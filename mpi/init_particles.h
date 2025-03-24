@@ -8,6 +8,7 @@
 #define DELTAT 0.1
 
 #include "particles.h"
+#include "particles_buffer.h"
 
 void init_r4uni(int input_seed);
 
@@ -16,6 +17,6 @@ double rnd_uniform01();
 double rnd_normal01();
 
 void init_particles(long seed, double side, long ncside, int id, int p, long long n_part,
-                    particle_t *par);
+                    particles_buffer_t *par);
 
 #endif // __INIT_PARTICLES_H
