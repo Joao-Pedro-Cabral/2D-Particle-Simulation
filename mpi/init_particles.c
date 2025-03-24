@@ -41,6 +41,7 @@ void init_particles(long seed, double side, long ncside, int id, int p, long lon
     double vx = rnd01();
     double vy = rnd01();
     double m = rnd01();
+    // TODO: My dear particle, who is your owner? Tell me, <3
     if(PARTICLE_LOW(id, p, n_part) <= i && i <= PARTICLE_HIGH(id, p, n_part)) {
       par[i - PARTICLE_LOW(id, p, n_part)].x = x * side;
       par[i - PARTICLE_LOW(id, p, n_part)].y = y * side;

@@ -6,8 +6,10 @@
 #include <mpi.h>
 
 typedef struct {
-  center_t *centers_up;
-  center_t *centers_down;
+  center_t *send_centers_up;
+  center_t *send_centers_down;
+  center_t *recv_centers_up;
+  center_t *recv_centers_down;
   particles_buffer_t send_particles_up;
   particles_buffer_t send_particles_down;
   particles_buffer_t recv_particles_up;

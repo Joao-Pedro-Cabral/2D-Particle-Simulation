@@ -97,13 +97,21 @@ void init_blocks(double size, long ncside, long long npart, int id, int p,
   free(count);
   free(par);
   communication_buffers_init(buffers, ncside, id, p, npart);
-  MPI_Irecv(buffers->centers_up, sizeof(center_t) * NUM_COLUMNS(id, p, ncside),
+  MPI_Recv_init(buffers->recv_centers_up, sizeof(center_t) * NUM_COLUMNS(id, p, ncside),
             MPI_BYTE, (id - 1 + p) % p, TAG_CENTER_UP, MPI_COMM_WORLD,
             &buffers->centers_requests[0]);
-  MPI_Irecv(buffers->centers_down,
+  MPI_Recv_init(buffers->recv_centers_down,
             sizeof(center_t) * NUM_COLUMNS(id, p, ncside), MPI_BYTE,
             (id + 1 + p) % p, TAG_CENTER_DOWN, MPI_COMM_WORLD,
             &buffers->centers_requests[1]);
+  MPI_Send_init(buffers->send_centers_down,
+            sizeof(center_t) * NUM_COLUMNS(id, p, ncside), MPI_BYTE,
+            (id - 1 + p) % p, TAG_CENTER_DOWN, MPI_COMM_WORLD,
+            &buffers->centers_requests[2]);
+  MPI_Send_init(buffers->send_centers_up,
+            sizeof(center_t) * NUM_COLUMNS(id, p, ncside), MPI_BYTE,
+            (id + 1 + p) % p, TAG_CENTER_UP, MPI_COMM_WORLD,
+            &buffers->centers_requests[3]);
   MPI_Iprobe((id - 1 + p) % p, TAG_PARTICLE_UP, MPI_COMM_WORLD,
              &buffers->particles_flags[0], &buffers->particles_status[0]);
   MPI_Iprobe((id + 1 + p) % p, TAG_PARTICLE_DOWN, MPI_COMM_WORLD,
@@ -203,28 +211,30 @@ void compute_centers_of_mass(double side, long ncside, int id, int p,
       }
     }
   }
-  MPI_Isend(&centers[cells[0].center],
-            sizeof(center_t) * NUM_COLUMNS(id, p, ncside), MPI_BYTE,
-            (id - 1 + p) % p, TAG_CENTER_DOWN, MPI_COMM_WORLD,
-            &buffers->centers_requests[2]);
-  MPI_Isend(&centers[cells[ncside * (NUM_ROWS(id, p, ncside) - 1)].center],
-            sizeof(center_t) * NUM_COLUMNS(id, p, ncside), MPI_BYTE,
-            (id + 1 + p) % p, TAG_CENTER_UP, MPI_COMM_WORLD,
-            &buffers->centers_requests[3]);
+  for(long i = 0; i < BLOCK_NUM_OF_NEIGHBORS(id, p, ncside); i++) {
+    buffers->send_centers_down[i].x = centers[cells[i].center].x;
+    buffers->send_centers_down[i].y = centers[cells[i].center].y;
+    buffers->send_centers_down[i].m = centers[cells[i].center].m;
+    buffers->send_centers_up[i].x = centers[cells[ncside * (NUM_ROWS(id, p, ncside) - 1) + i].center].x;
+    buffers->send_centers_up[i].y = centers[cells[ncside * (NUM_ROWS(id, p, ncside) - 1) + i].center].y;
+    buffers->send_centers_up[i].m = centers[cells[ncside * (NUM_ROWS(id, p, ncside) - 1) + i].center].m;
+  }
+  MPI_Startall(2 * BLOCK_NUM_OF_NEIGHBORS(id, p, ncside),
+              buffers->centers_requests);
   MPI_Waitall(2 * BLOCK_NUM_OF_NEIGHBORS(id, p, ncside),
               buffers->centers_requests, MPI_STATUS_IGNORE);
   for (long i = 0; i < NUM_COLUMNS(id, p, ncside); i++) {
     long ind = i + 1;
-    centers[ind].x = buffers->centers_up[i].x;
+    centers[ind].x = buffers->recv_centers_up[i].x;
     centers[ind].y =
-        (id == 0) ? buffers->centers_up[i].y - side : buffers->centers_up[i].y;
-    centers[ind].m = buffers->centers_up[i].m;
+        (id == 0) ? buffers->recv_centers_up[i].y - side : buffers->recv_centers_up[i].y;
+    centers[ind].m = buffers->recv_centers_up[i].m;
     long ind2 =
         (NUM_ROWS(id, p, ncside) + 1) * (NUM_COLUMNS(id, p, ncside) + 2) + ind;
-    centers[ind2].x = buffers->centers_down[i].x;
-    centers[ind2].y = (id == p - 1) ? buffers->centers_down[i].y + side
-                                    : buffers->centers_down[i].y;
-    centers[ind2].m = buffers->centers_down[i].m;
+    centers[ind2].x = buffers->recv_centers_down[i].x;
+    centers[ind2].y = (id == p - 1) ? buffers->recv_centers_down[i].y + side
+                                    : buffers->recv_centers_down[i].y;
+    centers[ind2].m = buffers->recv_centers_down[i].m;
     if (i == 0 || i == NUM_COLUMNS(id, p, ncside) - 1) {
       long ind3 = (i == 0) ? ind + NUM_COLUMNS(id, p, ncside)
                            : ind - NUM_COLUMNS(id, p, ncside);
@@ -240,13 +250,6 @@ void compute_centers_of_mass(double side, long ncside, int id, int p,
       centers[ind4].m = centers[ind2].m;
     }
   }
-  MPI_Irecv(buffers->centers_up, sizeof(center_t) * NUM_COLUMNS(id, p, ncside),
-            MPI_BYTE, (id - 1 + p) % p, TAG_CENTER_UP, MPI_COMM_WORLD,
-            &buffers->centers_requests[0]);
-  MPI_Irecv(buffers->centers_down,
-            sizeof(center_t) * NUM_COLUMNS(id, p, ncside), MPI_BYTE,
-            (id + 1 + p) % p, TAG_CENTER_DOWN, MPI_COMM_WORLD,
-            &buffers->centers_requests[1]);
   debug_centers(ncside, id, p, centers);
 }
 
