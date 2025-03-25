@@ -36,7 +36,7 @@ void communication_buffers_init(communication_buffers_t *buffers, long ncside,
     particles_buffer_init(&buffers->send_particles[i], initial_estimation);
     particles_buffer_init(&buffers->recv_particles[i], initial_estimation);
     buffers->particles_flags[i] = 0;
-    int neighbor = find_neighbor(buffers, id, i);
+    int neighbor = find_neighbor(buffers, i);
     DEBUG("Process: %d, Neighbor: %d, len: %ld, recv: %ld, send: %ld\n", id, neighbor, len, TAG_CENTER + i, TAG_CENTER + NUM_OF_NEIGHBORS - i - 1);
     MPI_Recv_init(&buffers->recv_centers[i], sizeof(center_t) * len, MPI_BYTE, neighbor,
             TAG_CENTER + i, buffers->cart_comm, &buffers->centers_requests[i]);
@@ -94,37 +94,42 @@ long find_cell_c(communication_buffers_t *buffers, cell_t *cell, long long i, do
   return buffers->lens[0] * (ypart - buffers->rows[0]) + (xpart - buffers->cols[0]);
 }
 
-int find_neighbor(communication_buffers_t *buffers, int id, int pos) {
-  int neighbor, aux;
+int find_neighbor(communication_buffers_t *buffers, int pos) {
+  int neighbor, coords[2];
   switch (pos) {
   case 0:
-    MPI_Cart_shift(buffers->cart_comm, 1, -1, &id, &aux);
-    MPI_Cart_shift(buffers->cart_comm, 0, -1, &aux, &neighbor);
+    coords[0] = buffers->coords[0] - 1;
+    coords[1] = buffers->coords[1] - 1;
     break;
   case 1:
-    MPI_Cart_shift(buffers->cart_comm, 0, -1, &id, &neighbor);
+    coords[0] = buffers->coords[0] - 1;
+    coords[1] = buffers->coords[1];
     break;
   case 2:
-    MPI_Cart_shift(buffers->cart_comm, 0, -1, &id, &aux);
-    MPI_Cart_shift(buffers->cart_comm, 1, 1, &aux, &neighbor);
+    coords[0] = buffers->coords[0] - 1;
+    coords[1] = buffers->coords[1] + 1;
     break;
   case 3:
-    MPI_Cart_shift(buffers->cart_comm, 1, -1, &id, &neighbor);
+    coords[0] = buffers->coords[0];
+    coords[1] = buffers->coords[1] - 1;
     break;
   case 4:
-    MPI_Cart_shift(buffers->cart_comm, 1, 1, &id, &neighbor);
+    coords[0] = buffers->coords[0];
+    coords[1] = buffers->coords[1] + 1;
     break;
   case 5:
-    MPI_Cart_shift(buffers->cart_comm, 0, 1, &id, &aux);
-    MPI_Cart_shift(buffers->cart_comm, 1, -1, &aux, &neighbor);
+    coords[0] = buffers->coords[0] + 1;
+    coords[1] = buffers->coords[1] - 1;
     break;
   case 6:
-    MPI_Cart_shift(buffers->cart_comm, 0, 1, &id, &neighbor);
+    coords[0] = buffers->coords[0] + 1;
+    coords[1] = buffers->coords[1];
     break;
   default: // 7
-    MPI_Cart_shift(buffers->cart_comm, 1, 1, &id, &aux);
-    MPI_Cart_shift(buffers->cart_comm, 0, 1, &aux, &neighbor);
+    coords[0] = buffers->coords[0] + 1;
+    coords[1] = buffers->coords[1] + 1;
     break;
   }
+  MPI_Cart_rank(buffers->cart_comm, coords, &neighbor);
   return neighbor;
 }

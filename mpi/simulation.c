@@ -307,7 +307,7 @@ void compute_new_particle_cell(double size, long ncside, int id,
     }
   }
   for(long i = 0; i < NUM_OF_NEIGHBORS; i++) {
-    int neighbor = find_neighbor(buffers, id, i);
+    int neighbor = find_neighbor(buffers, i);
     MPI_Isend(buffers->send_particles[i].particles,
       buffers->send_particles[i].size * sizeof(particle_t), MPI_BYTE,
       neighbor, TAG_PARTICLE + NUM_OF_NEIGHBORS - i - 1, buffers->cart_comm,
