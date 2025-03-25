@@ -12,7 +12,7 @@ typedef struct {
 } simulation_result;
 
 simulation_result simulation(double side, long ncside, long long npart, int id,
-                             int p, long long nstep, particles_buffer_t *par,
+                             long long nstep, particles_buffer_t *par,
                              communication_buffers_t* buffers);
 
 #endif // __SIMULATION_H

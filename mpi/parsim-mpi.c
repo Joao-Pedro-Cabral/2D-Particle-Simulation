@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
   double exec_time;
   init_particles(seed, side, ncside, id, npart, &par, &buffers);
   exec_time = -omp_get_wtime();
-  simulation_result res = simulation(side, ncside, npart, id, p, nstep, &par, &buffers);
+  simulation_result res = simulation(side, ncside, npart, id, nstep, &par, &buffers);
   exec_time += omp_get_wtime();
   if(id == 0) {
     print_result(res);

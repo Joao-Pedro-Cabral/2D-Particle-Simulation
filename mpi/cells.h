@@ -36,6 +36,6 @@ double squared_distance(cell_t *cell, long long i, long long j);
 void update_position_and_velocity(cell_t *cell, long long i, double side);
 void gravitational_force_pp(cell_t *cell, long long i, long long j);
 void gravitational_force_pc(cell_t *cell, long long i, center_t *center);
-void copy_center(const center_t * center1, center_t * center2);
+void copy_center(center_t * center1, const center_t * center2);
 
 #endif // __CELL_H

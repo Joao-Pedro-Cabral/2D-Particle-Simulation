@@ -26,11 +26,12 @@ typedef struct {
 } communication_buffers_t;
 
 void communication_buffers_create_world(communication_buffers_t *buffers, long ncside, int id, int p);
-void communication_buffers_init(communication_buffers_t *buffers, long ncside, int id, int p, long long npart);
+void communication_buffers_init(communication_buffers_t *buffers, long ncside, int id, long long npart);
 void communication_buffers_clean(communication_buffers_t *buffers);
-int find_owner_xy(communication_buffers_t *buffers, double x, double y, double size, double ncside);
-int find_owner_c(communication_buffers_t *buffers, cell_t * cell, long long i, double size, double ncside);
+int find_owner_xy(communication_buffers_t *buffers, double x, double y, double size, long ncside);
+int find_owner_c(communication_buffers_t *buffers, cell_t * cell, long long i, double size, long ncside);
 long find_cell_p(communication_buffers_t *buffers, particle_t *par, double size);
 long find_cell_c(communication_buffers_t *buffers, cell_t * cell, long long i, double size);
+int find_neighbor(communication_buffers_t *buffers, int id, int pos);
 
 #endif // __COMMUNICATION_BUFFERS_H
