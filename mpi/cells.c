@@ -4,18 +4,6 @@
 #include <math.h>
 #include <stdlib.h>
 
-long find_cell_p(particle_t *par, double size, long ncside) {
-  long xpart = par->x / size;
-  long ypart = par->y / size;
-  return ncside * ypart + xpart;
-}
-
-long find_cell_c(cell_t *cell, long long i, double size, long ncside) {
-  long xpart = cell->x[i] / size;
-  long ypart = cell->y[i] / size;
-  return ncside * ypart + xpart;
-}
-
 void cell_init(cell_t *cell, long long capacity, long center) {
   cell->x = (double *)malloc(capacity * sizeof(double));
   cell->y = (double *)malloc(capacity * sizeof(double));
@@ -163,4 +151,10 @@ void gravitational_force_pc(cell_t *cell, long long i, center_t *center) {
   double force_y = dy * F;
   cell->ax[i] += force_x;
   cell->ay[i] += force_y;
+}
+
+void copy_center(const center_t * center1, center_t * center2) {
+  center2->x = center1->x;
+  center2->y = center1->y;
+  center2->m = center1->m;
 }

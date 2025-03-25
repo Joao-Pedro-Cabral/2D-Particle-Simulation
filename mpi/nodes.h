@@ -2,22 +2,10 @@
 #ifndef __NODES_H
 #define __NODES_H
 
-#define PARTICLE_LOW(id, p, n) ((id) * (n) / (p))
-#define PARTICLE_HIGH(id, p, n) (PARTICLE_LOW((id) + 1, p, n) - 1)
-#define PARTICLE_SIZE(id, p, n) (PARTICLE_HIGH(id, p, n) - PARTICLE_LOW(id, p, n) + 1)
-#define BLOCK_LOW(id, p, n) ((id) * (n) / (p)) * n
-#define BLOCK_HIGH(id, p, n) (BLOCK_LOW((id) + 1, p, n) - 1)
-#define BLOCK_SIZE(id, p, n) (BLOCK_HIGH(id, p, n) - BLOCK_LOW(id, p, n) + 1)
-#define BLOCK_NUM_OF_NEIGHBORS(id, p, n) (2)
-#define BLOCK_FRONTIER(id, p, n) (n)
-#define NUM_COLUMNS(id, p, n) (n)
-#define NUM_ROWS(id, p, n) BLOCK_SIZE(id, p, n) / NUM_COLUMNS(id, p, n)
-#define BLOCK_NEIGHBORHOOD(id, p, n) (2 * (n + 2) + 2 * NUM_ROWS(id, p, n))
-#define BLOCK_OWNER(index, p, n) (((p) * ((index/n) + 1) - 1) / n)
-#define TAG_CENTER_UP 0
-#define TAG_CENTER_DOWN 1
-#define TAG_PARTICLE_UP 2
-#define TAG_PARTICLE_DOWN 3
-#define TAG_PARTICLE_ZERO 4
+#define BLOCK_INDEX(ind, k, n) (ind + ((k % 3) - 1) + (k / 3 - 1) * n)
+#define NUM_OF_NEIGHBORS 8
+#define TAG_CENTER 0
+#define TAG_PARTICLE NUM_OF_NEIGHBORS
+#define TAG_PARTICLE_ZERO 2*NUM_OF_NEIGHBORS
 
 #endif // __NODES_H

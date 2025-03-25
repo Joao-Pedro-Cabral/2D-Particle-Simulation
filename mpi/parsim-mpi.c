@@ -4,6 +4,7 @@
 #include "simulation.h"
 #include "utils.h"
 #include "particles_buffer.h"
+#include "communication_buffers.h"
 #include <mpi.h>
 #include <omp.h>
 #include <stdio.h>
@@ -52,14 +53,16 @@ int main(int argc, char *argv[]) {
   int id, p;
   MPI_Comm_rank(MPI_COMM_WORLD, &id);
   MPI_Comm_size(MPI_COMM_WORLD, &p);
+  communication_buffers_t buffers;
+  communication_buffers_create_world(&buffers, ncside, id, p);
 
   particles_buffer_t par;
   particles_buffer_init(&par, 2*npart/p);
 
   double exec_time;
-  init_particles(seed, side, ncside, id, p, npart, &par);
+  init_particles(seed, side, ncside, id, npart, &par, &buffers);
   exec_time = -omp_get_wtime();
-  simulation_result res = simulation(side, ncside, npart, id, p, nstep, &par);
+  simulation_result res = simulation(side, ncside, npart, id, p, nstep, &par, &buffers);
   exec_time += omp_get_wtime();
   if(id == 0) {
     print_result(res);

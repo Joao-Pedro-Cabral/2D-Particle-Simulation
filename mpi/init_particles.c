@@ -24,8 +24,8 @@ double rnd_normal01() {
   return result;
 }
 
-void init_particles(long seed, double side, long ncside, int id, int p, long long n_part,
-                    particles_buffer_t *par) {
+void init_particles(long seed, double side, long ncside, int id, long long n_part,
+                    particles_buffer_t *par, communication_buffers_t * buffers) {
   double (*rnd01)() = rnd_uniform01;
   long long i;
 
@@ -45,10 +45,7 @@ void init_particles(long seed, double side, long ncside, int id, int p, long lon
     double m = rnd01();
     x = x * side;
     y = y * side;
-    long xpart = x / size;
-    long ypart = y / size;
-    long cell = ncside * ypart + xpart;
-    if(id == BLOCK_OWNER(cell, p, ncside)) {
+    if(id == find_owner_xy(buffers, x, y, size, ncside)) {
       vx = (vx - 0.5) * side / ncside / 5.0;
       vy = (vy - 0.5) * side / ncside / 5.0;
       m = m * 0.01 * (ncside * ncside) / n_part / G * EPSILON2;

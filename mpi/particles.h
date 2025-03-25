@@ -11,10 +11,4 @@ typedef struct {
   long long ind;
 } particle_t;
 
-typedef struct {
-  double x;
-  double y;
-  double m;
-} center_t;
-
 #endif // __PARTICLES_H

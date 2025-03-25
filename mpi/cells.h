@@ -6,6 +6,12 @@
 #include <omp.h>
 
 typedef struct {
+  double x;
+  double y;
+  double m;
+} center_t;
+
+typedef struct {
   long center;
   double *x;
   double *y;
@@ -20,8 +26,6 @@ typedef struct {
   long long capacity;
 } cell_t;
 
-long find_cell_p(particle_t *par, double size, long ncside);
-long find_cell_c(cell_t *cell, long long i, double size, long ncside);
 void cell_init(cell_t *cell, long long capacity, long center);
 void cell_resize(cell_t *cell, long long capacity);
 void cell_push_back_c(cell_t *cell, cell_t *cell2, long long i);
@@ -32,5 +36,6 @@ double squared_distance(cell_t *cell, long long i, long long j);
 void update_position_and_velocity(cell_t *cell, long long i, double side);
 void gravitational_force_pp(cell_t *cell, long long i, long long j);
 void gravitational_force_pc(cell_t *cell, long long i, center_t *center);
+void copy_center(const center_t * center1, center_t * center2);
 
 #endif // __CELL_H

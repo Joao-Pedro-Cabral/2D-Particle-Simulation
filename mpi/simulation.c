@@ -11,58 +11,36 @@
 
 static long long ncollisions = 0;
 
-void init_blocks(double size, long ncside, long long npart, int id, int p,
+void init_block(double size, long ncside, long long npart, int id, int p,
                  particles_buffer_t *par, cell_t *cells,
                  communication_buffers_t *buffers) {
-  long long *count = malloc(sizeof(long long) * BLOCK_SIZE(id, p, ncside));
-  for (long i = 0; i < BLOCK_SIZE(id, p, ncside); i++) {
+  long long *count = malloc(sizeof(long long) * buffers->size);
+  for (long i = 0; i < buffers->size; i++) {
     count[i] = 0;
   }
-  long block_low = BLOCK_LOW(id, p, ncside);
   for (long long i = 0; i < par->size; i++) {
-    long cell = find_cell_p(&par->particles[i], size, ncside);
-    count[cell - block_low]++;
+    long cell = find_cell_p(buffers, &par->particles[i], size);
+    count[cell]++;
   }
   long long min_size = 2 * npart / (ncside * ncside);
-  min_size = (min_size > 10) ? min_size : 10;
-  for (long i = 0; i < BLOCK_SIZE(id, p, ncside); i++) {
+  for (long i = 0; i < buffers->size; i++) {
     count[i] *= 2;
     long long capacity =
         count[i] > npart ? npart : (count[i] > min_size ? count[i] : min_size);
     cell_init(&cells[i], capacity,
-              (i % ncside + 1) + (i / ncside + 1) * (ncside + 2));
+              (i % buffers->lens[0] + 1) + (i / buffers->lens[1] + 1) * (buffers->lens[0] + 2));
   }
   for (long long i = 0; i < par->size; i++) {
-    long cell = find_cell_p(&par->particles[i], size, ncside);
-    cell_push_back_p(&cells[cell - block_low], &par->particles[i]);
+    long cell = find_cell_p(buffers, &par->particles[i], size);
+    cell_push_back_p(&cells[cell], &par->particles[i]);
   }
   free(count);
   particles_buffer_clean(par);
   communication_buffers_init(buffers, ncside, id, p, npart);
-  MPI_Recv_init(buffers->recv_centers_up, sizeof(center_t) * NUM_COLUMNS(id, p, ncside),
-            MPI_BYTE, (id - 1 + p) % p, TAG_CENTER_UP, MPI_COMM_WORLD,
-            &buffers->centers_requests[0]);
-  MPI_Recv_init(buffers->recv_centers_down,
-            sizeof(center_t) * NUM_COLUMNS(id, p, ncside), MPI_BYTE,
-            (id + 1 + p) % p, TAG_CENTER_DOWN, MPI_COMM_WORLD,
-            &buffers->centers_requests[1]);
-  MPI_Send_init(buffers->send_centers_down,
-            sizeof(center_t) * NUM_COLUMNS(id, p, ncside), MPI_BYTE,
-            (id - 1 + p) % p, TAG_CENTER_DOWN, MPI_COMM_WORLD,
-            &buffers->centers_requests[2]);
-  MPI_Send_init(buffers->send_centers_up,
-            sizeof(center_t) * NUM_COLUMNS(id, p, ncside), MPI_BYTE,
-            (id + 1 + p) % p, TAG_CENTER_UP, MPI_COMM_WORLD,
-            &buffers->centers_requests[3]);
-  MPI_Iprobe((id - 1 + p) % p, TAG_PARTICLE_UP, MPI_COMM_WORLD,
-             &buffers->particles_flags[0], &buffers->particles_status[0]);
-  MPI_Iprobe((id + 1 + p) % p, TAG_PARTICLE_DOWN, MPI_COMM_WORLD,
-             &buffers->particles_flags[1], &buffers->particles_status[1]);
 }
 
-void clean_blocks(long ncside, int id, int p, cell_t *cells, center_t *centers,
-                  communication_buffers_t *buffers) {
-  for (long i = 0; i < BLOCK_SIZE(id, p, ncside); i++) {
+void clean_blocks(cell_t *cells, center_t *centers, communication_buffers_t *buffers) {
+  for (long i = 0; i < buffers->size; i++) {
     cell_clean(&cells[i]);
   }
   free(cells);
@@ -70,16 +48,15 @@ void clean_blocks(long ncside, int id, int p, cell_t *cells, center_t *centers,
   communication_buffers_clean(buffers);
 }
 
-void debug_centers(long ncside, int id, int p, center_t *centers) {
-  for (long i = 0;
-       i < BLOCK_SIZE(id, p, ncside) + BLOCK_NEIGHBORHOOD(id, p, ncside); i++) {
+void debug_centers(int id, long ncenters, center_t *centers) {
+  for (long i = 0; i < ncenters; i++) {
     DEBUG("From %d: Center %ld x: %.6lf y: %.6lf m: %.6lf\n", id, i,
           centers[i].x, centers[i].y, centers[i].m);
   }
 }
 
-void debug_particles(long ncside, int id, int p, cell_t *cells) {
-  for (long i = 0; i < BLOCK_SIZE(id, p, ncside); i++) {
+void debug_particles(int id, long ncells, cell_t *cells) {
+  for (long i = 0; i < ncells; i++) {
     long long cell_size = cells[i].size;
     for (long long j = 0; j < cell_size; j++) {
       DEBUG("From %d: Particle %lld: m: %.6f, x: %.6f, y: %.6f, vx: %.6f, vy: "
@@ -97,13 +74,13 @@ static inline double sum_lanes(__m256d vec) {
   return ((double *)&vec)[0] + ((double *)&vec)[2];
 }
 
-void compute_centers_of_mass(double side, long ncside, int id, int p,
+void compute_centers_of_mass(double side,
                              cell_t *cells, center_t *centers,
                              communication_buffers_t *buffers) {
 
-  for (long iy = 0; iy < NUM_ROWS(id, p, ncside); iy++) {
-    for (long ix = 0; ix < NUM_COLUMNS(id, p, ncside); ix++) {
-      long i = ix + ncside * iy;
+  for (long iy = 0; iy < buffers->lens[1]; iy++) {
+    for (long ix = 0; ix < buffers->lens[0]; ix++) {
+      long i = ix + buffers->lens[0] * iy;
       double total_mass = 0.0;
       double weighted_x = 0.0;
       double weighted_y = 0.0;
@@ -143,62 +120,111 @@ void compute_centers_of_mass(double side, long ncside, int id, int p,
         centers[ind].y = -2 * side;
       }
 
-      if (ix == 0 || ix == NUM_COLUMNS(id, p, ncside) - 1) {
-        long ind2 = (ix == 0) ? ind + NUM_COLUMNS(id, p, ncside)
-                              : ind - NUM_COLUMNS(id, p, ncside);
-        centers[ind2].x =
-            (ix == 0) ? centers[ind].x + side : centers[ind].x - side;
-        centers[ind2].y = centers[ind].y;
-        centers[ind2].m = centers[ind].m;
+      if (ix == 0) {
+        copy_center(&buffers->send_centers[3][iy], &centers[ind]);
+        if(iy == 0) {
+          copy_center(&buffers->send_centers[0][0], &centers[ind]);
+          MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 0]);
+        } else if (iy == buffers->lens[1] - 1) {
+          copy_center(&buffers->send_centers[5][0], &centers[ind]);
+          MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 5]);
+          MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 3]);
+        }
+      } else if (ix == buffers->lens[0] - 1) {
+        copy_center(&buffers->send_centers[4][iy], &centers[ind]);
+        if(iy == 0) {
+          copy_center(&buffers->send_centers[2][0], &centers[ind]);
+          MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 2]);
+        } else if (iy == buffers->lens[1] - 1) {
+          copy_center(&buffers->send_centers[7][0], &centers[ind]);
+          MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 7]);
+          MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 4]);
+        }
+      }
+      if(iy == 0) {
+        copy_center(&buffers->send_centers[1][ix], &centers[ind]);
+        if(ix == buffers->lens[0] - 1) {
+          MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 1]);
+        }
+      } else if (iy == buffers->lens[1] - 1) {
+        copy_center(&buffers->send_centers[6][ix], &centers[ind]);
+        if(ix == buffers->lens[0] - 1) {
+          MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 6]);
+        }
       }
     }
   }
-  for(long i = 0; i < BLOCK_FRONTIER(id, p, ncside); i++) {
-    buffers->send_centers_down[i].x = centers[cells[i].center].x;
-    buffers->send_centers_down[i].y = centers[cells[i].center].y;
-    buffers->send_centers_down[i].m = centers[cells[i].center].m;
-    buffers->send_centers_up[i].x = centers[cells[ncside * (NUM_ROWS(id, p, ncside) - 1) + i].center].x;
-    buffers->send_centers_up[i].y = centers[cells[ncside * (NUM_ROWS(id, p, ncside) - 1) + i].center].y;
-    buffers->send_centers_up[i].m = centers[cells[ncside * (NUM_ROWS(id, p, ncside) - 1) + i].center].m;
-  }
-  MPI_Startall(2 * BLOCK_NUM_OF_NEIGHBORS(id, p, ncside),
-              buffers->centers_requests);
-  MPI_Waitall(2 * BLOCK_NUM_OF_NEIGHBORS(id, p, ncside),
-              buffers->centers_requests, MPI_STATUS_IGNORE);
-  for (long i = 0; i < NUM_COLUMNS(id, p, ncside); i++) {
-    long ind = i + 1;
-    centers[ind].x = buffers->recv_centers_up[i].x;
-    centers[ind].y =
-        (id == 0) ? buffers->recv_centers_up[i].y - side : buffers->recv_centers_up[i].y;
-    centers[ind].m = buffers->recv_centers_up[i].m;
-    long ind2 =
-        (NUM_ROWS(id, p, ncside) + 1) * (NUM_COLUMNS(id, p, ncside) + 2) + ind;
-    centers[ind2].x = buffers->recv_centers_down[i].x;
-    centers[ind2].y = (id == p - 1) ? buffers->recv_centers_down[i].y + side
-                                    : buffers->recv_centers_down[i].y;
-    centers[ind2].m = buffers->recv_centers_down[i].m;
-    if (i == 0 || i == NUM_COLUMNS(id, p, ncside) - 1) {
-      long ind3 = (i == 0) ? ind + NUM_COLUMNS(id, p, ncside)
-                           : ind - NUM_COLUMNS(id, p, ncside);
-      centers[ind3].x =
-          (i == 0) ? centers[ind].x + side : centers[ind].x - side;
-      centers[ind3].y = centers[ind].y;
-      centers[ind3].m = centers[ind].m;
-      long ind4 = (i == 0) ? ind2 + NUM_COLUMNS(id, p, ncside)
-                           : ind2 - NUM_COLUMNS(id, p, ncside);
-      centers[ind4].x =
-          (i == 0) ? centers[ind2].x + side : centers[ind2].x - side;
-      centers[ind4].y = centers[ind2].y;
-      centers[ind4].m = centers[ind2].m;
+  for (long i = 0; i < NUM_OF_NEIGHBORS; i++) {
+    long base, stride;
+    double x_offset, y_offset;
+    switch (i) {
+    case 0:
+      base = 0;
+      stride = 0;
+      x_offset = (buffers->coords[1] == 0) ? -side : 0;
+      y_offset = (buffers->coords[0] == 0) ? -side : 0;
+      break;
+    case 1:
+      base = 1;
+      stride = 1;
+      x_offset = 0;
+      y_offset = (buffers->coords[0] == 0) ? -side : 0;
+      break;
+    case 2:
+      base = buffers->centers_lens[0] + 1;
+      stride = 0;
+      x_offset = (buffers->coords[1] == buffers->dims[1] - 1) ? side : 0;
+      y_offset = (buffers->coords[0] == 0) ? -side : 0;
+      break;
+    case 3:
+      base = buffers->centers_lens[0] + 2;
+      stride = buffers->centers_lens[0] + 2;
+      x_offset = (buffers->coords[1] == 0) ? -side : 0;
+      y_offset = 0;
+      break;
+    case 4:
+      base = 2*buffers->centers_lens[0] + 1;
+      stride = buffers->centers_lens[0] + 2;
+      x_offset = (buffers->coords[1] == buffers->dims[1] - 1) ? side : 0;
+      y_offset = 0;
+      break;
+    case 5:
+      base = (buffers->centers_lens[0] + 1)*(buffers->centers_lens[0] + 2);
+      stride = 0;
+      x_offset = (buffers->coords[1] == 0) ? -side : 0;
+      y_offset = (buffers->coords[0] == buffers->dims[0] - 1) ? side : 0;
+      break;
+    case 6:
+      base = (buffers->centers_lens[0] + 1)*(buffers->centers_lens[0] + 2) + 1;
+      stride = 1;
+      x_offset = 0;
+      y_offset = (buffers->coords[0] == buffers->dims[0] - 1) ? side : 0;
+      break;
+    case 7:
+      base = (buffers->centers_lens[0] + 2)*(buffers->centers_lens[0] + 2) - 1;
+      stride = 0;
+      x_offset = (buffers->coords[1] == buffers->dims[1] - 1) ? side : 0;
+      y_offset = (buffers->coords[0] == buffers->dims[0] - 1) ? side : 0;
+      break;
+    default:
+      break;
     }
+    MPI_Wait(&buffers->centers_requests[i], MPI_STATUS_IGNORE);
+    for(long j = 0; j < buffers->centers_lens[i]; j++) {
+      long ind = base + j*stride;
+      centers[ind].x = buffers->recv_centers[i][j].x + x_offset;
+      centers[ind].y = buffers->recv_centers[i][j].y + y_offset;
+      centers[ind].m = buffers->recv_centers[i][j].m;
+    }
+    MPI_Start(&buffers->centers_requests[i]);
+    MPI_Wait(&buffers->centers_requests[NUM_OF_NEIGHBORS + i], MPI_STATUS_IGNORE);
   }
-  debug_centers(ncside, id, p, centers);
 }
 
-void compute_kinetics(double side, long ncside, int id, int p, cell_t *cells,
+void compute_kinetics(double side, long ncside, long ncells, cell_t *cells,
                       center_t *centers) {
 
-  for (long i = 0; i < BLOCK_SIZE(id, p, ncside); i++) {
+  for (long i = 0; i < ncells; i++) {
     long long cell_size = cells[i].size;
     for (long long j = 0; j < cell_size; j++) {
       __m256d resx_vec = _mm256_setzero_pd();
@@ -254,7 +280,7 @@ void compute_kinetics(double side, long ncside, int id, int p, cell_t *cells,
       for (long long k = 0; k < 9; k++) {
         if (k == 4)
           continue;
-        long ind = cells[i].center + ((k % 3) - 1) + (k / 3 - 1) * (ncside + 2);
+        long ind = BLOCK_INDEX(cells[i].center, k, ncside + 2);
         gravitational_force_pc(&cells[i], j, &centers[ind]);
       }
       cells[i].ax[j] /= cells[i].m[j];
@@ -267,77 +293,49 @@ void compute_kinetics(double side, long ncside, int id, int p, cell_t *cells,
 void compute_new_particle_cell(double size, long ncside, int id, int p,
                                cell_t *cells,
                                communication_buffers_t *buffers) {
-  for (long i = 0; i < BLOCK_SIZE(id, p, ncside); i++) {
+  for (long i = 0; i < buffers->size; i++) {
     long long cell_size = cells[i].size;
     for (long long j = 0; j < cell_size; j++) {
-      long ind = find_cell_c(&cells[i], j, size, ncside);
-      if ((ind - BLOCK_LOW(id, p, ncside)) == i)
-        continue;
-      int owner = BLOCK_OWNER(ind, p, ncside);
+      int owner = find_owner_c(buffers, &cells[i], j, size, ncside);
       if (owner == id) {
-        cell_push_back_c(&cells[ind - BLOCK_LOW(id, p, ncside)], &cells[i], j);
-      } else if (owner == (id - 1 + p) % p) {
-        particles_buffer_add_c(&buffers->send_particles_up, &cells[i], j);
-      } else if (owner == (id + 1 + p) % p) {
-        particles_buffer_add_c(&buffers->send_particles_down, &cells[i], j);
+        long ind = find_cell_c(buffers, &cells[i], j, size);
+        cell_push_back_c(&cells[ind], &cells[i], j);
+      } else {
+        particles_buffer_add_c(&buffers->send_particles[owner], &cells[i], j);
       }
       cells[i].ind[j] = -1;
     }
   }
-  MPI_Isend(buffers->send_particles_up.particles,
-           buffers->send_particles_up.size * sizeof(particle_t), MPI_BYTE,
-           (id - 1 + p) % p, TAG_PARTICLE_DOWN, MPI_COMM_WORLD,
-           &buffers->particles_requests[0]);
-  MPI_Isend(buffers->send_particles_down.particles,
-           buffers->send_particles_down.size * sizeof(particle_t), MPI_BYTE,
-           (id + 1 + p) % p, TAG_PARTICLE_UP, MPI_COMM_WORLD,
-           &buffers->particles_requests[1]);
-  while (!buffers->particles_flags[0] || !buffers->particles_flags[1]) {
-    MPI_Iprobe((id - 1 + p) % p, TAG_PARTICLE_UP, MPI_COMM_WORLD,
-               &buffers->particles_flags[0], &buffers->particles_status[0]);
-    MPI_Iprobe((id + 1 + p) % p, TAG_PARTICLE_DOWN, MPI_COMM_WORLD,
-               &buffers->particles_flags[1], &buffers->particles_status[1]);
+  for(long i = 0; i < NUM_OF_NEIGHBORS; i++) {
+    MPI_Isend(buffers->send_particles[i].particles,
+      buffers->send_particles[i].size * sizeof(particle_t), MPI_BYTE,
+      BLOCK_INDEX(id, i, p), TAG_PARTICLE + NUM_OF_NEIGHBORS - i - 1, buffers->cart_comm,
+      &buffers->particles_requests[i]);
+    particles_buffer_resize(&buffers->send_particles[i], 0);
+    while (!buffers->particles_flags[i]) {
+      MPI_Iprobe(BLOCK_INDEX(id, i, p), TAG_PARTICLE + i, buffers->cart_comm,
+                 &buffers->particles_flags[i], &buffers->particles_status[i]);
+    }
+    buffers->particles_flags[i] = 0;
+    int bytes;
+    MPI_Get_count(&buffers->particles_status[i], MPI_BYTE, &bytes);
+    particles_buffer_resize(&buffers->recv_particles[i], bytes / sizeof(particle_t));
+    MPI_Recv(buffers->recv_particles[i].particles, bytes, MPI_BYTE,
+            BLOCK_INDEX(id, i, p), TAG_PARTICLE + i, buffers->cart_comm,
+            &buffers->particles_status[i]);
+    for (long long j = 0; j < buffers->recv_particles[i].size; j++) {
+      long ind = find_cell_p(buffers, &buffers->recv_particles[i].particles[j], size);
+      cell_push_back_p(&cells[ind], &buffers->recv_particles[i].particles[j]);
+    }
+    MPI_Iprobe(BLOCK_INDEX(id, i, p), TAG_PARTICLE + i, buffers->cart_comm,
+             &buffers->particles_flags[i], &buffers->particles_status[i]);
+    MPI_Wait(&buffers->particles_requests[i], MPI_STATUS_IGNORE);
   }
-  buffers->particles_flags[0] = 0;
-  buffers->particles_flags[1] = 0;
-  int bytes_up, bytes_down;
-  MPI_Get_count(&buffers->particles_status[0], MPI_BYTE, &bytes_up);
-  MPI_Get_count(&buffers->particles_status[1], MPI_BYTE, &bytes_down);
-  particles_buffer_resize(&buffers->recv_particles_up,
-                          bytes_up / sizeof(particle_t));
-  particles_buffer_resize(&buffers->recv_particles_down,
-                          bytes_down / sizeof(particle_t));
-  particles_buffer_resize(&buffers->send_particles_up, 0);
-  particles_buffer_resize(&buffers->send_particles_down, 0);
-  MPI_Recv(buffers->recv_particles_up.particles, bytes_up, MPI_BYTE,
-           (id - 1 + p) % p, TAG_PARTICLE_UP, MPI_COMM_WORLD,
-           &buffers->particles_status[0]);
-  MPI_Recv(buffers->recv_particles_down.particles, bytes_down, MPI_BYTE,
-           (id + 1 + p) % p, TAG_PARTICLE_DOWN, MPI_COMM_WORLD,
-           &buffers->particles_status[1]);
-  for (long long i = 0; i < buffers->recv_particles_up.size; i++) {
-    long ind =
-        find_cell_p(&buffers->recv_particles_up.particles[i], size, ncside);
-    cell_push_back_p(&cells[ind - BLOCK_LOW(id, p, ncside)],
-                     &buffers->recv_particles_up.particles[i]);
-  }
-  for (long long i = 0; i < buffers->recv_particles_down.size; i++) {
-    long ind =
-        find_cell_p(&buffers->recv_particles_down.particles[i], size, ncside);
-    cell_push_back_p(&cells[ind - BLOCK_LOW(id, p, ncside)],
-                     &buffers->recv_particles_down.particles[i]);
-  }
-  MPI_Waitall(BLOCK_NUM_OF_NEIGHBORS(id, p, ncside),
-              buffers->particles_requests, MPI_STATUS_IGNORE);
-  MPI_Iprobe((id - 1 + p) % p, TAG_PARTICLE_UP, MPI_COMM_WORLD,
-             &buffers->particles_flags[0], &buffers->particles_status[0]);  // TODO: Is it correct?
-  MPI_Iprobe((id + 1 + p) % p, TAG_PARTICLE_DOWN, MPI_COMM_WORLD,
-             &buffers->particles_flags[1], &buffers->particles_status[1]);
 }
 
-void detect_collisions(long ncside, int id, int p, cell_t *cells) {
+void detect_collisions(long ncells, cell_t *cells) {
 
-  for (long i = 0; i < BLOCK_SIZE(id, p, ncside); i++) {
+  for (long i = 0; i < ncells; i++) {
     long long cell_collisions = 0;
     long long cell_size = cells[i].size;
     for (long long j = cell_size - 1; j >= 0; j--) {
@@ -403,13 +401,11 @@ void detect_collisions(long ncside, int id, int p, cell_t *cells) {
     ncollisions += cell_collisions;
     cell_resize(&cells[i], cell_size);
   }
-  DEBUG("Number of collisions %lld\n", ncollisions);
-  debug_particles(ncside, id, p, cells);
 }
 
-particle_t find_particle_zero(int id, int p, long ncside, cell_t *cells) {
+particle_t find_particle_zero(long id, long size, cell_t *cells) {
   particle_t par0;
-  for (long i = 0; i < BLOCK_SIZE(id, p, ncside); i++) {
+  for (long i = 0; i < size; i++) {
     long long cell_size = cells[i].size;
     for (long long j = 0; j < cell_size; j++) {
       if (cells[i].ind[j] == 0) {
@@ -419,7 +415,9 @@ particle_t find_particle_zero(int id, int p, long ncside, cell_t *cells) {
         par0.vy = cells[i].vy[j];
         par0.m = cells[i].m[j];
         par0.ind = 0;
-        MPI_Send(&par0, sizeof(particle_t), MPI_BYTE, 0, TAG_PARTICLE_ZERO, MPI_COMM_WORLD);
+        if(id != 0) {
+          MPI_Send(&par0, sizeof(particle_t), MPI_BYTE, 0, TAG_PARTICLE_ZERO, MPI_COMM_WORLD);
+        }
         return par0;
       }
     }
@@ -434,27 +432,27 @@ particle_t find_particle_zero(int id, int p, long ncside, cell_t *cells) {
 }
 
 simulation_result simulation(double side, long ncside, long long npart, int id,
-                             int p, long long nstep, particles_buffer_t *par) {
+                             int p, long long nstep, particles_buffer_t *par,
+                             communication_buffers_t* buffers) {
   double size = side / ncside;
-  cell_t *cells = malloc(sizeof(cell_t) * BLOCK_SIZE(id, p, ncside));
-  center_t *centers =
-      malloc(sizeof(center_t) *
-             (BLOCK_SIZE(id, p, ncside) + BLOCK_NEIGHBORHOOD(id, p, ncside)));
+  cell_t *cells = malloc(sizeof(cell_t) * buffers->size);
+  center_t *centers = malloc(sizeof(center_t) * ((buffers->lens[0] + 2)*(buffers->lens[1] + 2)));
   simulation_result res;
-  communication_buffers_t buffers;
-  init_blocks(size, ncside, npart, id, p, par, cells, &buffers);
+  init_block(size, ncside, npart, id, p, par, cells, buffers);
   for (long long i = 0; i < nstep; i++) {
-    // DEBUG("--------STEP %d: %lld --------------\n", id, i);
-    compute_centers_of_mass(side, ncside, id, p, cells, centers, &buffers);
-    compute_kinetics(side, ncside, id, p, cells, centers);
-    compute_new_particle_cell(size, ncside, id, p, cells, &buffers);
-    detect_collisions(ncside, id, p, cells);
+    DEBUG("--------STEP %d: %lld --------------\n", id, i);
+    compute_centers_of_mass(side, cells, centers, buffers);
+    debug_centers(id, (buffers->lens[0] + 2)*(buffers->lens[1] + 2), centers);
+    compute_kinetics(side, ncside, buffers->size, cells, centers);
+    compute_new_particle_cell(size, ncside, id, p, cells, buffers);
+    detect_collisions(buffers->size, cells);
+    debug_particles(id, buffers->size, cells);
   }
   MPI_Reduce(&ncollisions, &res.number_of_collisions, 1, MPI_LONG_LONG_INT, MPI_SUM, 0, MPI_COMM_WORLD);
-  res.particle_zero = find_particle_zero(id, p, ncside, cells);
+  res.particle_zero = find_particle_zero(id, buffers->size, cells);
   if(id == 0 && res.particle_zero.ind == -1) {
     MPI_Recv(&res.particle_zero, sizeof(particle_t), MPI_BYTE, MPI_ANY_SOURCE, TAG_PARTICLE_ZERO, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   }
-  clean_blocks(ncside, id, p, cells, centers, &buffers);
+  clean_blocks(cells, centers, buffers);
   return res;
 }
