@@ -23,6 +23,7 @@ void communication_buffers_create_world(communication_buffers_t *buffers, long n
 void communication_buffers_init(communication_buffers_t *buffers, long ncside,
                                 int id, long long npart) {
   long long initial_estimation = 2 * npart / ncside;
+  DEBUG("Process: %d, lens: %ld, %ld, row: %ld, col: %ld, dims: %d, %d\n", id, buffers->lens[0], buffers->lens[1], buffers->rows[0], buffers->cols[0], buffers->dims[0], buffers->dims[1]);
   for(long i = 0; i < NUM_OF_NEIGHBORS; i++) {
     long len = 1;
     if (i == 1 || i == 6) {
@@ -38,9 +39,9 @@ void communication_buffers_init(communication_buffers_t *buffers, long ncside,
     buffers->particles_flags[i] = 0;
     int neighbor = find_neighbor(buffers, i);
     DEBUG("Process: %d, Neighbor: %d, len: %ld, recv: %ld, send: %ld\n", id, neighbor, len, TAG_CENTER + i, TAG_CENTER + NUM_OF_NEIGHBORS - i - 1);
-    MPI_Recv_init(&buffers->recv_centers[i], sizeof(center_t) * len, MPI_BYTE, neighbor,
+    MPI_Recv_init(buffers->recv_centers[i], sizeof(center_t) * len, MPI_BYTE, neighbor,
             TAG_CENTER + i, buffers->cart_comm, &buffers->centers_requests[i]);
-    MPI_Send_init(&buffers->send_centers[i], sizeof(center_t) * len, MPI_BYTE, neighbor,
+    MPI_Send_init(buffers->send_centers[i], sizeof(center_t) * len, MPI_BYTE, neighbor,
             TAG_CENTER + NUM_OF_NEIGHBORS - i - 1, buffers->cart_comm, &buffers->centers_requests[NUM_OF_NEIGHBORS + i]);
     MPI_Start(&buffers->centers_requests[i]);
     MPI_Iprobe(neighbor, TAG_PARTICLE + i, buffers->cart_comm,

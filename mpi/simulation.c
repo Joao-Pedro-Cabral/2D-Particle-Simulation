@@ -28,7 +28,7 @@ void init_block(double size, long ncside, long long npart, int id,
     long long capacity =
         count[i] > npart ? npart : (count[i] > min_size ? count[i] : min_size);
     cell_init(&cells[i], capacity,
-              (i % buffers->lens[0] + 1) + (i / buffers->lens[1] + 1) * (buffers->lens[0] + 2));
+              ((i % buffers->lens[1]) + 1) + ((i / buffers->lens[1]) + 1) * (buffers->lens[1] + 2));
   }
   for (long long i = 0; i < par->size; i++) {
     long cell = find_cell_p(buffers, &par->particles[i], size);
@@ -74,13 +74,13 @@ static inline double sum_lanes(__m256d vec) {
   return ((double *)&vec)[0] + ((double *)&vec)[2];
 }
 
-void compute_centers_of_mass(double side,
+void compute_centers_of_mass(double side, int id,
                              cell_t *cells, center_t *centers,
                              communication_buffers_t *buffers) {
 
-  for (long iy = 0; iy < buffers->lens[1]; iy++) {
-    for (long ix = 0; ix < buffers->lens[0]; ix++) {
-      long i = ix + buffers->lens[0] * iy;
+  for (long iy = 0; iy < buffers->lens[0]; iy++) {
+    for (long ix = 0; ix < buffers->lens[1]; ix++) {
+      long i = ix + buffers->lens[1] * iy;
       double total_mass = 0.0;
       double weighted_x = 0.0;
       double weighted_y = 0.0;
@@ -125,17 +125,20 @@ void compute_centers_of_mass(double side,
         if(iy == 0) {
           copy_center(&buffers->send_centers[0][0], &centers[ind]);
           MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 0]);
-        } else if (iy == buffers->lens[1] - 1) {
+        }
+        if (iy == buffers->lens[0] - 1) {
           copy_center(&buffers->send_centers[5][0], &centers[ind]);
           MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 5]);
           MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 3]);
         }
-      } else if (ix == buffers->lens[0] - 1) {
+      }
+      if (ix == buffers->lens[1] - 1) {
         copy_center(&buffers->send_centers[4][iy], &centers[ind]);
         if(iy == 0) {
           copy_center(&buffers->send_centers[2][0], &centers[ind]);
           MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 2]);
-        } else if (iy == buffers->lens[1] - 1) {
+        }
+        if (iy == buffers->lens[0] - 1) {
           copy_center(&buffers->send_centers[7][0], &centers[ind]);
           MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 7]);
           MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 4]);
@@ -143,12 +146,13 @@ void compute_centers_of_mass(double side,
       }
       if(iy == 0) {
         copy_center(&buffers->send_centers[1][ix], &centers[ind]);
-        if(ix == buffers->lens[0] - 1) {
+        if(ix == buffers->lens[1] - 1) {
           MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 1]);
         }
-      } else if (iy == buffers->lens[1] - 1) {
+      }
+      if (iy == buffers->lens[0] - 1) {
         copy_center(&buffers->send_centers[6][ix], &centers[ind]);
-        if(ix == buffers->lens[0] - 1) {
+        if(ix == buffers->lens[1] - 1) {
           MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 6]);
         }
       }
@@ -442,7 +446,7 @@ simulation_result simulation(double side, long ncside, long long npart, int id,
   init_block(size, ncside, npart, id, par, cells, buffers);
   for (long long i = 0; i < nstep; i++) {
     DEBUG("--------STEP %d: %lld --------------\n", id, i);
-    compute_centers_of_mass(side, cells, centers, buffers);
+    compute_centers_of_mass(side, id, cells, centers, buffers);
     debug_centers(id, (buffers->lens[0] + 2)*(buffers->lens[1] + 2), centers);
     compute_kinetics(side, ncside, buffers->size, cells, centers);
     compute_new_particle_cell(size, ncside, id, cells, buffers);
