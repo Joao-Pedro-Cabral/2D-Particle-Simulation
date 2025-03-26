@@ -221,7 +221,6 @@ void compute_centers_of_mass(double side,
       centers[ind].m = buffers->recv_centers[i][j].m;
     }
     MPI_Start(&buffers->centers_requests[i]);
-    MPI_Wait(&buffers->centers_requests[NUM_OF_NEIGHBORS + i], MPI_STATUS_IGNORE);
   }
 }
 
@@ -338,8 +337,9 @@ void compute_new_particle_cell(double size, long ncside, int id,
       long ind = find_cell_p(buffers, &buffers->recv_particles[i].particles[j], size);
       cell_push_back_p(&cells[ind], &buffers->recv_particles[i].particles[j]);
     }
-    MPI_Iprobe(neighbor, TAG_PARTICLE + i, buffers->cart_comm,
-             &buffers->particles_flags[i], &buffers->particles_status[i]);
+  }
+  for(long i = 0; i < NUM_OF_NEIGHBORS; i++) {
+    MPI_Wait(&buffers->centers_requests[NUM_OF_NEIGHBORS + i], MPI_STATUS_IGNORE);
     MPI_Wait(&buffers->particles_requests[i], MPI_STATUS_IGNORE);
   }
 }

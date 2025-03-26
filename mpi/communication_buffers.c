@@ -44,8 +44,6 @@ void communication_buffers_init(communication_buffers_t *buffers, long ncside,
     MPI_Send_init(buffers->send_centers[i], sizeof(center_t) * len, MPI_BYTE, buffers->neighbors[i],
             TAG_CENTER + NUM_OF_NEIGHBORS - i - 1, buffers->cart_comm, &buffers->centers_requests[NUM_OF_NEIGHBORS + i]);
     MPI_Start(&buffers->centers_requests[i]);
-    MPI_Iprobe(buffers->neighbors[i], TAG_PARTICLE + i, buffers->cart_comm,
-             &buffers->particles_flags[i], &buffers->particles_status[i]); // TODO: Good idea?
   }
 }
 
