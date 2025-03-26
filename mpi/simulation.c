@@ -225,10 +225,10 @@ void compute_centers_of_mass(double side,
   }
 }
 
-void compute_kinetics(double side, long ncside, long ncells, cell_t *cells,
-                      center_t *centers) {
+void compute_kinetics(double side, cell_t *cells,
+                      center_t *centers, communication_buffers_t *buffers) {
 
-  for (long i = 0; i < ncells; i++) {
+  for (long i = 0; i < buffers->size; i++) {
     long long cell_size = cells[i].size;
     for (long long j = 0; j < cell_size; j++) {
       __m256d resx_vec = _mm256_setzero_pd();
@@ -284,7 +284,7 @@ void compute_kinetics(double side, long ncside, long ncells, cell_t *cells,
       for (long long k = 0; k < 9; k++) {
         if (k == 4)
           continue;
-        long ind = cells[i].center + ((k % 3) - 1) + (k / 3 - 1) * (ncside + 2);
+        long ind = cells[i].center + ((k % 3) - 1) + (k / 3 - 1) * (buffers->lens[1] + 2);
         gravitational_force_pc(&cells[i], j, &centers[ind]);
       }
       cells[i].ax[j] /= cells[i].m[j];
@@ -454,7 +454,7 @@ simulation_result simulation(double side, long ncside, long long npart, int id,
     DEBUG("--------STEP %d: %lld --------------\n", id, i);
     compute_centers_of_mass(side, cells, centers, buffers);
     debug_centers(id, (buffers->lens[0] + 2)*(buffers->lens[1] + 2), centers);
-    compute_kinetics(side, ncside, buffers->size, cells, centers);
+    compute_kinetics(side, cells, centers, buffers);
     compute_new_particle_cell(size, ncside, id, cells, buffers);
     detect_collisions(buffers->size, cells);
     debug_particles(id, buffers->size, cells);
