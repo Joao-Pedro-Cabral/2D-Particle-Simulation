@@ -33,7 +33,7 @@ void cell_init(cell_t *cell, long long capacity, long center) {
 
 void cell_resize(cell_t *cell, long long size) {
   cell->size = size;
-  if (size > cell->capacity) {
+  if (size >= cell->capacity) {
     long long capacity = (cell->capacity == 0) ? 1 : cell->capacity * 2;
     cell->x = (double *)realloc(cell->x, capacity * sizeof(double));
     cell->y = (double *)realloc(cell->y, capacity * sizeof(double));
