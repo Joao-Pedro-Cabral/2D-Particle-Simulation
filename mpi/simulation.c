@@ -303,6 +303,8 @@ void compute_new_particle_cell(double size, long ncside, int id,
       int owner = find_owner_c(buffers, &cells[i], j, size, ncside);
       if (owner == id) {
         long ind = find_cell_c(buffers, &cells[i], j, size);
+        if(ind == i)
+          continue;
         cell_push_back_c(&cells[ind], &cells[i], j);
       } else {
         particles_buffer_add_c(&buffers->send_particles[owner], &cells[i], j);
@@ -317,6 +319,9 @@ void compute_new_particle_cell(double size, long ncside, int id,
       neighbor, TAG_PARTICLE + NUM_OF_NEIGHBORS - i - 1, buffers->cart_comm,
       &buffers->particles_requests[i]);
     particles_buffer_resize(&buffers->send_particles[i], 0);
+  }
+  for(long i = 0; i < NUM_OF_NEIGHBORS; i++) {
+    int neighbor = find_neighbor(buffers, i);
     while (!buffers->particles_flags[i]) {
       MPI_Iprobe(neighbor, TAG_PARTICLE + i, buffers->cart_comm,
                  &buffers->particles_flags[i], &buffers->particles_status[i]);
