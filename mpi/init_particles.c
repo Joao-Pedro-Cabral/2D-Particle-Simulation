@@ -45,7 +45,11 @@ void init_particles(long seed, double side, long ncside, int id, long long n_par
     double m = rnd01();
     x = x * side;
     y = y * side;
-    if(id == find_owner_xy(buffers, x, y, size, ncside)) {
+    long xpart = x / size;
+    long ypart = y / size;
+    int col = (buffers->dims[1]*(xpart+1)-1) / ncside;
+    int row = (buffers->dims[0]*(ypart+1)-1) / ncside;
+    if(buffers->coords[0] == row && buffers->coords[1] == col) {
       vx = (vx - 0.5) * side / ncside / 5.0;
       vy = (vy - 0.5) * side / ncside / 5.0;
       m = m * 0.01 * (ncside * ncside) / n_part / G * EPSILON2;

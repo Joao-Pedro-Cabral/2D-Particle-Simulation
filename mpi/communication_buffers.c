@@ -59,26 +59,12 @@ void communication_buffers_clean(communication_buffers_t *buffers) {
   MPI_Comm_free(&buffers->cart_comm);
 }
 
-int find_owner_xy(communication_buffers_t *buffers, double x, double y, double size, long ncside) {
-  long xpart = x / size;
-  long ypart = y / size;
-  int col = (buffers->dims[1]*(xpart+1)-1) / ncside;
-  int row = (buffers->dims[0]*(ypart+1)-1) / ncside;
-  int coords[2] = {row, col};
-  int owner;
-  MPI_Cart_rank(buffers->cart_comm, coords, &owner);
-  return owner;
-}
-
 int find_owner_c(communication_buffers_t *buffers, cell_t *cell, long long i, double size, long ncside) {
   long xpart = cell->x[i] / size;
   long ypart = cell->y[i] / size;
   int col = (buffers->dims[1]*(xpart+1)-1) / ncside;
   int row = (buffers->dims[0]*(ypart+1)-1) / ncside;
-  int coords[2] = {row, col};
-  int owner;
-  MPI_Cart_rank(buffers->cart_comm, coords, &owner);
-  return owner;
+  return col + row*buffers->dims[1];
 }
 
 long find_cell_p(communication_buffers_t *buffers, particle_t *par, double size) {
