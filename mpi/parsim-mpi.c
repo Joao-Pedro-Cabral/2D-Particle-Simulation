@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
   communication_buffers_create_world(&buffers, ncside, id, p);
 
   particles_buffer_t par;
-  particles_buffer_init(&par, 2*npart/p);
+  particles_buffer_init(&par, npart/p);
 
   double exec_time;
   init_particles(seed, side, ncside, id, npart, &par, &buffers);

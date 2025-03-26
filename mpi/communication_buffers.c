@@ -22,7 +22,6 @@ void communication_buffers_create_world(communication_buffers_t *buffers, long n
 
 void communication_buffers_init(communication_buffers_t *buffers, long ncside,
                                 int id, long long npart) {
-  long long initial_estimation = 2 * npart / ncside;
   DEBUG("Process: %d, lens: %ld, %ld, row: %ld, col: %ld, dims: %d, %d\n", id, buffers->lens[0], buffers->lens[1], buffers->rows[0], buffers->cols[0], buffers->dims[0], buffers->dims[1]);
   for(long i = 0; i < NUM_OF_NEIGHBORS; i++) {
     long len = 1;
@@ -34,6 +33,7 @@ void communication_buffers_init(communication_buffers_t *buffers, long ncside,
     buffers->centers_lens[i] = len;
     buffers->send_centers[i] = (center_t*) malloc(sizeof(center_t)*len);
     buffers->recv_centers[i] = (center_t*) malloc(sizeof(center_t)*len);
+    long initial_estimation = 2 * len * npart / (ncside*ncside);
     particles_buffer_init(&buffers->send_particles[i], initial_estimation);
     particles_buffer_init(&buffers->recv_particles[i], initial_estimation);
     buffers->particles_flags[i] = 0;
