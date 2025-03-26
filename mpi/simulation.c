@@ -76,9 +76,10 @@ static inline double sum_lanes(__m256d vec) {
 
 void compute_centers_of_mass(double side,
                              cell_t *cells, center_t *centers,
-                             communication_buffers_t *buffers) {
+                             communication_buffers_t *buffers,
+                             long chunk_size) {
 
-#pragma omp for collapse(2) schedule(dynamic, 2) nowait
+#pragma omp for collapse(2) schedule(dynamic, chunk_size) nowait
   for (long iy = 0; iy < buffers->lens[0]; iy++) {
     for (long ix = 0; ix < buffers->lens[1]; ix++) {
       long i = ix + buffers->lens[1] * iy;
@@ -225,9 +226,10 @@ void compute_centers_of_mass(double side,
 }
 
 void compute_kinetics(double side, cell_t *cells,
-                      center_t *centers, communication_buffers_t *buffers) {
+                      center_t *centers, communication_buffers_t *buffers,
+                      long chunk_size) {
 
-#pragma omp for schedule(dynamic, 2)
+#pragma omp for schedule(dynamic, chunk_size)
   for (long i = 0; i < buffers->size; i++) {
     long long cell_size = cells[i].size;
     for (long long j = 0; j < cell_size; j++) {
@@ -295,9 +297,9 @@ void compute_kinetics(double side, cell_t *cells,
 }
 
 void compute_new_particle_cell(double size, long ncside, int id,
-                               cell_t *cells,
-                               communication_buffers_t *buffers) {
-#pragma omp for schedule(dynamic, 2)
+                               cell_t *cells, communication_buffers_t *buffers,
+                               long chunk_size) {
+#pragma omp for schedule(dynamic, chunk_size)
   for (long i = 0; i < buffers->size; i++) {
     omp_set_lock(&cells[i].lock);
     long long cell_size = cells[i].size;
@@ -357,9 +359,9 @@ void compute_new_particle_cell(double size, long ncside, int id,
   }
 }
 
-void detect_collisions(long ncells, cell_t *cells) {
+void detect_collisions(long ncells, cell_t *cells, long chunk_size) {
 
-#pragma omp for reduction(+ : ncollisions) schedule(dynamic, 2)
+#pragma omp for reduction(+ : ncollisions) schedule(dynamic, chunk_size)
   for (long i = 0; i < ncells; i++) {
     long long cell_collisions = 0;
     long long cell_size = cells[i].size;
@@ -464,15 +466,14 @@ simulation_result simulation(double side, long ncside, long long npart, int id,
   center_t *centers = malloc(sizeof(center_t) * ((buffers->lens[0] + 2)*(buffers->lens[1] + 2)));
   simulation_result res;
   init_block(size, ncside, npart, id, par, cells, buffers);
+  long chunk_size = (buffers->size >= 4*omp_get_max_threads()) ? 2 : 1;
   #pragma omp parallel
   for (long long i = 0; i < nstep; i++) {
     DEBUG("--------STEP %d: %lld --------------\n", id, i);
-    compute_centers_of_mass(side, cells, centers, buffers);
-    debug_centers(id, (buffers->lens[0] + 2)*(buffers->lens[1] + 2), centers);
-    compute_kinetics(side, cells, centers, buffers);
-    compute_new_particle_cell(size, ncside, id, cells, buffers);
-    detect_collisions(buffers->size, cells);
-    debug_particles(id, buffers->size, cells);
+    compute_centers_of_mass(side, cells, centers, buffers, chunk_size);
+    compute_kinetics(side, cells, centers, buffers, chunk_size);
+    compute_new_particle_cell(size, ncside, id, cells, buffers, chunk_size);
+    detect_collisions(buffers->size, cells, chunk_size);
   }
   MPI_Reduce(&ncollisions, &res.number_of_collisions, 1, MPI_LONG_LONG_INT, MPI_SUM, 0, MPI_COMM_WORLD);
   res.particle_zero = find_particle_zero(id, buffers->size, cells);
