@@ -24,6 +24,7 @@ typedef struct {
   long long *collided;
   long long size;
   long long capacity;
+  omp_lock_t lock;
 } cell_t;
 
 void cell_init(cell_t *cell, long long capacity, long center);

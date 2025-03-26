@@ -24,6 +24,7 @@ typedef struct {
   int particles_flags [NUM_OF_NEIGHBORS];
   MPI_Status particles_status [NUM_OF_NEIGHBORS];
   MPI_Request particles_requests [NUM_OF_NEIGHBORS];
+  omp_lock_t locks [NUM_OF_NEIGHBORS];
 } communication_buffers_t;
 
 void communication_buffers_create_world(communication_buffers_t *buffers, long ncside, int id, int p);

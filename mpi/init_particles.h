@@ -17,7 +17,7 @@ double rnd_uniform01();
 
 double rnd_normal01();
 
-void init_particles(long seed, double side, long ncside, int id, long long n_part,
+void init_particles(long seed, double side, long ncside, long long n_part,
                     particles_buffer_t *par, communication_buffers_t * buffers);
 
 #endif // __INIT_PARTICLES_H

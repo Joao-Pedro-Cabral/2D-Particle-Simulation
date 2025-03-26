@@ -24,7 +24,7 @@ double rnd_normal01() {
   return result;
 }
 
-void init_particles(long seed, double side, long ncside, int id, long long n_part,
+void init_particles(long seed, double side, long ncside, long long n_part,
                     particles_buffer_t *par, communication_buffers_t * buffers) {
   double (*rnd01)() = rnd_uniform01;
   long long i;

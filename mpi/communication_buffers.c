@@ -44,6 +44,7 @@ void communication_buffers_init(communication_buffers_t *buffers, long ncside,
     MPI_Send_init(buffers->send_centers[i], sizeof(center_t) * len, MPI_BYTE, buffers->neighbors[i],
             TAG_CENTER + NUM_OF_NEIGHBORS - i - 1, buffers->cart_comm, &buffers->centers_requests[NUM_OF_NEIGHBORS + i]);
     MPI_Start(&buffers->centers_requests[i]);
+    omp_init_lock(&buffers->locks[i]);
   }
 }
 
@@ -55,6 +56,7 @@ void communication_buffers_clean(communication_buffers_t *buffers) {
     buffers->recv_centers[i] = NULL;
     particles_buffer_clean(&buffers->recv_particles[i]);
     particles_buffer_clean(&buffers->send_particles[i]);
+    omp_destroy_lock(&buffers->locks[i]);
   }
   MPI_Comm_free(&buffers->cart_comm);
 }

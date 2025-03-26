@@ -48,7 +48,11 @@ int main(int argc, char *argv[]) {
 
   DEBUG("%ld, %lf, %ld, %lld, %lld\n", seed, side, ncside, npart, nstep);
 
-  MPI_Init(&argc, &argv);
+  int provided;
+  MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
+  if(provided != MPI_THREAD_MULTIPLE) {
+    ERROR("MPI THREAD MULTIPLE NOT SUPPORTED!\n");
+  }
 
   int id, p;
   MPI_Comm_rank(MPI_COMM_WORLD, &id);
@@ -60,7 +64,7 @@ int main(int argc, char *argv[]) {
   particles_buffer_init(&par, npart/p);
 
   double exec_time;
-  init_particles(seed, side, ncside, id, npart, &par, &buffers);
+  init_particles(seed, side, ncside, npart, &par, &buffers);
   exec_time = -omp_get_wtime();
   simulation_result res = simulation(side, ncside, npart, id, nstep, &par, &buffers);
   exec_time += omp_get_wtime();
