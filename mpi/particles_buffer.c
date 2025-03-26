@@ -10,7 +10,7 @@ void particles_buffer_init(particles_buffer_t *buffer, long long capacity) {
 
 void particles_buffer_resize(particles_buffer_t *buffer, long long size) {
   buffer->size = size;
-  if (size > buffer->capacity) {
+  if (size >= buffer->capacity) {
     buffer->capacity = 2 * size;
     buffer->particles = (particle_t *)realloc(
         buffer->particles, buffer->capacity * sizeof(particle_t));

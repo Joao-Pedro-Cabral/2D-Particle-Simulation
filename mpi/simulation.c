@@ -307,13 +307,14 @@ void compute_new_particle_cell(double size, long ncside, int id,
           continue;
         cell_push_back_c(&cells[ind], &cells[i], j);
       } else {
-        particles_buffer_add_c(&buffers->send_particles[owner], &cells[i], j);
+        int neighbor = find_neighbor_pos(buffers, owner);
+        particles_buffer_add_c(&buffers->send_particles[neighbor], &cells[i], j);
       }
       cells[i].ind[j] = -1;
     }
   }
   for(long i = 0; i < NUM_OF_NEIGHBORS; i++) {
-    int neighbor = find_neighbor(buffers, i);
+    int neighbor = buffers->neighbors[i];
     MPI_Isend(buffers->send_particles[i].particles,
       buffers->send_particles[i].size * sizeof(particle_t), MPI_BYTE,
       neighbor, TAG_PARTICLE + NUM_OF_NEIGHBORS - i - 1, buffers->cart_comm,
@@ -321,7 +322,7 @@ void compute_new_particle_cell(double size, long ncside, int id,
     particles_buffer_resize(&buffers->send_particles[i], 0);
   }
   for(long i = 0; i < NUM_OF_NEIGHBORS; i++) {
-    int neighbor = find_neighbor(buffers, i);
+    int neighbor = buffers->neighbors[i];
     while (!buffers->particles_flags[i]) {
       MPI_Iprobe(neighbor, TAG_PARTICLE + i, buffers->cart_comm,
                  &buffers->particles_flags[i], &buffers->particles_status[i]);

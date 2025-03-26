@@ -37,14 +37,14 @@ void communication_buffers_init(communication_buffers_t *buffers, long ncside,
     particles_buffer_init(&buffers->send_particles[i], initial_estimation);
     particles_buffer_init(&buffers->recv_particles[i], initial_estimation);
     buffers->particles_flags[i] = 0;
-    int neighbor = find_neighbor(buffers, i);
-    DEBUG("Process: %d, Neighbor: %d, len: %ld, recv: %ld, send: %ld\n", id, neighbor, len, TAG_CENTER + i, TAG_CENTER + NUM_OF_NEIGHBORS - i - 1);
-    MPI_Recv_init(buffers->recv_centers[i], sizeof(center_t) * len, MPI_BYTE, neighbor,
+    buffers->neighbors[i] = find_neighbor(buffers, i);
+    DEBUG("Process: %d, Neighbor: %d, len: %ld, recv: %ld, send: %ld\n", id, buffers->neighbors[i], len, TAG_CENTER + i, TAG_CENTER + NUM_OF_NEIGHBORS - i - 1);
+    MPI_Recv_init(buffers->recv_centers[i], sizeof(center_t) * len, MPI_BYTE, buffers->neighbors[i],
             TAG_CENTER + i, buffers->cart_comm, &buffers->centers_requests[i]);
-    MPI_Send_init(buffers->send_centers[i], sizeof(center_t) * len, MPI_BYTE, neighbor,
+    MPI_Send_init(buffers->send_centers[i], sizeof(center_t) * len, MPI_BYTE, buffers->neighbors[i],
             TAG_CENTER + NUM_OF_NEIGHBORS - i - 1, buffers->cart_comm, &buffers->centers_requests[NUM_OF_NEIGHBORS + i]);
     MPI_Start(&buffers->centers_requests[i]);
-    MPI_Iprobe(neighbor, TAG_PARTICLE + i, buffers->cart_comm,
+    MPI_Iprobe(buffers->neighbors[i], TAG_PARTICLE + i, buffers->cart_comm,
              &buffers->particles_flags[i], &buffers->particles_status[i]); // TODO: Good idea?
   }
 }
@@ -133,4 +133,13 @@ int find_neighbor(communication_buffers_t *buffers, int pos) {
   }
   MPI_Cart_rank(buffers->cart_comm, coords, &neighbor);
   return neighbor;
+}
+
+int find_neighbor_pos(communication_buffers_t *buffers, int neighbor) {
+  for(int i = 0; i < NUM_OF_NEIGHBORS; i++) {
+    if(neighbor == buffers->neighbors[i]) {
+      return i;
+    }
+  }
+  return -1;
 }

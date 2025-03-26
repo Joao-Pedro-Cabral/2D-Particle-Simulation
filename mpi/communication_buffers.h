@@ -14,6 +14,7 @@ typedef struct {
   long cols [2];
   long lens [2];
   long size;
+  int neighbors [NUM_OF_NEIGHBORS];
   int centers_lens [NUM_OF_NEIGHBORS];
   center_t *send_centers [NUM_OF_NEIGHBORS];
   center_t *recv_centers [NUM_OF_NEIGHBORS];
@@ -33,5 +34,6 @@ int find_owner_c(communication_buffers_t *buffers, cell_t * cell, long long i, d
 long find_cell_p(communication_buffers_t *buffers, particle_t *par, double size);
 long find_cell_c(communication_buffers_t *buffers, cell_t * cell, long long i, double size);
 int find_neighbor(communication_buffers_t *buffers, int pos);
+int find_neighbor_pos(communication_buffers_t *buffers, int neighbor);
 
 #endif // __COMMUNICATION_BUFFERS_H
