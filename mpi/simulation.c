@@ -78,7 +78,7 @@ void compute_centers_of_mass(double side,
                              cell_t *cells, center_t *centers,
                              communication_buffers_t *buffers) {
 
-#pragma omp for collapse(2) schedule(dynamic, 2)
+#pragma omp for collapse(2) schedule(dynamic, 2) nowait
   for (long iy = 0; iy < buffers->lens[0]; iy++) {
     for (long ix = 0; ix < buffers->lens[1]; ix++) {
       long i = ix + buffers->lens[1] * iy;
@@ -320,7 +320,7 @@ void compute_new_particle_cell(double size, long ncside, int id,
       cells[i].ind[j] = -1;
     }
   }
-#pragma omp for schedule(dynamic, 1)
+#pragma omp for nowait
   for(long i = 0; i < NUM_OF_NEIGHBORS; i++) {
     int neighbor = buffers->neighbors[i];
     MPI_Isend(buffers->send_particles[i].particles,
@@ -350,7 +350,7 @@ void compute_new_particle_cell(double size, long ncside, int id,
       omp_unset_lock(&cells[ind].lock);
     }
   }
-#pragma omp for schedule(dynamic, 1)
+#pragma omp for schedule(dynamic, 1) nowait
   for(long i = 0; i < NUM_OF_NEIGHBORS; i++) {
     MPI_Wait(&buffers->centers_requests[NUM_OF_NEIGHBORS + i], MPI_STATUS_IGNORE);
     MPI_Wait(&buffers->particles_requests[i], MPI_STATUS_IGNORE);
