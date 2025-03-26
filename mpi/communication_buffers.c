@@ -86,13 +86,13 @@ int find_owner_c(communication_buffers_t *buffers, cell_t *cell, long long i, do
 long find_cell_p(communication_buffers_t *buffers, particle_t *par, double size) {
   long xpart = par->x / size;
   long ypart = par->y / size;
-  return buffers->lens[0] * (ypart - buffers->rows[0]) + (xpart - buffers->cols[0]);
+  return buffers->lens[1] * (ypart - buffers->rows[0]) + (xpart - buffers->cols[0]);
 }
 
 long find_cell_c(communication_buffers_t *buffers, cell_t *cell, long long i, double size) {
   long xpart = cell->x[i] / size;
   long ypart = cell->y[i] / size;
-  return buffers->lens[0] * (ypart - buffers->rows[0]) + (xpart - buffers->cols[0]);
+  return buffers->lens[1] * (ypart - buffers->rows[0]) + (xpart - buffers->cols[0]);
 }
 
 int find_neighbor(communication_buffers_t *buffers, int pos) {

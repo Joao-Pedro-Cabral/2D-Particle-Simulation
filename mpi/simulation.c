@@ -74,7 +74,7 @@ static inline double sum_lanes(__m256d vec) {
   return ((double *)&vec)[0] + ((double *)&vec)[2];
 }
 
-void compute_centers_of_mass(double side, int id,
+void compute_centers_of_mass(double side,
                              cell_t *cells, center_t *centers,
                              communication_buffers_t *buffers) {
 
@@ -175,37 +175,37 @@ void compute_centers_of_mass(double side, int id,
       y_offset = (buffers->coords[0] == 0) ? -side : 0;
       break;
     case 2:
-      base = buffers->centers_lens[0] + 1;
+      base = buffers->lens[1] + 1;
       stride = 0;
       x_offset = (buffers->coords[1] == buffers->dims[1] - 1) ? side : 0;
       y_offset = (buffers->coords[0] == 0) ? -side : 0;
       break;
     case 3:
-      base = buffers->centers_lens[0] + 2;
-      stride = buffers->centers_lens[0] + 2;
+      base = buffers->lens[1] + 2;
+      stride = buffers->lens[1] + 2;
       x_offset = (buffers->coords[1] == 0) ? -side : 0;
       y_offset = 0;
       break;
     case 4:
-      base = 2*buffers->centers_lens[0] + 1;
-      stride = buffers->centers_lens[0] + 2;
+      base = 2*buffers->lens[1] + 3;
+      stride = buffers->lens[1] + 2;
       x_offset = (buffers->coords[1] == buffers->dims[1] - 1) ? side : 0;
       y_offset = 0;
       break;
     case 5:
-      base = (buffers->centers_lens[0] + 1)*(buffers->centers_lens[0] + 2);
+      base = (buffers->lens[0] + 1)*(buffers->lens[1] + 2);
       stride = 0;
       x_offset = (buffers->coords[1] == 0) ? -side : 0;
       y_offset = (buffers->coords[0] == buffers->dims[0] - 1) ? side : 0;
       break;
     case 6:
-      base = (buffers->centers_lens[0] + 1)*(buffers->centers_lens[0] + 2) + 1;
+      base = (buffers->lens[0] + 1)*(buffers->lens[1] + 2) + 1;
       stride = 1;
       x_offset = 0;
       y_offset = (buffers->coords[0] == buffers->dims[0] - 1) ? side : 0;
       break;
     case 7:
-      base = (buffers->centers_lens[0] + 2)*(buffers->centers_lens[0] + 2) - 1;
+      base = (buffers->lens[0] + 2)*(buffers->lens[1] + 2) - 1;
       stride = 0;
       x_offset = (buffers->coords[1] == buffers->dims[1] - 1) ? side : 0;
       y_offset = (buffers->coords[0] == buffers->dims[0] - 1) ? side : 0;
@@ -446,7 +446,7 @@ simulation_result simulation(double side, long ncside, long long npart, int id,
   init_block(size, ncside, npart, id, par, cells, buffers);
   for (long long i = 0; i < nstep; i++) {
     DEBUG("--------STEP %d: %lld --------------\n", id, i);
-    compute_centers_of_mass(side, id, cells, centers, buffers);
+    compute_centers_of_mass(side, cells, centers, buffers);
     debug_centers(id, (buffers->lens[0] + 2)*(buffers->lens[1] + 2), centers);
     compute_kinetics(side, ncside, buffers->size, cells, centers);
     compute_new_particle_cell(size, ncside, id, cells, buffers);
