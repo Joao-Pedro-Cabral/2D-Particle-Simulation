@@ -106,6 +106,7 @@ for ntasks in "${NTASKS[@]}"; do
             echo "#!/bin/bash" > $job_script
             echo "#SBATCH --job-name=$job_name" >> $job_script
             echo "#SBATCH --output=$output_file" >> $job_script
+            echo "#SBATCH --error=$output_file" >> $job_script
             echo "#SBATCH --ntasks=$ntasks" >> $job_script
             echo "#SBATCH --cpus-per-task=$cpus_per_task" >> $job_script
             echo "#SBATCH --exclusive" >> $job_script
