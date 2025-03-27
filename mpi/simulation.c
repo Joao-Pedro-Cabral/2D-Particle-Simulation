@@ -211,7 +211,7 @@ void compute_centers_of_mass(double side,
 
 
 void compute_kinetics(double side, cell_t *cells,
-                      center_t *centers, communication_buffers_t *buffers,
+                      center_t *centers, const communication_buffers_t *buffers,
                       long chunk_size) {
 
 #pragma omp for schedule(dynamic, chunk_size)
@@ -302,9 +302,11 @@ void compute_new_particle_cell(double size, long ncside, int id,
             &buffers->particles_status[i]);
     for (long long j = 0; j < buffers->recv_particles[i].size; j++) {
       long ind = find_cell_p(buffers, &buffers->recv_particles[i].particles[j], size);
-      omp_set_lock(&cells[ind].lock);
+      if(ind == 0 || ind == (buffers->lens[1] - 1) || ind == ((buffers->lens[0] - 1)*buffers->lens[1]) || ind == (buffers->size - 1))
+        omp_set_lock(&cells[ind].lock);
       cell_push_back_p(&cells[ind], &buffers->recv_particles[i].particles[j]);
-      omp_unset_lock(&cells[ind].lock);
+      if(ind == 0 || ind == (buffers->lens[1] - 1) || ind == ((buffers->lens[0] - 1)*buffers->lens[1]) || ind == (buffers->size - 1))
+        omp_unset_lock(&cells[ind].lock);
     }
   }
 #pragma omp for schedule(dynamic, 1) nowait
