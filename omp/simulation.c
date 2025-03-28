@@ -212,7 +212,6 @@ void detect_collisions(long ncside2, cell_t *cells, long chunk_size) {
           collision++; 
         }
         cells[i].collided[k] = -1;
-        k++;
       }
       if(collision > 0 && (cells[i].collided[j] == 0)) {
         cells[i].collided[j] = -1;

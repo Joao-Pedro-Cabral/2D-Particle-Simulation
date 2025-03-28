@@ -235,7 +235,6 @@ void compute_kinetics(double side, cell_t *cells,
         cells[i].ay[k] -= forcey;
         resx += forcex;
         resy += forcey;
-        k++;
       }
       cells[i].ax[j] += resx;
       cells[i].ay[j] += resy;
