@@ -88,29 +88,13 @@ void compute_centers_of_mass(double side,
       double weighted_y = 0.0;
       long long cell_size = cells[i].size;
 
-      long long iter = (cell_size) - (cell_size & 3);
       long long j;
-      __m256d mass_vec = _mm256_setzero_pd();
-      __m256d x_vec = _mm256_setzero_pd();
-      __m256d y_vec = _mm256_setzero_pd();
-      for (j = 0; j < iter; j += 4) {
-        __m256d m = _mm256_loadu_pd(&cells[i].m[j]);
-        __m256d x = _mm256_loadu_pd(&cells[i].x[j]);
-        __m256d y = _mm256_loadu_pd(&cells[i].y[j]);
-        mass_vec = _mm256_add_pd(m, mass_vec);
-        x_vec = _mm256_fmadd_pd(m, x, x_vec);
-        y_vec = _mm256_fmadd_pd(m, y, y_vec);
-      }
-      total_mass = sum_lanes(mass_vec);
-      weighted_x = sum_lanes(x_vec);
-      weighted_y = sum_lanes(y_vec);
-      while (j < cell_size) {
+      for (j = 0; j < cell_size; j ++) {
         total_mass += cells[i].m[j];
         weighted_x += cells[i].m[j] * cells[i].x[j];
         weighted_y += cells[i].m[j] * cells[i].y[j];
         j++;
       }
-
       long ind = cells[i].center;
       centers[ind].m = total_mass;
 
@@ -160,7 +144,7 @@ void compute_centers_of_mass(double side,
       }
     }
   }
-#pragma omp for schedule(dynamic, 1)
+  #pragma omp for schedule(dynamic, 1)
   for (long i = 0; i < NUM_OF_NEIGHBORS; i++) {
     long base, stride;
     double x_offset, y_offset;
@@ -225,6 +209,7 @@ void compute_centers_of_mass(double side,
   }
 }
 
+
 void compute_kinetics(double side, cell_t *cells,
                       center_t *centers, communication_buffers_t *buffers,
                       long chunk_size) {
@@ -233,40 +218,11 @@ void compute_kinetics(double side, cell_t *cells,
   for (long i = 0; i < buffers->size; i++) {
     long long cell_size = cells[i].size;
     for (long long j = 0; j < cell_size; j++) {
-      __m256d resx_vec = _mm256_setzero_pd();
-      __m256d resy_vec = _mm256_setzero_pd();
       double mg = G * cells[i].m[j];
-      __m256d mg2 = _mm256_set1_pd(mg);
-      __m256d xj = _mm256_set1_pd(cells[i].x[j]);
-      __m256d yj = _mm256_set1_pd(cells[i].y[j]);
-      long long iter = (cell_size) - ((cell_size - (j + 1)) & 3);
+      double resx = 0.0;
+      double resy = 0.0;     
       long long k;
-      for (k = j + 1; k < iter; k += 4) {
-        __m256d xk = _mm256_loadu_pd(&cells[i].x[k]);
-        __m256d yk = _mm256_loadu_pd(&cells[i].y[k]);
-        __m256d dx = _mm256_sub_pd(xk, xj);
-        __m256d dy = _mm256_sub_pd(yk, yj);
-        __m256d denominator = _mm256_mul_pd(dx, dx);
-        denominator = _mm256_fmadd_pd(dy, dy, denominator);
-        __m256d sqrt_den = _mm256_sqrt_pd(denominator);
-        denominator = _mm256_mul_pd(sqrt_den, denominator);
-        __m256d mk = _mm256_loadu_pd(&cells[i].m[k]);
-        __m256d numerator = _mm256_mul_pd(mg2, mk);
-        __m256d F = _mm256_div_pd(numerator, denominator);
-        __m256d forcex = _mm256_mul_pd(dx, F);
-        __m256d forcey = _mm256_mul_pd(dy, F);
-        __m256d axk = _mm256_loadu_pd(&cells[i].ax[k]);
-        __m256d ayk = _mm256_loadu_pd(&cells[i].ay[k]);
-        axk = _mm256_sub_pd(axk, forcex);
-        ayk = _mm256_sub_pd(ayk, forcey);
-        _mm256_storeu_pd(&cells[i].ax[k], axk);
-        _mm256_storeu_pd(&cells[i].ay[k], ayk);
-        resx_vec = _mm256_add_pd(resx_vec, forcex);
-        resy_vec = _mm256_add_pd(resy_vec, forcey);
-      }
-      double resx = sum_lanes(resx_vec);
-      double resy = sum_lanes(resy_vec);
-      while (k < cell_size) {
+      for (k = j + 1; k < cell_size; k ++) {
         double dx = cells[i].x[k] - cells[i].x[j];
         double dy = cells[i].y[k] - cells[i].y[j];
         double denominator = dx * dx + dy * dy;
@@ -375,35 +331,12 @@ void detect_collisions(long ncells, cell_t *cells, long chunk_size) {
     }
     for (long long j = cell_size - 1; j >= 0; j--) {
       long long collision = 0;
-      __m256d epsilon2 = _mm256_set1_pd(EPSILON2);
-      __m256d xj = _mm256_set1_pd(cells[i].x[j]);
-      __m256d yj = _mm256_set1_pd(cells[i].y[j]);
       long long k;
-      long long iter = (j) - (j & 3);
-      for (k = 0; k < iter; k += 4) {
-        __m256d xk = _mm256_loadu_pd(&cells[i].x[k]);
-        __m256d yk = _mm256_loadu_pd(&cells[i].y[k]);
-        __m256d dx = _mm256_sub_pd(xk, xj);
-        __m256d dy = _mm256_sub_pd(yk, yj);
-        __m256d distance = _mm256_mul_pd(dx, dx);
-        distance = _mm256_fmadd_pd(dy, dy, distance);
-        __m256d cmp = _mm256_cmp_pd(distance, epsilon2, _CMP_LT_OQ);
-        if (_mm256_testz_pd(cmp, cmp)) {
-          continue;
-        }
-        __m256i near = _mm256_castpd_si256(cmp);
-        __m256i collided = _mm256_loadu_si256((__m256i *)&cells[i].collided[k]);
-        __m256i mask = _mm256_andnot_si256(collided, near);
-        collision += (_mm256_movemask_epi8(mask) != 0);
-        _mm256_storeu_si256((__m256i *)&cells[i].collided[k],
-                            _mm256_or_si256(near, collided));
-      }
-      while (k < j) {
+      for (k = 0; k < j; k ++) {
         double dx = cells[i].x[j] - cells[i].x[k];
         double dy = cells[i].y[j] - cells[i].y[k];
         double distance = dx * dx + dy * dy;
         if (distance > EPSILON2) {
-          k++;
           continue;
         }
         DEBUG("Distance: %.6lf, i: %ld, j: %lld, k: %lld\n", distance, i,
@@ -412,7 +345,6 @@ void detect_collisions(long ncells, cell_t *cells, long chunk_size) {
           collision++;
         }
         cells[i].collided[k] = -1;
-        k++;
       }
       if (collision > 0 && (cells[i].collided[j] == 0)) {
         cells[i].collided[j] = -1;
