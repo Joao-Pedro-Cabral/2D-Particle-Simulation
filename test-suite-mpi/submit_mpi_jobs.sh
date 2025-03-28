@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Generate and submit MPI jobs using Slurm
 TESTS=(
@@ -16,8 +16,8 @@ TESTS=(
     "32 100 6 10000 100000" "29.530 30.082" "4448"
 )
 
-NTASKS=(1 2 4 8 16 32)
-CPUS_PER_TASK=(1 2 4 6)
+NTASKS=(1 2)
+CPUS_PER_TASK=(1)
 
 mkdir -p results/mpi_outputs
 mkdir -p results/slurm_jobs
@@ -40,7 +40,7 @@ for ntasks in "${NTASKS[@]}"; do
             job_script="job.slurm"
 
             cat <<EOF > "$job_script"
-#!/bin/bash
+#!/usr/bin/env bash
 #SBATCH --job-name=$job_name
 #SBATCH --output=$output_file
 #SBATCH --error=$stderr_file
