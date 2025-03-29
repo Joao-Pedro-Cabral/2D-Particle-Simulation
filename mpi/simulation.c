@@ -50,7 +50,7 @@ void clean_blocks(cell_t *cells, center_t *centers, communication_buffers_t *buf
 
 void debug_centers(int id, long ncenters, center_t *centers) {
   for (long i = 0; i < ncenters; i++) {
-    DEBUG("From %d: Center %ld x: %.6lf y: %.6lf m: %.6lf\n", id, i,
+    DEBUG("From %d: Center %ld x: %.15lf y: %.15lf m: %.15lf\n", id, i,
           centers[i].x, centers[i].y, centers[i].m);
   }
 }
@@ -59,9 +59,9 @@ void debug_particles(int id, long ncells, cell_t *cells) {
   for (long i = 0; i < ncells; i++) {
     long long cell_size = cells[i].size;
     for (long long j = 0; j < cell_size; j++) {
-      DEBUG("From %d: Particle %lld: m: %.6f, x: %.6f, y: %.6f, vx: %.6f, vy: "
-            "%.6f, "
-            "ax: %.6f, ay: %.6f, collided: %lld, cell: %ld\n",
+      DEBUG("From %d: Particle %lld: m: %.15f, x: %.15f, y: %.15f, vx: %.15f, vy: "
+            "%.15f, "
+            "ax: %.15f, ay: %.15f, collided: %lld, cell: %ld\n",
             id, cells[i].ind[j], cells[i].m[j], cells[i].x[j], cells[i].y[j],
             cells[i].vx[j], cells[i].vy[j], cells[i].ax[j], cells[i].ay[j],
             cells[i].collided[j], cells[i].center);
@@ -79,7 +79,7 @@ void compute_centers_of_mass(double side,
                              communication_buffers_t *buffers,
                              long chunk_size) {
 
-// #pragma omp for collapse(2) schedule(dynamic, chunk_size) nowait
+  #pragma omp for collapse(2) schedule(dynamic, chunk_size)
   for (long iy = 0; iy < buffers->lens[0]; iy++) {
     for (long ix = 0; ix < buffers->lens[1]; ix++) {
       long i = ix + buffers->lens[1] * iy;
@@ -135,11 +135,14 @@ void compute_centers_of_mass(double side,
       }
     }
   }
+  #pragma omp single
+  {
   MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 1]);
   MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 3]);
   MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 4]);
   MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 6]);
-  // #pragma omp for schedule(dynamic, 1)
+  }
+  #pragma omp for schedule(dynamic, 1)
   for (long i = 0; i < NUM_OF_NEIGHBORS; i++) {
     long base, stride;
     double x_offset, y_offset;
@@ -209,7 +212,7 @@ void compute_kinetics(double side, cell_t *cells,
                       center_t *centers, const communication_buffers_t *buffers,
                       long chunk_size) {
 
-// #pragma omp for schedule(dynamic, chunk_size)
+  #pragma omp for schedule(dynamic, chunk_size)
   for (long i = 0; i < buffers->size; i++) {
     long long cell_size = cells[i].size;
     for (long long j = 0; j < cell_size; j++) {
@@ -249,7 +252,7 @@ void compute_kinetics(double side, cell_t *cells,
 void compute_new_particle_cell(double size, long ncside, int id,
                                cell_t *cells, communication_buffers_t *buffers,
                                long chunk_size) {
-// #pragma omp for schedule(dynamic, chunk_size)
+  #pragma omp for schedule(dynamic, chunk_size)
   for (long i = 0; i < buffers->size; i++) {
     omp_set_lock(&cells[i].lock);
     long long cell_size = cells[i].size;
@@ -272,7 +275,7 @@ void compute_new_particle_cell(double size, long ncside, int id,
       cells[i].ind[j] = -1;
     }
   }
-// #pragma omp for nowait
+  #pragma omp for
   for(long i = 0; i < NUM_OF_NEIGHBORS; i++) {
     int neighbor = buffers->neighbors[i];
     MPI_Isend(buffers->send_particles[i].particles,
@@ -281,7 +284,7 @@ void compute_new_particle_cell(double size, long ncside, int id,
       &buffers->particles_requests[i]);
     particles_buffer_resize(&buffers->send_particles[i], 0);
   }
-// #pragma omp for schedule(dynamic, 1)
+  #pragma omp for schedule(dynamic, 1)
   for(long i = 0; i < NUM_OF_NEIGHBORS; i++) {
     int neighbor = buffers->neighbors[i];
     while (!buffers->particles_flags[i]) {
@@ -297,27 +300,30 @@ void compute_new_particle_cell(double size, long ncside, int id,
             &buffers->particles_status[i]);
     for (long long j = 0; j < buffers->recv_particles[i].size; j++) {
       long ind = find_cell_p(buffers, &buffers->recv_particles[i].particles[j], size);
-      if(ind == 0 || ind == (buffers->lens[1] - 1) || ind == ((buffers->lens[0] - 1)*buffers->lens[1]) || ind == (buffers->size - 1))
+      // if(ind == 0 || ind == (buffers->lens[1] - 1) || ind == ((buffers->lens[0] - 1)*buffers->lens[1]) || ind == (buffers->size - 1))
         omp_set_lock(&cells[ind].lock);
       cell_push_back_p(&cells[ind], &buffers->recv_particles[i].particles[j]);
-      if(ind == 0 || ind == (buffers->lens[1] - 1) || ind == ((buffers->lens[0] - 1)*buffers->lens[1]) || ind == (buffers->size - 1))
+      // if(ind == 0 || ind == (buffers->lens[1] - 1) || ind == ((buffers->lens[0] - 1)*buffers->lens[1]) || ind == (buffers->size - 1))
         omp_unset_lock(&cells[ind].lock);
     }
   }
+  #pragma omp single
+  {
   MPI_Waitall(NUM_OF_NEIGHBORS, &buffers->centers_requests[NUM_OF_NEIGHBORS], MPI_STATUSES_IGNORE);
   MPI_Waitall(NUM_OF_NEIGHBORS, &buffers->particles_requests[0], MPI_STATUSES_IGNORE);
+  }
 }
 
 void detect_collisions(long ncells, cell_t *cells, long chunk_size) {
 
-// #pragma omp for reduction(+ : ncollisions) schedule(dynamic, chunk_size)
+  #pragma omp for reduction(+ : ncollisions) schedule(dynamic, chunk_size)
   for (long i = 0; i < ncells; i++) {
     long long cell_collisions = 0;
     long long cell_size = cells[i].size;
     for (long long j = cell_size - 1; j >= 0; j--) {
       if (cells[i].ind[j] == -1) {
-        DEBUG("Removing mass null Particle %lld from cells[%ld].par[%lld]\n",
-              cells[i].ind[j], i, j);
+        // DEBUG("Removing mass null Particle %lld from cells[%ld].par[%lld]\n",
+        //       cells[i].ind[j], i, j);
         cell_size--;
         cell_remove_particle(&cells[i], j);
       }
@@ -392,9 +398,9 @@ simulation_result simulation(double side, long ncside, long long npart, int id,
   simulation_result res;
   init_block(size, ncside, npart, id, par, cells, buffers);
   long chunk_size = (buffers->size >= 4*omp_get_max_threads()) ? 2 : 1;
-  // #pragma omp parallel
+  #pragma omp parallel
   for (long long i = 0; i < nstep; i++) {
-    DEBUG("--------STEP %d: %lld --------------\n", id, i);
+    // DEBUG("--------STEP %d: %lld --------------\n", id, i);
     compute_centers_of_mass(side, cells, centers, buffers, chunk_size);
     compute_kinetics(side, cells, centers, buffers, chunk_size);
     compute_new_particle_cell(size, ncside, id, cells, buffers, chunk_size);
