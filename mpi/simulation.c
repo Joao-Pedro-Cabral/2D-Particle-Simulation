@@ -135,7 +135,7 @@ void compute_centers_of_mass(double side,
       }
     }
   }
-  #pragma omp single
+  #pragma omp single nowait
   {
   MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 1]);
   MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 3]);
@@ -252,30 +252,22 @@ void compute_kinetics(double side, cell_t *cells,
 void compute_new_particle_cell(double size, long ncside, int id,
                                cell_t *cells, communication_buffers_t *buffers,
                                long chunk_size) {
-  #pragma omp for schedule(dynamic, chunk_size)
   for (long i = 0; i < buffers->size; i++) {
-    omp_set_lock(&cells[i].lock);
     long long cell_size = cells[i].size;
-    omp_unset_lock(&cells[i].lock);
     for (long long j = 0; j < cell_size; j++) {
       int owner = find_owner_c(buffers, &cells[i], j, size, ncside);
       if (owner == id) {
         long ind = find_cell_c(buffers, &cells[i], j, size);
         if(ind == i)
           continue;
-        omp_set_lock(&cells[ind].lock);
         cell_push_back_c(&cells[ind], &cells[i], j);
-        omp_unset_lock(&cells[ind].lock);
       } else {
         int pos = find_neighbor_pos(buffers, owner);
-        omp_set_lock(&buffers->locks[pos]);
         particles_buffer_add_c(&buffers->send_particles[pos], &cells[i], j);
-        omp_unset_lock(&buffers->locks[pos]);
       }
       cells[i].ind[j] = -1;
     }
   }
-  #pragma omp for
   for(long i = 0; i < NUM_OF_NEIGHBORS; i++) {
     int neighbor = buffers->neighbors[i];
     MPI_Isend(buffers->send_particles[i].particles,
@@ -284,7 +276,6 @@ void compute_new_particle_cell(double size, long ncside, int id,
       &buffers->particles_requests[i]);
     particles_buffer_resize(&buffers->send_particles[i], 0);
   }
-  #pragma omp for schedule(dynamic, 1)
   for(long i = 0; i < NUM_OF_NEIGHBORS; i++) {
     int neighbor = buffers->neighbors[i];
     while (!buffers->particles_flags[i]) {
@@ -300,18 +291,11 @@ void compute_new_particle_cell(double size, long ncside, int id,
             &buffers->particles_status[i]);
     for (long long j = 0; j < buffers->recv_particles[i].size; j++) {
       long ind = find_cell_p(buffers, &buffers->recv_particles[i].particles[j], size);
-      // if(ind == 0 || ind == (buffers->lens[1] - 1) || ind == ((buffers->lens[0] - 1)*buffers->lens[1]) || ind == (buffers->size - 1))
-        omp_set_lock(&cells[ind].lock);
       cell_push_back_p(&cells[ind], &buffers->recv_particles[i].particles[j]);
-      // if(ind == 0 || ind == (buffers->lens[1] - 1) || ind == ((buffers->lens[0] - 1)*buffers->lens[1]) || ind == (buffers->size - 1))
-        omp_unset_lock(&cells[ind].lock);
     }
   }
-  #pragma omp single
-  {
   MPI_Waitall(NUM_OF_NEIGHBORS, &buffers->centers_requests[NUM_OF_NEIGHBORS], MPI_STATUSES_IGNORE);
   MPI_Waitall(NUM_OF_NEIGHBORS, &buffers->particles_requests[0], MPI_STATUSES_IGNORE);
-  }
 }
 
 void detect_collisions(long ncells, cell_t *cells, long chunk_size) {
@@ -403,7 +387,10 @@ simulation_result simulation(double side, long ncside, long long npart, int id,
     // DEBUG("--------STEP %d: %lld --------------\n", id, i);
     compute_centers_of_mass(side, cells, centers, buffers, chunk_size);
     compute_kinetics(side, cells, centers, buffers, chunk_size);
+    #pragma omp single
+    {
     compute_new_particle_cell(size, ncside, id, cells, buffers, chunk_size);
+    }
     detect_collisions(buffers->size, cells, chunk_size);
   }
   MPI_Reduce(&ncollisions, &res.number_of_collisions, 1, MPI_LONG_LONG_INT, MPI_SUM, 0, MPI_COMM_WORLD);
