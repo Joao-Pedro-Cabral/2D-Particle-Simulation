@@ -31,6 +31,7 @@ void communication_buffers_init(communication_buffers_t *buffers, long ncside,
       len = buffers->lens[0];
     }
     buffers->centers_lens[i] = len;
+    buffers->centers_flags[i] = 0;
     buffers->send_centers[i] = (center_t*) malloc(sizeof(center_t)*len);
     buffers->recv_centers[i] = (center_t*) malloc(sizeof(center_t)*len);
     long initial_estimation = 2 * len * npart / (ncside*ncside);

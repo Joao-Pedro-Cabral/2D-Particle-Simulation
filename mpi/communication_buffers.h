@@ -18,6 +18,7 @@ typedef struct {
   int centers_lens [NUM_OF_NEIGHBORS];
   center_t *send_centers [NUM_OF_NEIGHBORS];
   center_t *recv_centers [NUM_OF_NEIGHBORS];
+  int centers_flags [NUM_OF_NEIGHBORS];
   MPI_Request centers_requests [2*NUM_OF_NEIGHBORS];
   particles_buffer_t send_particles [NUM_OF_NEIGHBORS];
   particles_buffer_t recv_particles [NUM_OF_NEIGHBORS];
