@@ -16,17 +16,21 @@ TESTS=(
     "32 100 6 10000 100000" "29.530 30.082" "4448"
 )
 
-NTASKS=(1 2)
-CPUS_PER_TASK=(1)
+NTASKS=(1 2 4 8 16 32)
+CPUS_PER_TASK=(1 2 4 6 8)
 
+rm -rf results/mpi_outputs
 mkdir -p results/mpi_outputs
-mkdir -p results/slurm_jobs
 
 cd ../mpi || exit 1
 make profile || exit 1
 
 for ntasks in "${NTASKS[@]}"; do
     for cpus_per_task in "${CPUS_PER_TASK[@]}"; do
+        # number of machine used must be atmost 32
+        # if ((ntasks*cpus_per_task > 32)); then
+        #     continue
+        # fi
         for ((i=0; i<${#TESTS[@]}; i+=3)); do
             params="${TESTS[i]}"
             # If ncside < ntasks then jump the test
@@ -34,20 +38,21 @@ for ntasks in "${NTASKS[@]}"; do
             if (( ncside < ntasks )); then
                 continue
             fi
-            job_name="joao"
-            output_file="../test-suite-mpi/results/mpi_outputs/output_%j.txt"
-            stderr_file="../test-suite-mpi/results/mpi_outputs/stderr_%j.txt"
+            job_name="g24" 
+            output_file="../test-suite-mpi/results/mpi_outputs/output_nt${ntasks}_ncpu${cpus_per_task}.txt"
+            #stderr_file="../test-suite-mpi/results/mpi_outputs/output_nt${ntasks}_ncpu${cpus_per_task}.txt"
             job_script="job.slurm"
 
             cat <<EOF > "$job_script"
 #!/usr/bin/env bash
 #SBATCH --job-name=$job_name
 #SBATCH --output=$output_file
-#SBATCH --error=$stderr_file
+#SBATCH --error=$output_file
 #SBATCH --ntasks=$ntasks
 #SBATCH --cpus-per-task=$cpus_per_task
 #SBATCH --exclusive
 #SBATCH --ntasks-per-node=1
+echo "$ ./parsim-mpi ${params}" >> $output_file
 srun parsim-mpi $params
 EOF
 
