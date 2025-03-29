@@ -79,7 +79,7 @@ void compute_centers_of_mass(double side,
                              communication_buffers_t *buffers,
                              long chunk_size) {
 
-#pragma omp for collapse(2) schedule(dynamic, chunk_size) nowait
+#pragma omp for collapse(2) schedule(dynamic, chunk_size)
   for (long iy = 0; iy < buffers->lens[0]; iy++) {
     for (long ix = 0; ix < buffers->lens[1]; ix++) {
       long i = ix + buffers->lens[1] * iy;
@@ -131,7 +131,6 @@ void compute_centers_of_mass(double side,
         if (iy == buffers->lens[0] - 1) {
           copy_center(&buffers->send_centers[5][0], &centers[ind]);
           MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 5]);
-          MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 3]);
         }
       }
       if (ix == buffers->lens[1] - 1) {
@@ -143,23 +142,23 @@ void compute_centers_of_mass(double side,
         if (iy == buffers->lens[0] - 1) {
           copy_center(&buffers->send_centers[7][0], &centers[ind]);
           MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 7]);
-          MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 4]);
         }
       }
       if(iy == 0) {
         copy_center(&buffers->send_centers[1][ix], &centers[ind]);
-        if(ix == buffers->lens[1] - 1) {
-          MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 1]);
-        }
       }
       if (iy == buffers->lens[0] - 1) {
         copy_center(&buffers->send_centers[6][ix], &centers[ind]);
-        if(ix == buffers->lens[1] - 1) {
-          MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 6]);
-        }
       }
     }
   }
+#pragma omp single nowait
+{
+  MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 1]);
+  MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 3]);
+  MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 4]);
+  MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 6]);
+}
 #pragma omp for schedule(dynamic, 1)
   for (long i = 0; i < NUM_OF_NEIGHBORS; i++) {
     long base, stride;
@@ -354,10 +353,10 @@ void compute_new_particle_cell(double size, long ncside, int id,
         omp_unset_lock(&cells[ind].lock);
     }
   }
-#pragma omp for schedule(dynamic, 1) nowait
-  for(long i = 0; i < NUM_OF_NEIGHBORS; i++) {
-    MPI_Wait(&buffers->centers_requests[NUM_OF_NEIGHBORS + i], MPI_STATUS_IGNORE);
-    MPI_Wait(&buffers->particles_requests[i], MPI_STATUS_IGNORE);
+#pragma omp single nowait
+  {
+  MPI_Waitall(NUM_OF_NEIGHBORS, &buffers->centers_requests[NUM_OF_NEIGHBORS], MPI_STATUSES_IGNORE);
+  MPI_Waitall(NUM_OF_NEIGHBORS, &buffers->particles_requests[0], MPI_STATUSES_IGNORE);
   }
 }
 
