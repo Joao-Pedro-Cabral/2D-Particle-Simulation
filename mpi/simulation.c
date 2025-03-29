@@ -114,7 +114,6 @@ void compute_centers_of_mass(double side,
         if (iy == buffers->lens[0] - 1) {
           copy_center(&buffers->send_centers[5][0], &centers[ind]);
           MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 5]);
-          MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 3]);
         }
       }
       if (ix == buffers->lens[1] - 1) {
@@ -126,23 +125,20 @@ void compute_centers_of_mass(double side,
         if (iy == buffers->lens[0] - 1) {
           copy_center(&buffers->send_centers[7][0], &centers[ind]);
           MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 7]);
-          MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 4]);
         }
       }
       if(iy == 0) {
         copy_center(&buffers->send_centers[1][ix], &centers[ind]);
-        if(ix == buffers->lens[1] - 1) {
-          MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 1]);
-        }
       }
       if (iy == buffers->lens[0] - 1) {
         copy_center(&buffers->send_centers[6][ix], &centers[ind]);
-        if(ix == buffers->lens[1] - 1) {
-          MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 6]);
-        }
       }
     }
   }
+  MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 1]);
+  MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 3]);
+  MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 4]);
+  MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 6]);
   // #pragma omp for schedule(dynamic, 1)
   for (long i = 0; i < NUM_OF_NEIGHBORS; i++) {
     long base, stride;
@@ -308,11 +304,8 @@ void compute_new_particle_cell(double size, long ncside, int id,
         omp_unset_lock(&cells[ind].lock);
     }
   }
-// #pragma omp for schedule(dynamic, 1) nowait
-  for(long i = 0; i < NUM_OF_NEIGHBORS; i++) {
-    MPI_Wait(&buffers->centers_requests[NUM_OF_NEIGHBORS + i], MPI_STATUS_IGNORE);
-    MPI_Wait(&buffers->particles_requests[i], MPI_STATUS_IGNORE);
-  }
+  MPI_Waitall(NUM_OF_NEIGHBORS, &buffers->centers_requests[NUM_OF_NEIGHBORS], MPI_STATUSES_IGNORE);
+  MPI_Waitall(NUM_OF_NEIGHBORS, &buffers->particles_requests[0], MPI_STATUSES_IGNORE);
 }
 
 void detect_collisions(long ncells, cell_t *cells, long chunk_size) {
