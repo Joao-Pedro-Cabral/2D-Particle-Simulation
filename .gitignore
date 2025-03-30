@@ -3,4 +3,4 @@ parsim
 serial/parsim
 omp/parsim*
 mpi/parsim-mpi
-test-suite-mpi/results/*
+test-suite-mpi/results/output_nt*

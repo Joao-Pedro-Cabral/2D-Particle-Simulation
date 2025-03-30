@@ -51,7 +51,7 @@ def check_correctness(mpi_dic):
 
 def compute_speedup(serial_dic, mpi_dic):
     speedups = {}
-    with open('results/speedup_summary.txt', 'w') as f:
+    with open('results/speedup_summary-nodebugflag.txt', 'w') as f:
         f.write("Speedup Summary\n")
         
         for config, tests in mpi_dic.items():
@@ -74,7 +74,7 @@ def compute_speedup(serial_dic, mpi_dic):
 
 def get_mpi_outputs(): 
     MPI_OUTPUT = {}   
-    with open('results/mpi_outputs/byhand.txt') as mpi_file:
+    with open('results/mpi_outputs/byhand-nodebugflag.txt') as mpi_file:
         current_config = None
         for line in mpi_file:
             line = line.strip()
@@ -110,7 +110,7 @@ def main():
     # Compute and save speedups
     print("\nComputing speedups...")
     speedups = compute_speedup(SERIAL_OUTPUT, MPI_OUTPUT)
-    print("Speedup summary written to results/speedup_summary.txt")
+    print("Speedup summary written to results/speedup_summary-nodebugflag.txt")
 
 if __name__ == "__main__":
     main()
