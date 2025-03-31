@@ -1,9 +1,6 @@
-'''
-apri i file in results/mpi_outputs
-for each ntask/cpu config load the results and exec time
-compute the speed up for each
-'''
+# Checks MPI correctness and compute the speedup respect to the serial one
 
+# TODO put this TEST list in and external common file for all the scripts
 TESTS = {
     '5893 0.05 3 10 10': ['0.002 0.035', '2'],
     '8555 0.05 3 10 10': ['0.016 0.049', '1'],
@@ -34,6 +31,7 @@ def get_serial_outputs():
                 SERIAL_OUTPUT[test_params][2] = float(exec_time[:-1])  
     return SERIAL_OUTPUT
 
+# TODO run this correctness checker here for the serial too, and remove it from run_serial.sh, makes more sense
 def check_correctness(mpi_dic):
     all_correct = True
     for config, tests in mpi_dic.items():
@@ -72,9 +70,14 @@ def compute_speedup(serial_dic, mpi_dic):
     
     return speedups
 
+def get_mpi_results_file():
+    # TODO generate a results/serial_results.txt alike file but gathering the results/mpi-outputs/* files, called mpi_results.txt
+    is_created = True
+    return is_created
+
 def get_mpi_outputs(): 
     MPI_OUTPUT = {}   
-    with open('results/mpi_outputs/byhand.txt') as mpi_file:
+    with open('results/mpi_outputs/mpi_results.txt') as mpi_file:
         current_config = None
         for line in mpi_file:
             line = line.strip()
@@ -90,24 +93,26 @@ def get_mpi_outputs():
                 test_params = ' '.join(line.split()[2:])
                 coords = mpi_file.readline().strip()
                 collisions = mpi_file.readline().strip()
-                exec_time = float(mpi_file.readline().strip()[:-1])
+                exec_time = float(mpi_file.readline().strip()[:-1]) # removes 's' of seconds
                 
                 MPI_OUTPUT[current_config][test_params] = (coords, collisions, exec_time)
 
     return MPI_OUTPUT
 
 def main():
+    print("\nCollecting the Serial outputs..")
     SERIAL_OUTPUT = get_serial_outputs() 
-    MPI_OUTPUT = get_mpi_outputs()
+
+    print("\nCollecting all the MPI outputs..")
+    if get_mpi_results_file():
+        MPI_OUTPUT = get_mpi_outputs()
     
-    # Check correctness
     print("\nChecking correctness of MPI results...")
     if check_correctness(MPI_OUTPUT):
-        print("All tests passed!")
+        print("All MPI tests passed!")
     else:
         print("Some tests failed - check warnings above")
     
-    # Compute and save speedups
     print("\nComputing speedups...")
     speedups = compute_speedup(SERIAL_OUTPUT, MPI_OUTPUT)
     print("Speedup summary written to results/speedup_summary.txt")
