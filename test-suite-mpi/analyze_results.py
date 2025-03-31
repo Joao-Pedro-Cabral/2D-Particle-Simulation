@@ -1,8 +1,3 @@
-'''
-apri i file in results/mpi_outputs
-for each ntask/cpu config load the results and exec time
-compute the speed up for each
-'''
 
 TESTS = {
     '5893 0.05 3 10 10': ['0.002 0.035', '2'],
