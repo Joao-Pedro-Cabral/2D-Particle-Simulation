@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Firstly it creates all the slurm job files needed, secondly it submit the with slurm `sbatch`
+# Firstly it creates all the slurm job files needed, secondly it submit the with slurm 'sbatch'
 
 #TODO: FIX readarray -t TESTS < <(grep -v '^\s*#' ../test-suite-mpi/TESTS.txt)
 TESTS=(
@@ -22,6 +22,7 @@ NTASKS=(1 2 4 8 16 32)
 CPUS_PER_TASK=(1 2 4 6 8)
 
 rm -rf results/mpi-outputs
+rm -rf results/job-files
 mkdir -p results/mpi-outputs
 mkdir -p results/job-files
 
@@ -37,9 +38,8 @@ for ntasks in "${NTASKS[@]}"; do
                 continue
             fi
             job_name="g24" 
-            test_ind=$((i / 3))
-            output_file="../mpi_outputs/output_nt${ntasks}_ncpu${cpus_per_task}_${test_ind}.txt"
-            job_script="job_nt${ntasks}_ncpu${cpus_per_task}_${test_ind}.slurm"
+            output_file="../mpi-outputs/output_nt${ntasks}_ncpu${cpus_per_task}_${i}.txt"
+            job_script="job_nt${ntasks}_ncpu${cpus_per_task}_${i}.slurm"
 
             cat <<EOF > "$job_script"
 #!/usr/bin/env bash
@@ -50,7 +50,9 @@ for ntasks in "${NTASKS[@]}"; do
 #SBATCH --cpus-per-task=$cpus_per_task
 #SBATCH --exclusive
 #SBATCH --exclude=lab5p[1-20]
+#SBATCH --exclude=lab0p[1-9]
 #SBATCH --ntasks-per-node=1
+srun parsim-mpi $params
 EOF
         done
     done
@@ -59,12 +61,13 @@ done
 echo "All MPI jobs created."
 
 cd ../../../mpi
-make release
-cd ../test-suite-mpi
+make release || exit 1
+cp parsim-mpi ../test-suite-mpi/results/job-files
+cd ../test-suite-mpi/results/job-files
 
-for f in ./results/job-files/*.slurm; do
-    sbatch ../mpi/parsim-mpi "$f" 
+for f in *.slurm; do
+    sbatch "$f" 
 done 
 
-echo "All MPI jobs submitted. Check status of the cluster with `squeue`"
-echo "MPI results are saved in ./results/mpi_outputs"
+echo "All MPI jobs submitted. Check status of the cluster with 'squeue'"
+echo "MPI results are saved in ./results/mpi-outputs"
