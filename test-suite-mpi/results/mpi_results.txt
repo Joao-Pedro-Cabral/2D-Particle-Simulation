@@ -1,0 +1,1468 @@
+
+$ cat output_nt1_ncpu1_id0
+params 5893 0.05 3 10 10
+0.002 0.035
+2
+0.0s
+
+$ cat output_nt1_ncpu1_id1
+params 8555 0.05 3 10 10
+0.016 0.049
+1
+0.0s
+
+$ cat output_nt1_ncpu1_id2
+params 12 100 5 10000 10000
+76.732 61.943
+2209
+47.0s
+
+$ cat output_nt1_ncpu1_id3
+params -11 3500 20 500000 10
+1984.878 1625.992
+35
+40.9s
+
+$ cat output_nt1_ncpu1_id4
+params 1 5000 100 1000000 4
+3936.506 131.472
+4
+1.3s
+
+$ cat output_nt1_ncpu1_id5
+params 1 5000 100 1000000 100
+3899.787 156.291
+163
+27.8s
+
+$ cat output_nt1_ncpu1_id6
+params 1 5000 20 1000000 10
+3918.912 143.364
+19
+46.9s
+
+$ cat output_nt1_ncpu1_id7
+params 1 1000 3 10000 10000
+287.788 261.446
+31
+211.4s
+
+$ cat output_nt1_ncpu1_id8
+params 3 5000 50 1000000 300
+3819.032 25.659
+469
+247.0s
+
+$ cat output_nt1_ncpu1_id9
+params 3 5000 50 1000000 500
+3738.436 58.743
+804
+420.9s
+
+$ cat output_nt1_ncpu1_id10
+params -1 1000 30 100000 1000
+575.878 370.663
+1203
+70.2s
+
+$ cat output_nt1_ncpu2_id0
+params 5893 0.05 3 10 10
+0.002 0.035
+2
+0.0s
+
+$ cat output_nt1_ncpu2_id1
+params 8555 0.05 3 10 10
+0.016 0.049
+1
+0.0s
+
+$ cat output_nt1_ncpu2_id2
+params 12 100 5 10000 10000
+76.732 61.943
+2209
+23.7s
+
+$ cat output_nt1_ncpu2_id3
+params -11 3500 20 500000 10
+1984.878 1625.992
+35
+20.3s
+
+$ cat output_nt1_ncpu2_id4
+params 1 5000 100 1000000 4
+3936.506 131.472
+4
+0.8s
+
+$ cat output_nt1_ncpu2_id6
+params 1 5000 20 1000000 10
+3918.912 143.364
+19
+24.2s
+
+$ cat output_nt1_ncpu2_id7
+params 1 1000 3 10000 10000
+287.788 261.446
+31
+119.8s
+
+$ cat output_nt1_ncpu2_id8
+params 3 5000 50 1000000 300
+3819.032 25.659
+469
+130.4s
+
+$ cat output_nt1_ncpu2_id9
+params 3 5000 50 1000000 500
+3738.436 58.743
+804
+217.0s
+
+$ cat output_nt1_ncpu2_id10
+params -1 1000 30 100000 1000
+575.878 370.663
+1203
+37.1s
+
+$ cat output_nt1_ncpu2_id11
+params 32 100 6 10000 100000
+29.530 30.082
+4451
+44.1s
+
+$ cat output_nt1_ncpu4_id4
+params 1 5000 100 1000000 4
+3936.506 131.472
+4
+0.5s
+
+$ cat output_nt1_ncpu6_id0
+params 5893 0.05 3 10 10
+0.002 0.035
+2
+0.0s
+
+$ cat output_nt1_ncpu6_id1
+params 8555 0.05 3 10 10
+0.016 0.049
+1
+0.0s
+
+$ cat output_nt1_ncpu6_id2
+params 12 100 5 10000 10000
+76.732 61.943
+2209
+16.1s
+
+$ cat output_nt1_ncpu6_id3
+params -11 3500 20 500000 10
+1984.878 1625.992
+35
+11.5s
+
+$ cat output_nt1_ncpu6_id4
+params 1 5000 100 1000000 4
+3936.506 131.472
+4
+0.4s
+
+$ cat output_nt1_ncpu6_id5
+params 1 5000 100 1000000 100
+3899.787 156.291
+163
+11.5s
+
+$ cat output_nt1_ncpu6_id6
+params 1 5000 20 1000000 10
+3918.912 143.364
+19
+20.7s
+
+$ cat output_nt1_ncpu6_id7
+params 1 1000 3 10000 10000
+287.788 261.446
+31
+112.4s
+
+$ cat output_nt1_ncpu6_id8
+params 3 5000 50 1000000 300
+3819.032 25.659
+469
+105.9s
+
+$ cat output_nt1_ncpu6_id9
+params 3 5000 50 1000000 500
+3738.436 58.743
+804
+176.4s
+
+$ cat output_nt1_ncpu6_id10
+params -1 1000 30 100000 1000
+575.878 370.663
+1203
+29.8s
+
+$ cat output_nt1_ncpu6_id11
+params 32 100 6 10000 100000
+29.530 30.082
+4451
+38.6s
+
+$ cat output_nt1_ncpu8_id0
+params 5893 0.05 3 10 10
+0.002 0.035
+2
+0.0s
+
+$ cat output_nt1_ncpu8_id1
+params 8555 0.05 3 10 10
+0.016 0.049
+1
+0.0s
+
+$ cat output_nt1_ncpu8_id2
+params 12 100 5 10000 10000
+76.732 61.943
+2209
+10.6s
+
+$ cat output_nt1_ncpu8_id3
+params -11 3500 20 500000 10
+1984.878 1625.992
+35
+7.8s
+
+$ cat output_nt1_ncpu8_id4
+params 1 5000 100 1000000 4
+3936.506 131.472
+4
+0.4s
+
+$ cat output_nt1_ncpu8_id5
+params 1 5000 100 1000000 100
+3899.787 156.291
+163
+7.7s
+
+$ cat output_nt1_ncpu8_id6
+params 1 5000 20 1000000 10
+3918.912 143.364
+19
+10.2s
+
+$ cat output_nt1_ncpu8_id7
+params 1 1000 3 10000 10000
+287.788 261.446
+31
+68.1s
+
+$ cat output_nt1_ncpu8_id8
+params 3 5000 50 1000000 300
+3819.032 25.659
+469
+57.2s
+
+$ cat output_nt1_ncpu8_id9
+params 3 5000 50 1000000 500
+3738.436 58.743
+804
+81.4s
+
+$ cat output_nt1_ncpu8_id10
+params -1 1000 30 100000 1000
+575.878 370.663
+1203
+13.2s
+
+$ cat output_nt1_ncpu8_id11
+params 32 100 6 10000 100000
+29.530 30.082
+4451
+18.5s
+
+$ cat output_nt2_ncpu1_id0
+params 5893 0.05 3 10 10
+0.002 0.035
+2
+0.0s
+
+$ cat output_nt2_ncpu1_id4
+params 1 5000 100 1000000 4
+3936.506 131.472
+4
+0.7s
+
+$ cat output_nt2_ncpu1_id5
+params 1 5000 100 1000000 100
+3899.787 156.291
+163
+15.6s
+
+$ cat output_nt2_ncpu1_id6
+params 1 5000 20 1000000 10
+3918.912 143.364
+19
+30.6s
+
+$ cat output_nt2_ncpu1_id8
+params 3 5000 50 1000000 300
+3819.032 25.659
+469
+99.8s
+
+$ cat output_nt2_ncpu1_id9
+params 3 5000 50 1000000 500
+3738.436 58.743
+804
+190.5s
+
+$ cat output_nt2_ncpu2_id0
+params 5893 0.05 3 10 10
+0.002 0.035
+2
+0.0s
+
+$ cat output_nt2_ncpu2_id3
+params -11 3500 20 500000 10
+1984.878 1625.992
+35
+8.0s
+
+$ cat output_nt2_ncpu4_id9
+params 3 5000 50 1000000 500
+3738.436 58.743
+804
+87.7s
+
+$ cat output_nt2_ncpu4_id11
+params 32 100 6 10000 100000
+29.530 30.082
+4448
+56.6s
+
+$ cat output_nt2_ncpu6_id0
+params 5893 0.05 3 10 10
+0.002 0.035
+2
+0.0s
+
+$ cat output_nt2_ncpu6_id1
+params 8555 0.05 3 10 10
+0.016 0.049
+1
+0.0s
+
+$ cat output_nt2_ncpu6_id2
+params 12 100 5 10000 10000
+76.732 61.943
+2209
+15.4s
+
+$ cat output_nt2_ncpu6_id3
+params -11 3500 20 500000 10
+1984.878 1625.992
+35
+6.5s
+
+$ cat output_nt2_ncpu6_id4
+params 1 5000 100 1000000 4
+3936.506 131.472
+4
+0.3s
+
+$ cat output_nt2_ncpu6_id5
+params 1 5000 100 1000000 100
+3899.787 156.291
+163
+5.7s
+
+$ cat output_nt2_ncpu6_id6
+params 1 5000 20 1000000 10
+3918.912 143.364
+19
+6.7s
+
+$ cat output_nt2_ncpu6_id7
+params 1 1000 3 10000 10000
+287.788 261.446
+31
+80.0s
+
+$ cat output_nt2_ncpu6_id8
+params 3 5000 50 1000000 300
+3819.032 25.659
+469
+26.5s
+
+$ cat output_nt2_ncpu6_id9
+params 3 5000 50 1000000 500
+3738.436 58.743
+804
+88.3s
+
+$ cat output_nt2_ncpu6_id10
+params -1 1000 30 100000 1000
+575.878 370.663
+1203
+8.6s
+
+$ cat output_nt2_ncpu6_id11
+params 32 100 6 10000 100000
+29.530 30.082
+4448
+46.9s
+
+$ cat output_nt2_ncpu8_id0
+params 5893 0.05 3 10 10
+0.002 0.035
+2
+0.0s
+
+$ cat output_nt2_ncpu8_id1
+params 8555 0.05 3 10 10
+0.016 0.049
+1
+0.0s
+
+$ cat output_nt2_ncpu8_id2
+params 12 100 5 10000 10000
+76.732 61.943
+2209
+12.4s
+
+$ cat output_nt2_ncpu8_id3
+params -11 3500 20 500000 10
+1984.878 1625.992
+35
+8.1s
+
+$ cat output_nt2_ncpu8_id4
+params 1 5000 100 1000000 4
+3936.506 131.472
+4
+0.2s
+
+$ cat output_nt2_ncpu8_id5
+params 1 5000 100 1000000 100
+3899.787 156.291
+163
+4.5s
+
+$ cat output_nt2_ncpu8_id6
+params 1 5000 20 1000000 10
+3918.912 143.364
+19
+5.2s
+
+$ cat output_nt2_ncpu8_id7
+params 1 1000 3 10000 10000
+287.788 261.446
+31
+43.9s
+
+$ cat output_nt2_ncpu8_id8
+params 3 5000 50 1000000 300
+3819.032 25.659
+469
+30.0s
+
+$ cat output_nt2_ncpu8_id9
+params 3 5000 50 1000000 500
+3738.436 58.743
+804
+67.3s
+
+$ cat output_nt2_ncpu8_id10
+params -1 1000 30 100000 1000
+575.878 370.663
+1203
+9.0s
+
+$ cat output_nt2_ncpu8_id11
+params 32 100 6 10000 100000
+29.530 30.082
+4448
+47.2s
+
+$ cat output_nt4_ncpu1_id5
+params 1 5000 100 1000000 100
+3899.787 156.291
+163
+7.0s
+
+$ cat output_nt4_ncpu1_id6
+params 1 5000 20 1000000 10
+slurmstepd: error: *** JOB 45179 ON lab1p4 CANCELLED AT 2025-03-31T19:58:48 DUE TO JOB REQUEUE ***
+srun: error: Unable to confirm allocation for job 45179: Job is pending execution
+srun: Check SLURM_JOB_ID environment variable. Expired or invalid job 45179
+7.0s
+
+$ cat output_nt4_ncpu1_id8
+params 3 5000 50 1000000 300
+3819.032 25.659
+469
+62.1s
+
+$ cat output_nt4_ncpu1_id9
+params 3 5000 50 1000000 500
+3738.436 58.743
+804
+128.2s
+
+$ cat output_nt4_ncpu1_id11
+params 32 100 6 10000 100000
+29.530 30.082
+4448
+58.8s
+
+$ cat output_nt4_ncpu2_id3
+params -11 3500 20 500000 10
+slurmstepd: error: *** JOB 45194 ON lab1p4 CANCELLED AT 2025-03-31T20:01:09 DUE TO JOB REQUEUE ***
+58.8s
+
+$ cat output_nt4_ncpu2_id4
+params 1 5000 100 1000000 4
+3936.506 131.472
+4
+0.2s
+
+$ cat output_nt4_ncpu2_id5
+params 1 5000 100 1000000 100
+slurmstepd: error: *** JOB 45187 ON lab1p4 CANCELLED AT 2025-03-31T20:00:48 DUE TO JOB REQUEUE ***
+0.2s
+
+$ cat output_nt4_ncpu2_id6
+params 1 5000 20 1000000 10
+3918.912 143.364
+19
+6.1s
+
+$ cat output_nt4_ncpu2_id8
+params 3 5000 50 1000000 300
+3819.032 25.659
+469
+32.8s
+
+$ cat output_nt4_ncpu2_id9
+params 3 5000 50 1000000 500
+slurmstepd: error: *** JOB 45190 ON lab1p4 CANCELLED AT 2025-03-31T20:01:08 DUE TO JOB REQUEUE ***
+srun: error: Unable to confirm allocation for job 45190: Job is pending execution
+srun: Check SLURM_JOB_ID environment variable. Expired or invalid job 45190
+32.8s
+
+$ cat output_nt4_ncpu2_id10
+params -1 1000 30 100000 1000
+575.878 370.663
+1203
+9.7s
+
+$ cat output_nt4_ncpu2_id11
+params 32 100 6 10000 100000
+29.530 30.082
+4448
+45.2s
+
+$ cat output_nt4_ncpu4_id6
+params 1 5000 20 1000000 10
+slurmstepd: error: *** JOB 45197 ON lab1p4 CANCELLED AT 2025-03-31T20:01:12 DUE TO JOB REQUEUE ***
+45.2s
+
+$ cat output_nt4_ncpu4_id9
+params 3 5000 50 1000000 500
+slurmstepd: error: *** JOB 45199 ON lab1p4 CANCELLED AT 2025-03-31T20:01:15 DUE TO JOB REQUEUE ***
+45.2s
+
+$ cat output_nt4_ncpu6_id2
+params 12 100 5 10000 10000
+76.732 61.943
+2209
+9.4s
+
+$ cat output_nt4_ncpu6_id3
+params -11 3500 20 500000 10
+1984.878 1625.992
+35
+3.2s
+
+$ cat output_nt4_ncpu6_id4
+params 1 5000 100 1000000 4
+3936.506 131.472
+4
+0.1s
+
+$ cat output_nt4_ncpu6_id5
+params 1 5000 100 1000000 100
+3899.787 156.291
+163
+2.4s
+
+$ cat output_nt4_ncpu6_id6
+params 1 5000 20 1000000 10
+3918.912 143.364
+19
+3.5s
+
+$ cat output_nt4_ncpu6_id8
+params 3 5000 50 1000000 300
+3819.032 25.659
+469
+26.7s
+
+$ cat output_nt4_ncpu6_id9
+params 3 5000 50 1000000 500
+3738.436 58.743
+804
+44.4s
+
+$ cat output_nt4_ncpu6_id10
+params -1 1000 30 100000 1000
+575.878 370.663
+1203
+8.7s
+
+$ cat output_nt4_ncpu6_id11
+params 32 100 6 10000 100000
+29.530 30.082
+4448
+53.1s
+
+$ cat output_nt4_ncpu8_id2
+params 12 100 5 10000 10000
+76.732 61.943
+2209
+8.6s
+
+$ cat output_nt4_ncpu8_id3
+params -11 3500 20 500000 10
+1984.878 1625.992
+35
+3.5s
+
+$ cat output_nt4_ncpu8_id4
+params 1 5000 100 1000000 4
+3936.506 131.472
+4
+0.1s
+
+$ cat output_nt4_ncpu8_id5
+params 1 5000 100 1000000 100
+3899.787 156.291
+163
+2.0s
+
+$ cat output_nt4_ncpu8_id6
+params 1 5000 20 1000000 10
+3918.912 143.364
+19
+3.0s
+
+$ cat output_nt4_ncpu8_id8
+params 3 5000 50 1000000 300
+3819.032 25.659
+469
+12.0s
+
+$ cat output_nt4_ncpu8_id9
+params 3 5000 50 1000000 500
+3738.436 58.743
+804
+24.5s
+
+$ cat output_nt4_ncpu8_id10
+params -1 1000 30 100000 1000
+575.878 370.663
+1203
+5.6s
+
+$ cat output_nt4_ncpu8_id11
+params 32 100 6 10000 100000
+29.530 30.082
+4448
+54.6s
+
+$ cat output_nt8_ncpu1_id4
+params 1 5000 100 1000000 4
+slurmstepd: error: *** JOB 45222 ON lab1p4 CANCELLED AT 2025-03-31T20:01:39 DUE TO JOB REQUEUE ***
+54.6s
+
+$ cat output_nt8_ncpu1_id5
+params 1 5000 100 1000000 100
+3899.787 156.291
+163
+3.6s
+
+$ cat output_nt8_ncpu1_id9
+params 3 5000 50 1000000 500
+3738.436 58.743
+804
+50.1s
+
+$ cat output_nt8_ncpu2_id6
+params 1 5000 20 1000000 10
+3918.912 143.364
+19
+4.8s
+
+$ cat output_nt8_ncpu2_id9
+params 3 5000 50 1000000 500
+3738.436 58.743
+804
+43.3s
+
+$ cat output_nt8_ncpu4_id6
+params 1 5000 20 1000000 10
+3918.912 143.364
+19
+4.0s
+
+$ cat output_nt8_ncpu6_id3
+params -11 3500 20 500000 10
+1984.878 1625.992
+35
+3.2s
+
+$ cat output_nt8_ncpu6_id4
+params 1 5000 100 1000000 4
+3936.506 131.472
+4
+0.1s
+
+$ cat output_nt8_ncpu6_id5
+params 1 5000 100 1000000 100
+3899.787 156.291
+163
+1.5s
+
+$ cat output_nt8_ncpu6_id6
+params 1 5000 20 1000000 10
+3918.912 143.364
+19
+2.8s
+
+$ cat output_nt8_ncpu6_id8
+params 3 5000 50 1000000 300
+3819.032 25.659
+469
+13.9s
+
+$ cat output_nt8_ncpu6_id9
+params 3 5000 50 1000000 500
+3738.436 58.743
+804
+23.1s
+
+$ cat output_nt8_ncpu6_id10
+params -1 1000 30 100000 1000
+575.878 370.663
+1203
+8.7s
+
+$ cat output_nt8_ncpu8_id3
+params -11 3500 20 500000 10
+1984.878 1625.992
+35
+5.1s
+
+$ cat output_nt8_ncpu8_id4
+params 1 5000 100 1000000 4
+3936.506 131.472
+4
+0.1s
+
+$ cat output_nt8_ncpu8_id5
+params 1 5000 100 1000000 100
+3899.787 156.291
+163
+1.1s
+
+$ cat output_nt8_ncpu8_id6
+params 1 5000 20 1000000 10
+3918.912 143.364
+19
+1.5s
+
+$ cat output_nt8_ncpu8_id8
+params 3 5000 50 1000000 300
+3819.032 25.659
+469
+10.6s
+
+$ cat output_nt8_ncpu8_id9
+params 3 5000 50 1000000 500
+3738.436 58.743
+804
+17.9s
+
+$ cat output_nt8_ncpu8_id10
+params -1 1000 30 100000 1000
+575.878 370.663
+1203
+5.3s
+
+$ cat output_nt16_ncpu1_id3
+params -11 3500 20 500000 10
+1984.878 1625.992
+35
+8.1s
+
+$ cat output_nt16_ncpu1_id4
+params 1 5000 100 1000000 4
+3936.506 131.472
+4
+0.1s
+
+$ cat output_nt16_ncpu1_id5
+params 1 5000 100 1000000 100
+3899.787 156.291
+163
+1.8s
+
+$ cat output_nt16_ncpu1_id6
+params 1 5000 20 1000000 10
+slurmstepd: error: *** JOB 45004 ON lab1p1 CANCELLED AT 2025-03-31T19:53:24 DUE TO JOB REQUEUE ***
+1.8s
+
+$ cat output_nt16_ncpu1_id8
+params 3 5000 50 1000000 300
+slurmstepd: error: execve(): parsim-mpi: No such file or directory
+srun: error: lab5p15: task 12: Exited with exit code 2
+parsim-mpi: error while loading shared libraries: libmpi.so.40: cannot open shared object file: No such file or directory
+srun: error: lab5p14: task 11: Exited with exit code 127
+slurmstepd: error: slurm_receive_msgs: [[lab5p14.rnl.tecnico.ulisboa.pt]:41498] failed: Zero Bytes were transmitted or received
+slurmstepd: error: slurm_receive_msgs: [[lab5p14.rnl.tecnico.ulisboa.pt]:41498] failed: Zero Bytes were transmitted or received
+slurmstepd: error: slurm_receive_msgs: [[lab5p14.rnl.tecnico.ulisboa.pt]:41498] failed: Zero Bytes were transmitted or received
+slurmstepd: error: slurm_receive_msgs: [[lab5p14.rnl.tecnico.ulisboa.pt]:41498] failed: Zero Bytes were transmitted or received
+slurmstepd: error: slurm_receive_msgs: [[lab5p14.rnl.tecnico.ulisboa.pt]:41498] failed: Zero Bytes were transmitted or received
+slurmstepd: error: slurm_receive_msgs: [[lab5p14.rnl.tecnico.ulisboa.pt]:41498] failed: Zero Bytes were transmitted or received
+slurmstepd: error: slurm_receive_msgs: [[lab5p14.rnl.tecnico.ulisboa.pt]:41498] failed: Zero Bytes were transmitted or received
+slurmstepd: error:  mpi/pmix_v5: pmixp_p2p_send: lab5p13 [10]: pmixp_utils.c:469: send failed, rc=1001, exceeded the retry limit
+slurmstepd: error:  mpi/pmix_v5: _slurm_send: lab5p13 [10]: pmixp_server.c:1581: Cannot send message to /var/spool/slurmd/stepd.slurm.pmix.45005.0, size = 174, hostlist:
+(null)
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab2p1 [0]: pmixp_coll_ring.c:737: 0x7f84b8037f50: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab2p1 [0]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p1 [0]: pmixp_coll_ring.c:755: 0x7f84b8037f50: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p1 [0]: pmixp_coll_ring.c:758: my peerid: 0:lab2p1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p1 [0]: pmixp_coll_ring.c:765: neighbor id: next 1:lab2p2, prev 15:lab6p9
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p1 [0]: pmixp_coll_ring.c:774: Context ptr=0x7f84b8037fc8, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p1 [0]: pmixp_coll_ring.c:774: Context ptr=0x7f84b8038000, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p1 [0]: pmixp_coll_ring.c:774: Context ptr=0x7f84b8038038, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p1 [0]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=3/fwd=4
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p1 [0]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p1 [0]: pmixp_coll_ring.c:820: 		 done contrib: lab6p[7-9]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p1 [0]: pmixp_coll_ring.c:822: 		 wait contrib: lab2p2,lab4p[5-9],lab5p[7-8,10,13-15]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p1 [0]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p1 [0]: pmixp_coll_ring.c:827: 	 buf (offset/size): 391/391
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab2p2 [1]: pmixp_coll_ring.c:737: 0x7f538802da10: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab2p2 [1]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p2 [1]: pmixp_coll_ring.c:755: 0x7f538802da10: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p2 [1]: pmixp_coll_ring.c:758: my peerid: 1:lab2p2
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p2 [1]: pmixp_coll_ring.c:765: neighbor id: next 2:lab4p5, prev 0:lab2p1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p2 [1]: pmixp_coll_ring.c:774: Context ptr=0x7f538802da88, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p2 [1]: pmixp_coll_ring.c:774: Context ptr=0x7f538802dac0, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p2 [1]: pmixp_coll_ring.c:774: Context ptr=0x7f538802daf8, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p2 [1]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=4/fwd=5
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p2 [1]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p2 [1]: pmixp_coll_ring.c:820: 		 done contrib: lab2p1,lab6p[7-9]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p2 [1]: pmixp_coll_ring.c:822: 		 wait contrib: lab4p[5-9],lab5p[7-8,10,13-15]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p2 [1]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab2p2 [1]: pmixp_coll_ring.c:827: 	 buf (offset/size): 467/467
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab4p7 [4]: pmixp_coll_ring.c:737: 0x7fd1000028c0: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab4p7 [4]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:755: 0x7fd1000028c0: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:758: my peerid: 4:lab4p7
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:765: neighbor id: next 5:lab4p8, prev 3:lab4p6
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:774: Context ptr=0x7fd100002938, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:774: Context ptr=0x7fd100002970, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:774: Context ptr=0x7fd1000029a8, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=7/fwd=8
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:820: 		 done contrib: lab2p[1-2],lab4p[5-6],lab6p[7-9]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:822: 		 wait contrib: lab4p[8-9],lab5p[7-8,10,13-15]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:827: 	 buf (offset/size): 695/695
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab4p9 [6]: pmixp_coll_ring.c:737: 0x7f4efc0028c0: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab4p9 [6]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:755: 0x7f4efc0028c0: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:758: my peerid: 6:lab4p9
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:765: neighbor id: next 7:lab5p7, prev 5:lab4p8
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:774: Context ptr=0x7f4efc002938, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:774: Context ptr=0x7f4efc002970, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:774: Context ptr=0x7f4efc0029a8, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=9/fwd=10
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:820: 		 done contrib: lab2p[1-2],lab4p[5-8],lab6p[7-9]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:822: 		 wait contrib: lab5p[7-8,10,13-15]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:827: 	 buf (offset/size): 847/847
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab4p5 [2]: pmixp_coll_ring.c:737: 0x7f1210002850: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab4p5 [2]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:755: 0x7f1210002850: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:758: my peerid: 2:lab4p5
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:765: neighbor id: next 3:lab4p6, prev 1:lab2p2
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:774: Context ptr=0x7f12100028c8, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:774: Context ptr=0x7f1210002900, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:774: Context ptr=0x7f1210002938, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=5/fwd=6
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:820: 		 done contrib: lab2p[1-2],lab6p[7-9]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:822: 		 wait contrib: lab4p[6-9],lab5p[7-8,10,13-15]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:827: 	 buf (offset/size): 543/543
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab4p6 [3]: pmixp_coll_ring.c:737: 0x7f4c080028c0: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab4p6 [3]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:755: 0x7f4c080028c0: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:758: my peerid: 3:lab4p6
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:765: neighbor id: next 4:lab4p7, prev 2:lab4p5
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:774: Context ptr=0x7f4c08002938, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:774: Context ptr=0x7f4c08002970, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:774: Context ptr=0x7f4c080029a8, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=6/fwd=7
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:820: 		 done contrib: lab2p[1-2],lab4p5,lab6p[7-9]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab5p7 [7]: pmixp_coll_ring.c:737: 0x7fe6b003bcd0: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab5p7 [7]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:755: 0x7fe6b003bcd0: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:822: 		 wait contrib: lab4p[7-9],lab5p[7-8,10,13-15]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:758: my peerid: 7:lab5p7
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:765: neighbor id: next 8:lab5p8, prev 6:lab4p9
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:827: 	 buf (offset/size): 619/619
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:774: Context ptr=0x7fe6b003bd48, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:774: Context ptr=0x7fe6b003bd80, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:774: Context ptr=0x7fe6b003bdb8, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=10/fwd=11
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:820: 		 done contrib: lab2p[1-2],lab4p[5-9],lab6p[7-9]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:822: 		 wait contrib: lab5p[8,10,13-15]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:827: 	 buf (offset/size): 923/923
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab5p10 [9]: pmixp_coll_ring.c:737: 0x7f9d60045140: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab5p10 [9]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:755: 0x7f9d60045140: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:758: my peerid: 9:lab5p10
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:765: neighbor id: next 10:lab5p13, prev 8:lab5p8
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:774: Context ptr=0x7f9d600451b8, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:774: Context ptr=0x7f9d600451f0, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:774: Context ptr=0x7f9d60045228, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=12/fwd=13
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:820: 		 done contrib: lab2p[1-2],lab4p[5-9],lab5p[7-8],lab6p[7-9]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:822: 		 wait contrib: lab5p[13-15]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:827: 	 buf (offset/size): 1075/1075
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab5p8 [8]: pmixp_coll_ring.c:737: 0x7fc4b803be00: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab5p8 [8]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:755: 0x7fc4b803be00: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:758: my peerid: 8:lab5p8
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:765: neighbor id: next 9:lab5p10, prev 7:lab5p7
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:774: Context ptr=0x7fc4b803be78, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:774: Context ptr=0x7fc4b803beb0, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:774: Context ptr=0x7fc4b803bee8, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=11/fwd=12
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:820: 		 done contrib: lab2p[1-2],lab4p[5-9],lab5p7,lab6p[7-9]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:822: 		 wait contrib: lab5p[10,13-15]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:827: 	 buf (offset/size): 999/999
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab4p8 [5]: pmixp_coll_ring.c:737: 0x7f8bb40028c0: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab4p8 [5]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:755: 0x7f8bb40028c0: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:758: my peerid: 5:lab4p8
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:765: neighbor id: next 6:lab4p9, prev 4:lab4p7
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:774: Context ptr=0x7f8bb4002938, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:774: Context ptr=0x7f8bb4002970, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:774: Context ptr=0x7f8bb40029a8, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=8/fwd=9
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:820: 		 done contrib: lab2p[1-2],lab4p[5-7],lab6p[7-9]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:822: 		 wait contrib: lab4p9,lab5p[7-8,10,13-15]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:827: 	 buf (offset/size): 771/771
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab6p7 [13]: pmixp_coll_ring.c:737: 0x7f3bac047bc0: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab6p7 [13]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:755: 0x7f3bac047bc0: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:758: my peerid: 13:lab6p7
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:765: neighbor id: next 14:lab6p8, prev 12:lab5p15
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:774: Context ptr=0x7f3bac047c38, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:774: Context ptr=0x7f3bac047c70, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:774: Context ptr=0x7f3bac047ca8, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=0/fwd=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:820: 		 done contrib: -
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:822: 		 wait contrib: lab2p[1-2],lab4p[5-9],lab5p[7-8,10,13-15],lab6p[8-9]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:827: 	 buf (offset/size): 76/76
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab6p8 [14]: pmixp_coll_ring.c:737: 0x7f69140028c0: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab6p8 [14]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:755: 0x7f69140028c0: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:758: my peerid: 14:lab6p8
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:765: neighbor id: next 15:lab6p9, prev 13:lab6p7
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:774: Context ptr=0x7f6914002938, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:774: Context ptr=0x7f6914002970, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:774: Context ptr=0x7f69140029a8, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=1/fwd=2
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:820: 		 done contrib: lab6p7
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:822: 		 wait contrib: lab2p[1-2],lab4p[5-9],lab5p[7-8,10,13-15],lab6p9
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:827: 	 buf (offset/size): 152/152
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab6p9 [15]: pmixp_coll_ring.c:737: 0x7f670402d6b0: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab6p9 [15]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:755: 0x7f670402d6b0: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:758: my peerid: 15:lab6p9
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:765: neighbor id: next 0:lab2p1, prev 14:lab6p8
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:774: Context ptr=0x7f670402d728, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:774: Context ptr=0x7f670402d760, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:774: Context ptr=0x7f670402d798, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=2/fwd=3
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:820: 		 done contrib: lab6p[7-8]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:822: 		 wait contrib: lab2p[1-2],lab4p[5-9],lab5p[7-8,10,13-15]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:827: 	 buf (offset/size): 294/294
+slurmstepd: error: slurm_receive_msgs: [[lab5p14.rnl.tecnico.ulisboa.pt]:41498] failed: Zero Bytes were transmitted or received
+slurmstepd: error: slurm_receive_msgs: [[lab5p14.rnl.tecnico.ulisboa.pt]:41498] failed: Zero Bytes were transmitted or received
+slurmstepd: error: slurm_receive_msgs: [[lab5p14.rnl.tecnico.ulisboa.pt]:41498] failed: Zero Bytes were transmitted or received
+slurmstepd: error: slurm_receive_msgs: [[lab5p14.rnl.tecnico.ulisboa.pt]:41498] failed: Zero Bytes were transmitted or received
+slurmstepd: error: slurm_receive_msgs: [[lab5p14.rnl.tecnico.ulisboa.pt]:41498] failed: Zero Bytes were transmitted or received
+slurmstepd: error: slurm_receive_msgs: [[lab5p14.rnl.tecnico.ulisboa.pt]:41498] failed: Zero Bytes were transmitted or received
+slurmstepd: error: slurm_receive_msgs: [[lab5p14.rnl.tecnico.ulisboa.pt]:41498] failed: Zero Bytes were transmitted or received
+slurmstepd: error:  mpi/pmix_v5: pmixp_p2p_send: lab6p9 [15]: pmixp_utils.c:469: send failed, rc=1001, exceeded the retry limit
+slurmstepd: error:  mpi/pmix_v5: _slurm_send: lab6p9 [15]: pmixp_server.c:1581: Cannot send message to /var/spool/slurmd/stepd.slurm.pmix.45005.0, size = 82, hostlist:
+(null)
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab5p13 [10]: pmixp_coll_ring.c:737: 0x7f406002ab10: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab5p13 [10]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p13 [10]: pmixp_coll_ring.c:755: 0x7f406002ab10: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p13 [10]: pmixp_coll_ring.c:758: my peerid: 10:lab5p13
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p13 [10]: pmixp_coll_ring.c:765: neighbor id: next 11:lab5p14, prev 9:lab5p10
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p13 [10]: pmixp_coll_ring.c:774: Context ptr=0x7f406002ab88, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p13 [10]: pmixp_coll_ring.c:774: Context ptr=0x7f406002abc0, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p13 [10]: pmixp_coll_ring.c:774: Context ptr=0x7f406002abf8, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p13 [10]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=13/fwd=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p13 [10]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p13 [10]: pmixp_coll_ring.c:820: 		 done contrib: lab2p[1-2],lab4p[5-9],lab5p[7-8,10],lab6p[7-9]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p13 [10]: pmixp_coll_ring.c:822: 		 wait contrib: lab5p[14-15]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p13 [10]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p13 [10]: pmixp_coll_ring.c:827: 	 buf (offset/size): 1151/1151
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab4p7 [4]: pmixp_coll_ring.c:737: 0x7fd1000028c0: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab4p7 [4]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:755: 0x7fd1000028c0: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:758: my peerid: 4:lab4p7
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:765: neighbor id: next 5:lab4p8, prev 3:lab4p6
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:774: Context ptr=0x7fd100002938, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:774: Context ptr=0x7fd100002970, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:774: Context ptr=0x7fd1000029a8, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=4/fwd=5
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:820: 		 done contrib: lab4p[5-6],lab6p[7-8]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:822: 		 wait contrib: lab2p[1-2],lab4p[8-9],lab5p[7-8,10,13-15],lab6p9
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p7 [4]: pmixp_coll_ring.c:827: 	 buf (offset/size): 380/380
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab4p9 [6]: pmixp_coll_ring.c:737: 0x7f4efc0028c0: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab4p9 [6]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:755: 0x7f4efc0028c0: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:758: my peerid: 6:lab4p9
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:765: neighbor id: next 7:lab5p7, prev 5:lab4p8
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:774: Context ptr=0x7f4efc002938, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:774: Context ptr=0x7f4efc002970, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:774: Context ptr=0x7f4efc0029a8, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=3/fwd=4
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab4p5 [2]: pmixp_coll_ring.c:737: 0x7f1210002850: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:820: 		 done contrib: lab4p8,lab6p[7-8]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:822: 		 wait contrib: lab2p[1-2],lab4p[5-7],lab5p[7-8,10,13-15],lab6p9
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab4p5 [2]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p9 [6]: pmixp_coll_ring.c:827: 	 buf (offset/size): 304/304
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:755: 0x7f1210002850: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:758: my peerid: 2:lab4p5
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:765: neighbor id: next 3:lab4p6, prev 1:lab2p2
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:774: Context ptr=0x7f12100028c8, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:774: Context ptr=0x7f1210002900, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:774: Context ptr=0x7f1210002938, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=2/fwd=3
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:820: 		 done contrib: lab6p[7-8]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:822: 		 wait contrib: lab2p[1-2],lab4p[6-9],lab5p[7-8,10,13-15],lab6p9
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p5 [2]: pmixp_coll_ring.c:827: 	 buf (offset/size): 228/228
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab4p6 [3]: pmixp_coll_ring.c:737: 0x7f4c080028c0: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab4p6 [3]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:755: 0x7f4c080028c0: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:758: my peerid: 3:lab4p6
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:765: neighbor id: next 4:lab4p7, prev 2:lab4p5
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:774: Context ptr=0x7f4c08002938, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:774: Context ptr=0x7f4c08002970, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:774: Context ptr=0x7f4c080029a8, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=3/fwd=4
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:820: 		 done contrib: lab4p5,lab6p[7-8]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:822: 		 wait contrib: lab2p[1-2],lab4p[7-9],lab5p[7-8,10,13-15],lab6p9
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p6 [3]: pmixp_coll_ring.c:827: 	 buf (offset/size): 304/304
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab5p7 [7]: pmixp_coll_ring.c:737: 0x7fe6b003bcd0: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab5p7 [7]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:755: 0x7fe6b003bcd0: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:758: my peerid: 7:lab5p7
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:765: neighbor id: next 8:lab5p8, prev 6:lab4p9
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:774: Context ptr=0x7fe6b003bd48, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:774: Context ptr=0x7fe6b003bd80, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:774: Context ptr=0x7fe6b003bdb8, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=4/fwd=5
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:820: 		 done contrib: lab4p[8-9],lab6p[7-8]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:822: 		 wait contrib: lab2p[1-2],lab4p[5-7],lab5p[8,10,13-15],lab6p9
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p7 [7]: pmixp_coll_ring.c:827: 	 buf (offset/size): 380/380
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab5p10 [9]: pmixp_coll_ring.c:737: 0x7f9d60045140: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab5p10 [9]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:755: 0x7f9d60045140: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:758: my peerid: 9:lab5p10
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:765: neighbor id: next 10:lab5p13, prev 8:lab5p8
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:774: Context ptr=0x7f9d600451b8, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:774: Context ptr=0x7f9d600451f0, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:774: Context ptr=0x7f9d60045228, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=6/fwd=7
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:820: 		 done contrib: lab4p[8-9],lab5p[7-8],lab6p[7-8]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:822: 		 wait contrib: lab2p[1-2],lab4p[5-7],lab5p[13-15],lab6p9
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p10 [9]: pmixp_coll_ring.c:827: 	 buf (offset/size): 532/532
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab5p8 [8]: pmixp_coll_ring.c:737: 0x7fc4b803be00: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab5p8 [8]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:755: 0x7fc4b803be00: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:758: my peerid: 8:lab5p8
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:765: neighbor id: next 9:lab5p10, prev 7:lab5p7
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:774: Context ptr=0x7fc4b803be78, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:774: Context ptr=0x7fc4b803beb0, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:774: Context ptr=0x7fc4b803bee8, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=5/fwd=6
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:820: 		 done contrib: lab4p[8-9],lab5p7,lab6p[7-8]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:822: 		 wait contrib: lab2p[1-2],lab4p[5-7],lab5p[10,13-15],lab6p9
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab5p8 [8]: pmixp_coll_ring.c:827: 	 buf (offset/size): 456/456
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab4p8 [5]: pmixp_coll_ring.c:737: 0x7f8bb40028c0: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab4p8 [5]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:755: 0x7f8bb40028c0: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:758: my peerid: 5:lab4p8
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:765: neighbor id: next 6:lab4p9, prev 4:lab4p7
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:774: Context ptr=0x7f8bb4002938, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:774: Context ptr=0x7f8bb4002970, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:774: Context ptr=0x7f8bb40029a8, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=2/fwd=3
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:820: 		 done contrib: lab6p[7-8]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:822: 		 wait contrib: lab2p[1-2],lab4p[5-7,9],lab5p[7-8,10,13-15],lab6p9
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab4p8 [5]: pmixp_coll_ring.c:827: 	 buf (offset/size): 228/228
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab6p7 [13]: pmixp_coll_ring.c:737: 0x7f3bac047bc0: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab6p7 [13]: pmixp_coll.c:286: Dumping collective state
+[lab2p1:1596592:0:1596592] Caught signal 11 (Segmentation fault: address not mapped to object at address 0xe0)
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:755: 0x7f3bac047bc0: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:758: my peerid: 13:lab6p7
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:765: neighbor id: next 14:lab6p8, prev 12:lab5p15
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:774: Context ptr=0x7f3bac047c38, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:774: Context ptr=0x7f3bac047c70, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:774: Context ptr=0x7f3bac047ca8, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=0/fwd=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:820: 		 done contrib: -
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:822: 		 wait contrib: lab2p[1-2],lab4p[5-9],lab5p[7-8,10,13-15],lab6p[8-9]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p7 [13]: pmixp_coll_ring.c:827: 	 buf (offset/size): 76/76
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab6p8 [14]: pmixp_coll_ring.c:737: 0x7f69140028c0: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab6p8 [14]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:755: 0x7f69140028c0: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:758: my peerid: 14:lab6p8
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:765: neighbor id: next 15:lab6p9, prev 13:lab6p7
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:774: Context ptr=0x7f6914002938, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:774: Context ptr=0x7f6914002970, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:774: Context ptr=0x7f69140029a8, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=1/prev=1/fwd=2
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:820: 		 done contrib: lab6p7
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:822: 		 wait contrib: lab2p[1-2],lab4p[5-9],lab5p[7-8,10,13-15],lab6p9
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p8 [14]: pmixp_coll_ring.c:827: 	 buf (offset/size): 152/152
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_reset_if_to: lab6p9 [15]: pmixp_coll_ring.c:737: 0x7f670402d6b0: collective timeout seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_log: lab6p9 [15]: pmixp_coll.c:286: Dumping collective state
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:755: 0x7f670402d6b0: COLL_FENCE_RING state seq=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:758: my peerid: 15:lab6p9
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:765: neighbor id: next 0:lab2p1, prev 14:lab6p8
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:774: Context ptr=0x7f670402d728, #0, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:774: Context ptr=0x7f670402d760, #1, in-use=0
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:774: Context ptr=0x7f670402d798, #2, in-use=1
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:783: 	 seq=0 contribs: loc=0/prev=2/fwd=2
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:787: 	 neighbor contribs [16]:
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:820: 		 done contrib: lab6p[7-8]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:822: 		 wait contrib: lab2p[1-2],lab4p[5-9],lab5p[7-8,10,13-15]
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:824: 	 status=PMIXP_COLL_RING_PROGRESS
+slurmstepd: error:  mpi/pmix_v5: pmixp_coll_ring_log: lab6p9 [15]: pmixp_coll_ring.c:827: 	 buf (offset/size): 152/152
+[lab6p9][[26960,0],15][btl_tcp_proc.c:400:mca_btl_tcp_proc_create] opal_modex_recv: failed with return value=-46
+slurmstepd: error: slurm_receive_msgs: [[lab5p15.rnl.tecnico.ulisboa.pt]:41498] failed: Zero Bytes were transmitted or received
+==== backtrace (tid:1596592) ====
+0 0x0000000000040620 __GI___sigaction()  ???:0
+1 0x000000000027ada8 mca_pml_ob1_recv_frag_callback_match()  ???:0
+2 0x00000000000de728 mca_btl_tcp_endpoint_recv_handler()  ???:0
+3 0x000000000001ea44 event_process_active_single_queue()  ???:0
+4 0x000000000001f0ef event_base_loop()  ???:0
+5 0x00000000000299a3 opal_progress_events.isra.0()  ???:0
+6 0x0000000000029a64 opal_progress()  ???:0
+7 0x000000000009a825 ompi_mpi_init()  ???:0
+8 0x00000000000cb510 MPI_Init_thread()  ???:0
+9 0x00000000004023ba main()  ???:0
+10 0x000000000002a27e __libc_start_call_main()  ???:0
+11 0x000000000002a339 __libc_start_main_alias_2()  ???:0
+12 0x0000000000402535 _start()  ???:0
+=================================
+slurmstepd: error: slurm_receive_msgs: [[lab5p15.rnl.tecnico.ulisboa.pt]:41498] failed: Zero Bytes were transmitted or received
+srun: error: lab2p1: task 0: Segmentation fault (core dumped)
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+srun: error: lab4p5: task 2: Exited with exit code 14
+srun: error: lab2p2: task 1: Killed
+srun: error: lab6p8: task 14: Killed
+srun: error: lab5p10: task 9: Killed
+srun: error: lab4p7: task 4: Killed
+srun: error: lab4p9: task 6: Killed
+srun: error: lab5p7: task 7: Killed
+srun: error: lab4p6: task 3: Killed
+srun: error: lab4p8: task 5: Killed
+srun: error: lab5p13: task 10: Killed
+srun: error: lab5p8: task 8: Killed
+srun: error: lab6p9: task 15: Killed
+srun: error: lab6p7: task 13: Killed
+1.8s
+
+$ cat output_nt16_ncpu1_id9
+params 3 5000 50 1000000 500
+3738.436 58.743
+804
+34.8s
+
+$ cat output_nt16_ncpu1_id10
+params -1 1000 30 100000 1000
+575.878 370.663
+1203
+13.5s
+
+$ cat output_nt16_ncpu2_id3
+params -11 3500 20 500000 10
+1984.878 1625.992
+35
+12.9s
+
+$ cat output_nt16_ncpu2_id4
+params 1 5000 100 1000000 4
+3936.506 131.472
+4
+0.1s
+
+$ cat output_nt16_ncpu2_id5
+params 1 5000 100 1000000 100
+slurmstepd: error: *** JOB 45010 ON lab1p3 CANCELLED AT 2025-03-31T19:53:58 DUE TO JOB REQUEUE ***
+0.1s
+
+$ cat output_nt16_ncpu2_id6
+params 1 5000 20 1000000 10
+3918.912 143.364
+19
+3.9s
+
+$ cat output_nt16_ncpu2_id9
+params 3 5000 50 1000000 500
+3738.436 58.743
+804
+32.1s
+
+$ cat output_nt16_ncpu2_id10
+params -1 1000 30 100000 1000
+575.878 370.663
+1203
+20.6s
+
+$ cat output_nt16_ncpu4_id3
+params -11 3500 20 500000 10
+1984.878 1625.992
+35
+4.7s
+
+$ cat output_nt16_ncpu4_id4
+params 1 5000 100 1000000 4
+3936.506 131.472
+4
+0.1s
+
+$ cat output_nt16_ncpu4_id5
+params 1 5000 100 1000000 100
+3899.787 156.291
+163
+1.0s
+
+$ cat output_nt16_ncpu4_id6
+params 1 5000 20 1000000 10
+3918.912 143.364
+19
+2.0s
+
+$ cat output_nt16_ncpu4_id8
+params 3 5000 50 1000000 300
+3819.032 25.659
+469
+9.9s
+
+$ cat output_nt16_ncpu4_id9
+params 3 5000 50 1000000 500
+3738.436 58.743
+804
+17.8s
+
+$ cat output_nt16_ncpu4_id10
+params -1 1000 30 100000 1000
+575.878 370.663
+1203
+7.8s
+
+$ cat output_nt16_ncpu6_id3
+params -11 3500 20 500000 10
+1984.878 1625.992
+35
+3.7s
+
+$ cat output_nt16_ncpu6_id4
+params 1 5000 100 1000000 4
+3936.506 131.472
+4
+0.1s
+
+$ cat output_nt16_ncpu6_id5
+params 1 5000 100 1000000 100
+3899.787 156.291
+163
+2.0s
+
+$ cat output_nt16_ncpu6_id6
+params 1 5000 20 1000000 10
+3918.912 143.364
+19
+1.4s
+
+$ cat output_nt16_ncpu6_id8
+params 3 5000 50 1000000 300
+3819.032 25.659
+469
+9.7s
+
+$ cat output_nt16_ncpu6_id9
+params 3 5000 50 1000000 500
+3738.436 58.743
+804
+11.1s
+
+$ cat output_nt16_ncpu6_id10
+params -1 1000 30 100000 1000
+575.878 370.663
+1203
+18.1s
+
+$ cat output_nt16_ncpu8_id3
+params -11 3500 20 500000 10
+1984.878 1625.992
+35
+4.1s
+
+$ cat output_nt16_ncpu8_id4
+params 1 5000 100 1000000 4
+3936.506 131.472
+4
+0.1s
+
+$ cat output_nt16_ncpu8_id5
+params 1 5000 100 1000000 100
+3899.787 156.291
+163
+0.6s
+
+$ cat output_nt16_ncpu8_id6
+params 1 5000 20 1000000 10
+3918.912 143.364
+19
+1.1s
+
+$ cat output_nt16_ncpu8_id8
+params 3 5000 50 1000000 300
+3819.032 25.659
+469
+5.6s
+
+$ cat output_nt16_ncpu8_id9
+params 3 5000 50 1000000 500
+3738.436 58.743
+804
+9.4s
+
+$ cat output_nt16_ncpu8_id10
+params -1 1000 30 100000 1000
+575.878 370.663
+1203
+9.9s
+
+$ cat output_nt32_ncpu1_id4
+params 1 5000 100 1000000 4
+slurmstepd: error: *** JOB 45157 ON lab1p4 CANCELLED AT 2025-03-31T19:57:31 DUE TO JOB REQUEUE ***
+9.9s
+
+$ cat output_nt32_ncpu2_id4
+params 1 5000 100 1000000 4
+3936.506 131.472
+4
+0.1s
+
+$ cat output_nt32_ncpu6_id4
+params 1 5000 100 1000000 4
+3936.506 131.472
+4
+0.1s
+
+$ cat output_nt32_ncpu6_id5
+params 1 5000 100 1000000 100
+3899.787 156.291
+163
+1.0s
+
+$ cat output_nt32_ncpu6_id8
+params 3 5000 50 1000000 300
+3819.032 25.659
+469
+5.3s
+
+$ cat output_nt32_ncpu6_id9
+params 3 5000 50 1000000 500
+3738.436 58.743
+804
+7.7s
+
+$ cat output_nt32_ncpu8_id4
+params 1 5000 100 1000000 4
+3936.506 131.472
+4
+0.1s
+
+$ cat output_nt32_ncpu8_id5
+params 1 5000 100 1000000 100
+3899.787 156.291
+163
+0.3s
+
+$ cat output_nt32_ncpu8_id8
+params 3 5000 50 1000000 300
+3819.032 25.659
+469
+3.7s
+
+$ cat output_nt32_ncpu8_id9
+params 3 5000 50 1000000 500
+3738.436 58.743
+804
+12.1s
