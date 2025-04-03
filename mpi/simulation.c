@@ -159,7 +159,7 @@ void compute_centers_of_mass(double side,
   MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 4]);
   MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 6]);
 }
-#pragma omp for schedule(dynamic, 1)
+#pragma omp for
   for (long i = 0; i < NUM_OF_NEIGHBORS; i++) {
     long base, stride;
     double x_offset, y_offset;
@@ -330,7 +330,7 @@ void compute_new_particle_cell(double size, long ncside, int id,
       &buffers->particles_requests[i]);
     particles_buffer_resize(&buffers->send_particles[i], 0);
   }
-#pragma omp for schedule(dynamic, 1)
+#pragma omp for
   for(long i = 0; i < NUM_OF_NEIGHBORS; i++) {
     int neighbor = buffers->neighbors[i];
     while (!buffers->particles_flags[i]) {
