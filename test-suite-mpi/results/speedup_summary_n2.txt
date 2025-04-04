@@ -7,11 +7,6 @@ Serial time: 59.9s
 MPI time: 47.0s
 Speedup: 1.27x
 
-Test: -11 3500 20 500000 10
-Serial time: 54.0s
-MPI time: 15.9s
-Speedup: 3.40x
-
 Test: 1 5000 100 1000000 4
 Serial time: 1.4s
 MPI time: 1.2s
@@ -192,16 +187,6 @@ Serial time: 59.9s
 MPI time: 27.8s
 Speedup: 2.15x
 
-Test: -11 3500 20 500000 10
-Serial time: 54.0s
-MPI time: 16.6s
-Speedup: 3.25x
-
-Test: 1 5000 100 1000000 4
-Serial time: 1.4s
-MPI time: 0.6s
-Speedup: 2.33x
-
 Test: 1 5000 100 1000000 100
 Serial time: 33.4s
 MPI time: 15.6s
@@ -212,89 +197,12 @@ Serial time: 62.0s
 MPI time: 30.5s
 Speedup: 2.03x
 
-Test: 1 1000 3 10000 10000
-Serial time: 277.6s
-MPI time: 183.0s
-Speedup: 1.52x
-
-Test: 3 5000 50 1000000 300
-Serial time: 318.0s
-MPI time: 47.1s
-Speedup: 6.75x
-
 Configuration: 2 tasks, 2 CPUs per task
-
-Test: 12 100 5 10000 10000
-Serial time: 59.9s
-MPI time: 24.8s
-Speedup: 2.42x
 
 Test: -11 3500 20 500000 10
 Serial time: 54.0s
 MPI time: 10.5s
 Speedup: 5.14x
-
-Test: 1 5000 100 1000000 4
-Serial time: 1.4s
-MPI time: 0.4s
-Speedup: 3.50x
-
-Test: 1 5000 100 1000000 100
-Serial time: 33.4s
-MPI time: 7.9s
-Speedup: 4.23x
-
-Test: 1 5000 20 1000000 10
-Serial time: 62.0s
-MPI time: 12.2s
-Speedup: 5.08x
-
-Test: 1 1000 3 10000 10000
-Serial time: 277.6s
-MPI time: 74.7s
-Speedup: 3.72x
-
-Test: 3 5000 50 1000000 300
-Serial time: 318.0s
-MPI time: 99.8s
-Speedup: 3.19x
-
-Configuration: 2 tasks, 4 CPUs per task
-
-Test: 12 100 5 10000 10000
-Serial time: 59.9s
-MPI time: 147.7s
-Speedup: 0.41x
-
-Test: -11 3500 20 500000 10
-Serial time: 54.0s
-MPI time: 6.3s
-Speedup: 8.57x
-
-Test: 1 5000 100 1000000 4
-Serial time: 1.4s
-MPI time: 0.5s
-Speedup: 2.80x
-
-Test: 1 5000 100 1000000 100
-Serial time: 33.4s
-MPI time: 4.8s
-Speedup: 6.96x
-
-Test: 1 5000 20 1000000 10
-Serial time: 62.0s
-MPI time: 15.4s
-Speedup: 4.03x
-
-Test: 1 1000 3 10000 10000
-Serial time: 277.6s
-MPI time: 106.6s
-Speedup: 2.60x
-
-Test: 3 5000 50 1000000 300
-Serial time: 318.0s
-MPI time: 53.4s
-Speedup: 5.96x
 
 Configuration: 2 tasks, 6 CPUs per task
 
@@ -381,11 +289,6 @@ Test: -11 3500 20 500000 10
 Serial time: 54.0s
 MPI time: 13.4s
 Speedup: 4.03x
-
-Test: 1 5000 100 1000000 4
-Serial time: 1.4s
-MPI time: 0.3s
-Speedup: 4.67x
 
 Test: 1 5000 100 1000000 100
 Serial time: 33.4s
@@ -682,11 +585,6 @@ Serial time: 33.4s
 MPI time: 1.8s
 Speedup: 18.56x
 
-Test: 1 5000 20 1000000 10
-Serial time: 62.0s
-MPI time: 3.9s
-Speedup: 15.90x
-
 Configuration: 16 tasks, 2 CPUs per task
 
 Test: 1 5000 100 1000000 4
@@ -711,25 +609,10 @@ Speedup: 25.44x
 
 Configuration: 16 tasks, 4 CPUs per task
 
-Test: -11 3500 20 500000 10
-Serial time: 54.0s
-MPI time: 5.6s
-Speedup: 9.64x
-
-Test: 1 5000 100 1000000 4
-Serial time: 1.4s
-MPI time: 0.1s
-Speedup: 14.00x
-
 Test: 1 5000 100 1000000 100
 Serial time: 33.4s
 MPI time: 0.8s
 Speedup: 41.75x
-
-Test: 1 5000 20 1000000 10
-Serial time: 62.0s
-MPI time: 2.1s
-Speedup: 29.52x
 
 Configuration: 16 tasks, 6 CPUs per task
 
@@ -767,27 +650,7 @@ Speedup: 56.79x
 
 Configuration: 32 tasks, 1 CPUs per task
 
-Test: 1 5000 100 1000000 4
-Serial time: 1.4s
-MPI time: 0.0s
-Speedup: 9999999.00x
-
-Test: 1 5000 100 1000000 100
-Serial time: 33.4s
-MPI time: 1.0s
-Speedup: 33.40x
-
-Test: 3 5000 50 1000000 300
-Serial time: 318.0s
-MPI time: 11.4s
-Speedup: 27.89x
-
 Configuration: 32 tasks, 2 CPUs per task
-
-Test: 1 5000 100 1000000 4
-Serial time: 1.4s
-MPI time: 0.1s
-Speedup: 14.00x
 
 Test: 1 5000 100 1000000 100
 Serial time: 33.4s

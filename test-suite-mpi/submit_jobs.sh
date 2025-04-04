@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-# Generate and submit MPI jobs using Slurm
+# Firstly it creates all the slurm job files needed, secondly it submit the with slurm 'sbatch'
+
+#TODO: FIX readarray -t TESTS < <(grep -v '^\s*#' ../test-suite-mpi/TESTS.txt)
 TESTS=(
     "5893 0.05 3 10 10" "0.002 0.035" "2"
     "8555 0.05 3 10 10" "0.016 0.049" "1"
@@ -19,20 +21,15 @@ TESTS=(
 NTASKS=(1 2 4 8 16 32)
 CPUS_PER_TASK=(1 2 4 6 8)
 
-rm -rf results/mpi_outputs
-mkdir -p results/mpi_outputs
+rm -rf results/mpi-outputs
+rm -rf results/job-files
+mkdir -p results/mpi-outputs
 mkdir -p results/job-files
 
-#cd ../mpi || exit 1
 cd results/job-files
-#make profile || exit 1
 
 for ntasks in "${NTASKS[@]}"; do
     for cpus_per_task in "${CPUS_PER_TASK[@]}"; do
-        # number of machine used must be atmost 32
-        # if ((ntasks*cpus_per_task > 32)); then
-        #     continue
-        # fi
         for ((i=0; i<${#TESTS[@]}; i+=3)); do
             params="${TESTS[i]}"
             # If ncside < ntasks then jump the test
@@ -41,9 +38,7 @@ for ntasks in "${NTASKS[@]}"; do
                 continue
             fi
             job_name="g24" 
-            #output_file="../test-suite-mpi/results/mpi_outputs/output_nt${ntasks}_ncpu${cpus_per_task}_${i}.txt"
-            #job_script="../test-suite-mpi/results/job-files/job_nt${ntasks}_ncpu${cpus_per_task}_${i}.slurm"
-            output_file="../mpi_outputs/output_nt${ntasks}_ncpu${cpus_per_task}_${i}.txt"
+            output_file="../mpi-outputs/output_nt${ntasks}_ncpu${cpus_per_task}_${i}.txt"
             job_script="job_nt${ntasks}_ncpu${cpus_per_task}_${i}.slurm"
 
             cat <<EOF > "$job_script"
@@ -55,13 +50,24 @@ for ntasks in "${NTASKS[@]}"; do
 #SBATCH --cpus-per-task=$cpus_per_task
 #SBATCH --exclusive
 #SBATCH --exclude=lab5p[1-20]
+#SBATCH --exclude=lab0p[1-9]
 #SBATCH --ntasks-per-node=1
 srun parsim-mpi $params
 EOF
-
-            #sbatch "$job_script"
         done
     done
 done
 
-echo "All MPI jobs submitted."
+echo "All MPI jobs created."
+
+cd ../../../mpi
+make release || exit 1
+cp parsim-mpi ../test-suite-mpi/results/job-files
+cd ../test-suite-mpi/results/job-files
+
+for f in *.slurm; do
+    sbatch "$f" 
+done 
+
+echo "All MPI jobs submitted. Check status of the cluster with 'squeue'"
+echo "MPI results are saved in ./results/mpi-outputs"

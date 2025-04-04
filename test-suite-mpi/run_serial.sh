@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 
-# Run all serial tests and save their execution times
+# Run all serial tests, checks the results and save their execution times
+
 SERIAL_OUT="results/serial_results.txt"
 echo -e "========== Serial Version ==========\n" > "./$SERIAL_OUT"
 
 cd ../serial
 make profile
-
-#declare -A serial_times
 
 #TODO: FIX readarray -t TESTS < <(grep -v '^\s*#' ../test-suite-mpi/TESTS.txt)
 TESTS=(
