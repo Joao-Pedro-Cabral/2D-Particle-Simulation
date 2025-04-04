@@ -1,3 +1,0 @@
-slurmstepd: error: *** JOB 42748 ON lab1p2 CANCELLED AT 2025-03-31T12:37:59 DUE TO JOB REQUEUE ***
-srun: error: Unable to confirm allocation for job 42748: Job is pending execution
-srun: Check SLURM_JOB_ID environment variable. Expired or invalid job 42748

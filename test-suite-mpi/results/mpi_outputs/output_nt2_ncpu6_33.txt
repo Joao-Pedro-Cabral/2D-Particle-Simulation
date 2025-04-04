@@ -1,5 +1,0 @@
-srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
-slurmstepd: error: *** STEP 42652.0 ON lab6p1 CANCELLED AT 2025-03-31T13:00:07 DUE TO TIME LIMIT ***
-slurmstepd: error: *** JOB 42652 ON lab6p1 CANCELLED AT 2025-03-31T13:00:07 DUE TO TIME LIMIT ***
-srun: error: lab6p2: task 1: Terminated
-srun: error: lab6p1: task 0: Terminated

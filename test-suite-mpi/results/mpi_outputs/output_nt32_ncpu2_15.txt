@@ -1,1 +1,0 @@
-slurmstepd: error: *** JOB 42673 ON lab1p2 CANCELLED AT 2025-03-31T12:30:28 DUE TO JOB REQUEUE ***
