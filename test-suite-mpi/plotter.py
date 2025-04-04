@@ -139,25 +139,157 @@ def plot_fixed_tasks(data, test_params, fixed_ntasks):
     plt.xticks(rotation=45, ha="right")
     plt.grid(True)
     plt.tight_layout()
-    plt.legend()
     plt.savefig(f"results/plots/execution_time_{test_params.replace(' ', '_')}_ntasks_{fixed_ntasks}.png")
     plt.show()
 
+def plot_fixed_cpus(data, test_params, fixed_cpus):
+    """Plot execution time trend for a specific test with fixed CPUs per task while varying number of tasks."""
+    plt.figure(figsize=(10, 6))
+    
+    # Ensure the fixed_cpus is valid
+    if fixed_cpus not in CPUS_PER_TASK:
+        print(f"Invalid number of CPUs per task: {fixed_cpus}. Valid options are: {CPUS_PER_TASK}")
+        return
+
+    # Check if the test exists in the data
+    if test_params not in data:
+        print(f"Test '{test_params}' not found in the data.")
+        return
+
+    # Filter configurations for the specific test and fixed CPUs per task
+    configs = {
+        (ntasks, ncpu): times
+        for (ntasks, ncpu), times in data[test_params].items()
+        if ncpu == fixed_cpus
+    }
+    
+    if not configs:
+        print(f"No data found for test '{test_params}' with {fixed_cpus} CPUs per task.")
+        return
+
+    # Sort configurations by number of tasks
+    configs_sorted = sorted(configs.items(), key=lambda x: x[0][0])  # Sort by ntasks
+    x_labels = []
+    y_values = []
+
+    # Iterate over NTASKS and check if data exists
+    for ntasks in NTASKS:
+        if (ntasks, fixed_cpus) in configs:
+            x_labels.append(f"{ntasks} tasks")
+            y_values.append(configs[(ntasks, fixed_cpus)][0])  # Extract the first MPI time
+        else:
+            print(f"Skipping missing configuration: {ntasks} tasks, {fixed_cpus} CPUs")
+
+    if not x_labels:
+        print(f"No valid configurations found for test '{test_params}' with {fixed_cpus} CPUs per task.")
+        return
+
+    # Plot the trend
+    plt.plot(x_labels, y_values, marker='o', label=f"Test: {test_params}, {fixed_cpus} CPUs/task")
+    plt.xlabel("Number of Tasks")
+    plt.ylabel("Execution Time (s)")
+    plt.title(f"Execution Time Trend for Test: '{test_params}' with {fixed_cpus} CPUs per Task")
+    plt.xticks(rotation=45, ha="right")
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig(f"results/plots/execution_time_{test_params.replace(' ', '_')}_cpus_{fixed_cpus}.png")
+    plt.show()
+
+def get_serial_outputs():
+    SERIAL_OUTPUT = {}
+    with open('results/serial_results.txt') as serial_file:
+        for line in serial_file:
+            if line.startswith('$ ./parsim'):
+                test_params = ' '.join(line.split()[2:])
+                SERIAL_OUTPUT[test_params] = ['', '', 0.0]  # Initialize with proper types
+                coords = serial_file.readline().strip()
+                collisions = serial_file.readline().strip()
+                exec_time = serial_file.readline().strip()
+                SERIAL_OUTPUT[test_params][0] = coords 
+                SERIAL_OUTPUT[test_params][1] = collisions
+                # Remove 's' and convert to float
+                SERIAL_OUTPUT[test_params][2] = float(exec_time.rstrip('s'))
+    return SERIAL_OUTPUT
+
+def plot_speedup_fixed_tasks(data, serial_data, test_params, fixed_ntasks):
+    """Plot speedup trend for a specific test with fixed number of tasks while varying CPUs per task."""
+    plt.figure(figsize=(10, 6))
+    
+    # Ensure the fixed_ntasks is valid
+    if fixed_ntasks not in NTASKS:
+        print(f"Invalid number of tasks: {fixed_ntasks}. Valid options are: {NTASKS}")
+        return
+
+    # Check if the test exists in both MPI and serial data
+    if test_params not in data or test_params not in serial_data:
+        print(f"Test '{test_params}' not found in the data.")
+        return
+
+    # Get serial execution time for this test
+    serial_time = serial_data[test_params][2]  # Index 2 contains execution time
+    
+    # Filter configurations for the specific test and fixed number of tasks
+    configs = {
+        (ntasks, ncpu): times
+        for (ntasks, ncpu), times in data[test_params].items()
+        if ntasks == fixed_ntasks
+    }
+    
+    if not configs:
+        print(f"No data found for test '{test_params}' with {fixed_ntasks} tasks.")
+        return
+
+    # Sort configurations by number of CPUs per task
+    configs_sorted = sorted(configs.items(), key=lambda x: x[0][1])  # Sort by ncpu
+    x_labels = []
+    speedup_values = []
+
+    # Iterate over CPUS_PER_TASK and check if data exists
+    for ncpu in CPUS_PER_TASK:
+        if (fixed_ntasks, ncpu) in configs:
+            x_labels.append(f"{ncpu} CPUs")
+            mpi_time = configs[(fixed_ntasks, ncpu)][0]  # Extract the first MPI time
+            speedup = serial_time / mpi_time if mpi_time > 0 else 0
+            speedup_values.append(speedup)
+        else:
+            print(f"Skipping missing configuration: {fixed_ntasks} tasks, {ncpu} CPUs")
+
+    if not x_labels:
+        print(f"No valid configurations found for test '{test_params}' with {fixed_ntasks} tasks.")
+        return
+
+    # Plot the trend
+    plt.plot(x_labels, speedup_values, marker='o', label=f"Test: {test_params}, {fixed_ntasks} tasks")
+    plt.xlabel("CPUs per Task")
+    plt.ylabel("Speedup (Serial Time / MPI Time)")
+    plt.title(f"Speedup for Test: '{test_params}' with {fixed_ntasks} Tasks")
+    plt.xticks(rotation=45, ha="right")
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig(f"results/plots/speedup_{test_params.replace(' ', '_')}_ntasks_{fixed_ntasks}.png")
+    plt.show()
+
 def main():
-    # Parse the speedup summary file
     file_path = "results/speedup_summary.txt"
     data = parse_speedup_summary(file_path)
+    serial_data = get_serial_outputs()
 
     # Dynamically select tests based on the TESTS dictionary
     selected_tests = {key for key in TESTS.keys() if not key.startswith('#')}  # Exclude commented-out tests
 
-    # Create a combined plot for execution time trends
-    plot_execution_time_combined(data, selected_tests)
+    # Create a combined plot for Execution Time trends
+    #plot_execution_time_combined(data, selected_tests)
 
-    # Plot the trend for a specific test with a fixed number of tasks
+    # Plot the Execution Time trend for a specific test with a fixed number of tasks
+    specific_test = '1 5000 100 1000000 100'  # Change this to the test you want
+    fixed_ntasks = 1  # Changed to a valid number of tasks (can be 1, 2, 4, 8, 16, or 32)
+    #plot_fixed_tasks(data, specific_test, fixed_ntasks)
+    plot_speedup_fixed_tasks(data, serial_data, specific_test, fixed_ntasks)
+
+    # Plot the Execution Time trend with fixed CPUs per task
     specific_test = '3 5000 50 1000000 500'  # Change this to the test you want
-    fixed_ntasks = 2  # Changed to a valid number of tasks (can be 1, 2, 4, 8, 16, or 32)
-    plot_fixed_tasks(data, specific_test, fixed_ntasks)
+    fixed_cpus = 1  # Choose from CPUS_PER_TASK=[1, 2, 4, 6, 8]
+    #plot_fixed_cpus(data, specific_test, fixed_cpus)
 
 if __name__ == "__main__":
     main()
