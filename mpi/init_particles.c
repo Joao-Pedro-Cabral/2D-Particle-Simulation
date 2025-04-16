@@ -1,7 +1,7 @@
 
 #include "init_particles.h"
-#include "nodes.h"
 #include "debug.h"
+#include "nodes.h"
 #include <math.h>
 
 unsigned int seed;
@@ -25,7 +25,7 @@ double rnd_normal01() {
 }
 
 void init_particles(long seed, double side, long ncside, long long n_part,
-                    particles_buffer_t *par, communication_buffers_t * buffers) {
+                    particles_buffer_t *par, communication_buffers_t *buffers) {
   double (*rnd01)() = rnd_uniform01;
   long long i;
 
@@ -47,9 +47,9 @@ void init_particles(long seed, double side, long ncside, long long n_part,
     y = y * side;
     long xpart = x / size;
     long ypart = y / size;
-    int col = (buffers->dims[1]*(xpart+1)-1) / ncside;
-    int row = (buffers->dims[0]*(ypart+1)-1) / ncside;
-    if(buffers->coords[0] == row && buffers->coords[1] == col) {
+    int col = (buffers->dims[1] * (xpart + 1) - 1) / ncside;
+    int row = (buffers->dims[0] * (ypart + 1) - 1) / ncside;
+    if (buffers->coords[0] == row && buffers->coords[1] == col) {
       vx = (vx - 0.5) * side / ncside / 5.0;
       vy = (vy - 0.5) * side / ncside / 5.0;
       m = m * 0.01 * (ncside * ncside) / n_part / G * EPSILON2;

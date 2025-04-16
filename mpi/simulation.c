@@ -12,8 +12,8 @@
 static long long ncollisions = 0;
 
 void init_block(double size, long ncside, long long npart, int id,
-                 particles_buffer_t *par, cell_t *cells,
-                 communication_buffers_t *buffers) {
+                particles_buffer_t *par, cell_t *cells,
+                communication_buffers_t *buffers) {
   long long *count = malloc(sizeof(long long) * buffers->size);
   for (long i = 0; i < buffers->size; i++) {
     count[i] = 0;
@@ -28,7 +28,8 @@ void init_block(double size, long ncside, long long npart, int id,
     long long capacity =
         count[i] > npart ? npart : (count[i] > min_size ? count[i] : min_size);
     cell_init(&cells[i], capacity,
-              ((i % buffers->lens[1]) + 1) + ((i / buffers->lens[1]) + 1) * (buffers->lens[1] + 2));
+              ((i % buffers->lens[1]) + 1) +
+                  ((i / buffers->lens[1]) + 1) * (buffers->lens[1] + 2));
   }
   for (long long i = 0; i < par->size; i++) {
     long cell = find_cell_p(buffers, &par->particles[i], size);
@@ -39,7 +40,8 @@ void init_block(double size, long ncside, long long npart, int id,
   communication_buffers_init(buffers, ncside, id, npart);
 }
 
-void clean_blocks(cell_t *cells, center_t *centers, communication_buffers_t *buffers) {
+void clean_blocks(cell_t *cells, center_t *centers,
+                  communication_buffers_t *buffers) {
   for (long i = 0; i < buffers->size; i++) {
     cell_clean(&cells[i]);
   }
@@ -74,8 +76,7 @@ static inline double sum_lanes(__m256d vec) {
   return ((double *)&vec)[0] + ((double *)&vec)[2];
 }
 
-void compute_centers_of_mass(double side,
-                             cell_t *cells, center_t *centers,
+void compute_centers_of_mass(double side, cell_t *cells, center_t *centers,
                              communication_buffers_t *buffers,
                              long chunk_size) {
 
@@ -124,7 +125,7 @@ void compute_centers_of_mass(double side,
 
       if (ix == 0) {
         copy_center(&buffers->send_centers[3][iy], &centers[ind]);
-        if(iy == 0) {
+        if (iy == 0) {
           copy_center(&buffers->send_centers[0][0], &centers[ind]);
           MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 0]);
         }
@@ -135,7 +136,7 @@ void compute_centers_of_mass(double side,
       }
       if (ix == buffers->lens[1] - 1) {
         copy_center(&buffers->send_centers[4][iy], &centers[ind]);
-        if(iy == 0) {
+        if (iy == 0) {
           copy_center(&buffers->send_centers[2][0], &centers[ind]);
           MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 2]);
         }
@@ -144,7 +145,7 @@ void compute_centers_of_mass(double side,
           MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 7]);
         }
       }
-      if(iy == 0) {
+      if (iy == 0) {
         copy_center(&buffers->send_centers[1][ix], &centers[ind]);
       }
       if (iy == buffers->lens[0] - 1) {
@@ -153,12 +154,12 @@ void compute_centers_of_mass(double side,
     }
   }
 #pragma omp single nowait
-{
-  MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 1]);
-  MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 3]);
-  MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 4]);
-  MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 6]);
-}
+  {
+    MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 1]);
+    MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 3]);
+    MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 4]);
+    MPI_Start(&buffers->centers_requests[NUM_OF_NEIGHBORS + 6]);
+  }
 #pragma omp for
   for (long i = 0; i < NUM_OF_NEIGHBORS; i++) {
     long base, stride;
@@ -189,33 +190,33 @@ void compute_centers_of_mass(double side,
       y_offset = 0;
       break;
     case 4:
-      base = 2*buffers->lens[1] + 3;
+      base = 2 * buffers->lens[1] + 3;
       stride = buffers->lens[1] + 2;
       x_offset = (buffers->coords[1] == buffers->dims[1] - 1) ? side : 0;
       y_offset = 0;
       break;
     case 5:
-      base = (buffers->lens[0] + 1)*(buffers->lens[1] + 2);
+      base = (buffers->lens[0] + 1) * (buffers->lens[1] + 2);
       stride = 0;
       x_offset = (buffers->coords[1] == 0) ? -side : 0;
       y_offset = (buffers->coords[0] == buffers->dims[0] - 1) ? side : 0;
       break;
     case 6:
-      base = (buffers->lens[0] + 1)*(buffers->lens[1] + 2) + 1;
+      base = (buffers->lens[0] + 1) * (buffers->lens[1] + 2) + 1;
       stride = 1;
       x_offset = 0;
       y_offset = (buffers->coords[0] == buffers->dims[0] - 1) ? side : 0;
       break;
     default: // 7
-      base = (buffers->lens[0] + 2)*(buffers->lens[1] + 2) - 1;
+      base = (buffers->lens[0] + 2) * (buffers->lens[1] + 2) - 1;
       stride = 0;
       x_offset = (buffers->coords[1] == buffers->dims[1] - 1) ? side : 0;
       y_offset = (buffers->coords[0] == buffers->dims[0] - 1) ? side : 0;
       break;
     }
     MPI_Wait(&buffers->centers_requests[i], MPI_STATUS_IGNORE);
-    for(long j = 0; j < buffers->centers_lens[i]; j++) {
-      long ind = base + j*stride;
+    for (long j = 0; j < buffers->centers_lens[i]; j++) {
+      long ind = base + j * stride;
       centers[ind].x = buffers->recv_centers[i][j].x + x_offset;
       centers[ind].y = buffers->recv_centers[i][j].y + y_offset;
       centers[ind].m = buffers->recv_centers[i][j].m;
@@ -224,9 +225,8 @@ void compute_centers_of_mass(double side,
   }
 }
 
-void compute_kinetics(double side, cell_t *cells,
-                      center_t *centers, const communication_buffers_t *buffers,
-                      long chunk_size) {
+void compute_kinetics(double side, cell_t *cells, center_t *centers,
+                      const communication_buffers_t *buffers, long chunk_size) {
 
 #pragma omp for schedule(dynamic, chunk_size)
   for (long i = 0; i < buffers->size; i++) {
@@ -285,7 +285,8 @@ void compute_kinetics(double side, cell_t *cells,
       for (long long k = 0; k < 9; k++) {
         if (k == 4)
           continue;
-        long ind = cells[i].center + ((k % 3) - 1) + (k / 3 - 1) * (buffers->lens[1] + 2);
+        long ind = cells[i].center + ((k % 3) - 1) +
+                   (k / 3 - 1) * (buffers->lens[1] + 2);
         gravitational_force_pc(&cells[i], j, &centers[ind]);
       }
       cells[i].ax[j] /= cells[i].m[j];
@@ -295,8 +296,8 @@ void compute_kinetics(double side, cell_t *cells,
   }
 }
 
-void compute_new_particle_cell(double size, long ncside, int id,
-                               cell_t *cells, communication_buffers_t *buffers,
+void compute_new_particle_cell(double size, long ncside, int id, cell_t *cells,
+                               communication_buffers_t *buffers,
                                long chunk_size) {
 #pragma omp for schedule(dynamic, chunk_size)
   for (long i = 0; i < buffers->size; i++) {
@@ -307,7 +308,7 @@ void compute_new_particle_cell(double size, long ncside, int id,
       int owner = find_owner_c(buffers, &cells[i], j, size, ncside);
       if (owner == id) {
         long ind = find_cell_c(buffers, &cells[i], j, size);
-        if(ind == i)
+        if (ind == i)
           continue;
         omp_set_lock(&cells[ind].lock);
         cell_push_back_c(&cells[ind], &cells[i], j);
@@ -322,16 +323,16 @@ void compute_new_particle_cell(double size, long ncside, int id,
     }
   }
 #pragma omp for nowait
-  for(long i = 0; i < NUM_OF_NEIGHBORS; i++) {
+  for (long i = 0; i < NUM_OF_NEIGHBORS; i++) {
     int neighbor = buffers->neighbors[i];
     MPI_Isend(buffers->send_particles[i].particles,
-      buffers->send_particles[i].size * sizeof(particle_t), MPI_BYTE,
-      neighbor, TAG_PARTICLE + NUM_OF_NEIGHBORS - i - 1, buffers->cart_comm,
-      &buffers->particles_requests[i]);
+              buffers->send_particles[i].size * sizeof(particle_t), MPI_BYTE,
+              neighbor, TAG_PARTICLE + NUM_OF_NEIGHBORS - i - 1,
+              buffers->cart_comm, &buffers->particles_requests[i]);
     particles_buffer_resize(&buffers->send_particles[i], 0);
   }
 #pragma omp for
-  for(long i = 0; i < NUM_OF_NEIGHBORS; i++) {
+  for (long i = 0; i < NUM_OF_NEIGHBORS; i++) {
     int neighbor = buffers->neighbors[i];
     while (!buffers->particles_flags[i]) {
       MPI_Iprobe(neighbor, TAG_PARTICLE + i, buffers->cart_comm,
@@ -340,23 +341,31 @@ void compute_new_particle_cell(double size, long ncside, int id,
     buffers->particles_flags[i] = 0;
     int bytes;
     MPI_Get_count(&buffers->particles_status[i], MPI_BYTE, &bytes);
-    particles_buffer_resize(&buffers->recv_particles[i], bytes / sizeof(particle_t));
-    MPI_Recv(buffers->recv_particles[i].particles, bytes, MPI_BYTE,
-            neighbor, TAG_PARTICLE + i, buffers->cart_comm,
-            &buffers->particles_status[i]);
+    particles_buffer_resize(&buffers->recv_particles[i],
+                            bytes / sizeof(particle_t));
+    MPI_Recv(buffers->recv_particles[i].particles, bytes, MPI_BYTE, neighbor,
+             TAG_PARTICLE + i, buffers->cart_comm,
+             &buffers->particles_status[i]);
     for (long long j = 0; j < buffers->recv_particles[i].size; j++) {
-      long ind = find_cell_p(buffers, &buffers->recv_particles[i].particles[j], size);
-      if(ind == 0 || ind == (buffers->lens[1] - 1) || ind == ((buffers->lens[0] - 1)*buffers->lens[1]) || ind == (buffers->size - 1))
+      long ind =
+          find_cell_p(buffers, &buffers->recv_particles[i].particles[j], size);
+      if (ind == 0 || ind == (buffers->lens[1] - 1) ||
+          ind == ((buffers->lens[0] - 1) * buffers->lens[1]) ||
+          ind == (buffers->size - 1))
         omp_set_lock(&cells[ind].lock);
       cell_push_back_p(&cells[ind], &buffers->recv_particles[i].particles[j]);
-      if(ind == 0 || ind == (buffers->lens[1] - 1) || ind == ((buffers->lens[0] - 1)*buffers->lens[1]) || ind == (buffers->size - 1))
+      if (ind == 0 || ind == (buffers->lens[1] - 1) ||
+          ind == ((buffers->lens[0] - 1) * buffers->lens[1]) ||
+          ind == (buffers->size - 1))
         omp_unset_lock(&cells[ind].lock);
     }
   }
 #pragma omp single nowait
   {
-  MPI_Waitall(NUM_OF_NEIGHBORS, &buffers->centers_requests[NUM_OF_NEIGHBORS], MPI_STATUSES_IGNORE);
-  MPI_Waitall(NUM_OF_NEIGHBORS, &buffers->particles_requests[0], MPI_STATUSES_IGNORE);
+    MPI_Waitall(NUM_OF_NEIGHBORS, &buffers->centers_requests[NUM_OF_NEIGHBORS],
+                MPI_STATUSES_IGNORE);
+    MPI_Waitall(NUM_OF_NEIGHBORS, &buffers->particles_requests[0],
+                MPI_STATUSES_IGNORE);
   }
 }
 
@@ -443,8 +452,9 @@ particle_t find_particle_zero(long id, long size, cell_t *cells) {
         par0.vy = cells[i].vy[j];
         par0.m = cells[i].m[j];
         par0.ind = 0;
-        if(id != 0) {
-          MPI_Send(&par0, sizeof(particle_t), MPI_BYTE, 0, TAG_PARTICLE_ZERO, MPI_COMM_WORLD);
+        if (id != 0) {
+          MPI_Send(&par0, sizeof(particle_t), MPI_BYTE, 0, TAG_PARTICLE_ZERO,
+                   MPI_COMM_WORLD);
         }
         return par0;
       }
@@ -461,14 +471,15 @@ particle_t find_particle_zero(long id, long size, cell_t *cells) {
 
 simulation_result simulation(double side, long ncside, long long npart, int id,
                              long long nstep, particles_buffer_t *par,
-                             communication_buffers_t* buffers) {
+                             communication_buffers_t *buffers) {
   double size = side / ncside;
   cell_t *cells = malloc(sizeof(cell_t) * buffers->size);
-  center_t *centers = malloc(sizeof(center_t) * ((buffers->lens[0] + 2)*(buffers->lens[1] + 2)));
+  center_t *centers = malloc(sizeof(center_t) *
+                             ((buffers->lens[0] + 2) * (buffers->lens[1] + 2)));
   simulation_result res;
   init_block(size, ncside, npart, id, par, cells, buffers);
-  long chunk_size = (buffers->size >= 4*omp_get_max_threads()) ? 2 : 1;
-  #pragma omp parallel
+  long chunk_size = (buffers->size >= 4 * omp_get_max_threads()) ? 2 : 1;
+#pragma omp parallel
   for (long long i = 0; i < nstep; i++) {
     DEBUG("--------STEP %d: %lld --------------\n", id, i);
     compute_centers_of_mass(side, cells, centers, buffers, chunk_size);
@@ -476,10 +487,12 @@ simulation_result simulation(double side, long ncside, long long npart, int id,
     compute_new_particle_cell(size, ncside, id, cells, buffers, chunk_size);
     detect_collisions(buffers->size, cells, chunk_size);
   }
-  MPI_Reduce(&ncollisions, &res.number_of_collisions, 1, MPI_LONG_LONG_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+  MPI_Reduce(&ncollisions, &res.number_of_collisions, 1, MPI_LONG_LONG_INT,
+             MPI_SUM, 0, MPI_COMM_WORLD);
   res.particle_zero = find_particle_zero(id, buffers->size, cells);
-  if(id == 0 && res.particle_zero.ind == -1) {
-    MPI_Recv(&res.particle_zero, sizeof(particle_t), MPI_BYTE, MPI_ANY_SOURCE, TAG_PARTICLE_ZERO, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+  if (id == 0 && res.particle_zero.ind == -1) {
+    MPI_Recv(&res.particle_zero, sizeof(particle_t), MPI_BYTE, MPI_ANY_SOURCE,
+             TAG_PARTICLE_ZERO, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
   }
   clean_blocks(cells, centers, buffers);
   return res;

@@ -2,9 +2,9 @@
 #ifndef __SIMULATION_H
 #define __SIMULATION_H
 
+#include "communication_buffers.h"
 #include "particles.h"
 #include "particles_buffer.h"
-#include "communication_buffers.h"
 
 typedef struct {
   particle_t particle_zero;
@@ -13,6 +13,6 @@ typedef struct {
 
 simulation_result simulation(double side, long ncside, long long npart, int id,
                              long long nstep, particles_buffer_t *par,
-                             communication_buffers_t* buffers);
+                             communication_buffers_t *buffers);
 
 #endif // __SIMULATION_H

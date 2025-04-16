@@ -155,7 +155,7 @@ void gravitational_force_pc(cell_t *cell, long long i, center_t *center) {
   cell->ay[i] += force_y;
 }
 
-void copy_center(center_t * center1, const center_t * center2) {
+void copy_center(center_t *center1, const center_t *center2) {
   center1->x = center2->x;
   center1->y = center2->y;
   center1->m = center2->m;

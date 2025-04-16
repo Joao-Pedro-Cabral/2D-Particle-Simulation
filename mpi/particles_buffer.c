@@ -17,8 +17,8 @@ void particles_buffer_resize(particles_buffer_t *buffer, long long size) {
   }
 }
 
-void particles_buffer_add_p(particles_buffer_t *buffer, double x,
-        double y, double vx, double vy, double m, long long ind) {
+void particles_buffer_add_p(particles_buffer_t *buffer, double x, double y,
+                            double vx, double vy, double m, long long ind) {
   buffer->particles[buffer->size].x = x;
   buffer->particles[buffer->size].y = y;
   buffer->particles[buffer->size].vx = vx;
@@ -30,7 +30,7 @@ void particles_buffer_add_p(particles_buffer_t *buffer, double x,
 }
 
 void particles_buffer_add_c(particles_buffer_t *buffer, cell_t *cell,
-                          long long i) {
+                            long long i) {
   buffer->particles[buffer->size].x = cell->x[i];
   buffer->particles[buffer->size].y = cell->y[i];
   buffer->particles[buffer->size].vx = cell->vx[i];

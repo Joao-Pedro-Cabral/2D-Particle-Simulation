@@ -1,10 +1,10 @@
+#include "communication_buffers.h"
 #include "debug.h"
 #include "init_particles.h"
 #include "nodes.h"
+#include "particles_buffer.h"
 #include "simulation.h"
 #include "utils.h"
-#include "particles_buffer.h"
-#include "communication_buffers.h"
 #include <mpi.h>
 #include <omp.h>
 #include <stdio.h>
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
 
   int provided;
   MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
-  if(provided != MPI_THREAD_MULTIPLE) {
+  if (provided != MPI_THREAD_MULTIPLE) {
     ERROR("MPI THREAD MULTIPLE NOT SUPPORTED!\n");
   }
 
@@ -61,14 +61,15 @@ int main(int argc, char *argv[]) {
   communication_buffers_create_world(&buffers, ncside, id, p);
 
   particles_buffer_t par;
-  particles_buffer_init(&par, npart/p);
+  particles_buffer_init(&par, npart / p);
 
   double exec_time;
   init_particles(seed, side, ncside, npart, &par, &buffers);
   exec_time = -omp_get_wtime();
-  simulation_result res = simulation(side, ncside, npart, id, nstep, &par, &buffers);
+  simulation_result res =
+      simulation(side, ncside, npart, id, nstep, &par, &buffers);
   exec_time += omp_get_wtime();
-  if(id == 0) {
+  if (id == 0) {
     print_result(res);
     fprintf(stderr, "%.1fs\n", exec_time);
   }
